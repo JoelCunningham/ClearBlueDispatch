@@ -1,0 +1,382 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.delivery",
+    "label": "Create table \"delivery\"",
+    "summary": "Creates table \"delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"delivery\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"delivery\"",
+        "sql": "CREATE TABLE \"public\".\"delivery\" (\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text NOT NULL,\n  \"routeId\" int4 NOT NULL,\n  \"tankDetails\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"delivery\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.route",
+    "label": "Create table \"route\"",
+    "summary": "Creates table \"route\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "route"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"route\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"route\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"route\"",
+        "sql": "CREATE TABLE \"public\".\"route\" (\n  \"assignedUserId\" int4 NOT NULL,\n  \"date\" date NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"route\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"route\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.user",
+    "label": "Create table \"user\"",
+    "summary": "Creates table \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"user\"",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"role\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_0e203bb4\" CHECK (\"role\" IN ('DRIVER', 'MANAGER'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.route.route_assignedUserId_date_key",
+    "label": "Add unique constraint on \"route\" (assignedUserId, date)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "route_assignedUserId_date_key",
+        "table": "route"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"route_assignedUserId_date_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "route_assignedUserId_date_key",
+          "public",
+          "\"public\".\"route\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"route_assignedUserId_date_key\"",
+        "sql": "ALTER TABLE \"public\".\"route\" ADD CONSTRAINT \"route_assignedUserId_date_key\" UNIQUE (\"assignedUserId\", \"date\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"route_assignedUserId_date_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "route_assignedUserId_date_key",
+          "public",
+          "\"public\".\"route\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.user.user_email_key",
+    "label": "Add unique constraint on \"user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_email_key",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.delivery.delivery_routeId_idx_91ae2fd6",
+    "label": "Create index \"delivery_routeId_idx_91ae2fd6\" on \"delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "delivery_routeId_idx_91ae2fd6",
+        "table": "delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"delivery_routeId_idx_91ae2fd6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"delivery_routeId_idx_91ae2fd6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"delivery_routeId_idx_91ae2fd6\"",
+        "sql": "CREATE INDEX \"delivery_routeId_idx_91ae2fd6\" ON \"public\".\"delivery\" (\"routeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"delivery_routeId_idx_91ae2fd6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"delivery_routeId_idx_91ae2fd6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.route.route_assignedUserId_idx_d0c6c9aa",
+    "label": "Create index \"route_assignedUserId_idx_d0c6c9aa\" on \"route\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "route_assignedUserId_idx_d0c6c9aa",
+        "table": "route"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"route_assignedUserId_idx_d0c6c9aa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"route_assignedUserId_idx_d0c6c9aa\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"route_assignedUserId_idx_d0c6c9aa\"",
+        "sql": "CREATE INDEX \"route_assignedUserId_idx_d0c6c9aa\" ON \"public\".\"route\" (\"assignedUserId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"route_assignedUserId_idx_d0c6c9aa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"route_assignedUserId_idx_d0c6c9aa\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.delivery.delivery_routeId_fkey",
+    "label": "Add foreign key \"delivery_routeId_fkey\" on \"delivery\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "delivery_routeId_fkey",
+        "table": "delivery"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"delivery_routeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "delivery_routeId_fkey",
+          "public",
+          "\"public\".\"delivery\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"delivery_routeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"delivery\"\nADD CONSTRAINT \"delivery_routeId_fkey\"\nFOREIGN KEY (\"routeId\")\nREFERENCES \"public\".\"route\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"delivery_routeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "delivery_routeId_fkey",
+          "public",
+          "\"public\".\"delivery\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.route.route_assignedUserId_fkey",
+    "label": "Add foreign key \"route_assignedUserId_fkey\" on \"route\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "route_assignedUserId_fkey",
+        "table": "route"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"route_assignedUserId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "route_assignedUserId_fkey",
+          "public",
+          "\"public\".\"route\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"route_assignedUserId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"route\"\nADD CONSTRAINT \"route_assignedUserId_fkey\"\nFOREIGN KEY (\"assignedUserId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"route_assignedUserId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "route_assignedUserId_fkey",
+          "public",
+          "\"public\".\"route\""
+        ]
+      }
+    ]
+  }
+]
