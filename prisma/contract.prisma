@@ -1,35 +1,104 @@
-// use prisma-8
-
 enum UserRole {
   DRIVER
   MANAGER
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
+  id Int @id @default(autoincrement())
+
+  email        String   @unique
   name         String
   role         UserRole
   passwordHash String
-  routes       Route[]
-  createdAt    TimestamptzString @default(now())
-  updatedAt    temporal.updatedAtString()
+
+  routes Route[]
+
+  createdAt TimestamptzString @default(now())
+  updatedAt TimestamptzString @default(now())
 }
 
 model Route {
-  id           Int        @id @default(autoincrement())
-  assignedUser User       @relation(fields: [assignedUserId], references: [id])
+  id Int @id @default(autoincrement())
+
+  assignedUser   User       @relation(fields: [assignedUserId], references: [id])
   assignedUserId Int
-  date         DateString
-  deliveries   Delivery[]
+  date           DateString
+
+  deliveries Delivery[]
 
   @@unique([assignedUserId, date])
 }
 
 model Delivery {
-  id      Int   @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
   route   Route @relation(fields: [routeId], references: [id])
   routeId Int
+
+  docket Docket?
+
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId Int
+
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId Int?
+
+  position    Int
+  notes       String
   tankDetails String
-  notes String
+}
+
+model Docket {
+  id Int @id @default(autoincrement())
+
+  volume      Int
+  batchNumber String
+
+  repName      String
+  repSignature String
+
+  delivery   Delivery @relation(fields: [deliveryId], references: [id])
+  deliveryId Int      @unique
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+
+  address String
+
+  deliveries Delivery[]
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+
+  name String
+  rate Float
+
+  locations     Location[]
+  contacts      Contact[]
+  invoiceEmails InvoiceEmail[]
+}
+
+model Contact {
+  id Int @id @default(autoincrement())
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+
+  name        String
+  phoneNumber String
+
+  deliveries Delivery[]
+}
+
+model InvoiceEmail {
+  id Int @id @default(autoincrement())
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+
+  emailAddress String
 }
