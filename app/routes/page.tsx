@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { requireUser } from "@/lib/auth/require-user";
+import { UserFilter } from "@/features/routes/components/user-filter";
 import { getRoutes, getUsers } from "@/features/routes/queries";
-import { UserFilter } from "./components/user-filter";
+import { requireUser } from "@/lib/auth/require-user";
 
 type RoutesPageProps = {
   searchParams: Promise<{ assignedUserId?: string; }>;
@@ -19,7 +19,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
   const params = await searchParams;
 
   const assignedUserId = params.assignedUserId ? Number(params.assignedUserId) : undefined;
-  
+
   const routes = await getRoutes({
     fromDate: getToday(),
     assignedUserId: user.role === "MANAGER" && Number.isInteger(assignedUserId) ? assignedUserId : undefined,
@@ -35,9 +35,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
         </h1>
 
         <p className="text-sm text-muted-foreground">
-          {user.role === "MANAGER"
-            ? "View upcoming delivery routes."
-            : "Your upcoming delivery routes."}
+          {user.role === "MANAGER" ? "View upcoming delivery routes." : "Your upcoming delivery routes."}
         </p>
       </div>
 
@@ -64,9 +62,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-medium">
-                    {new Date(
-                      `${route.date}T00:00:00`,
-                    ).toLocaleDateString(
+                    {new Date(`${route.date}T00:00:00`,).toLocaleDateString(
                       "en-AU",
                       {
                         weekday: "long",

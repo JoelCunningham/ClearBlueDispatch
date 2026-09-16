@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { reorderDeliveries } from "@/features/routes/actions";
 
@@ -28,12 +28,7 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
   const [deliveries, setDeliveries] = useState(initialDeliveries);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    console.log("DeliveryList hydrated");
-  }, []);
-
   function moveDelivery(index: number, direction: -1 | 1) {
-    console.log("moveDelivery", index, direction);
     const newIndex = index + direction;
 
     if (newIndex < 0 || newIndex >= deliveries.length || isPending) return;

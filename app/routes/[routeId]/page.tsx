@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DeliveryList } from "@/features/routes/components/delivery-list";
 import { getRoute } from "@/features/routes/queries";
-import { DeliveryList } from "../components/delivery-list";
-import { HydrationTest } from "../components/hydration-test";
 
 type RoutePageProps = {
   params: Promise<{ routeId: string }>;
@@ -28,7 +27,6 @@ export default async function RoutePage({ params }: RoutePageProps) {
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-24">
-      <HydrationTest />
       <div className="mb-6 space-y-2">
         <Link
           href="/routes"

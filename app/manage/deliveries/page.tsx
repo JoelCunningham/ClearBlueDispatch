@@ -1,6 +1,6 @@
 import { createDelivery } from "@/features/deliveries/actions";
+import { CreateDeliveryForm } from "@/features/deliveries/components/create-delivery-form";
 import { getAssignableUsers, getDeliveryContacts, getDeliveryLocations } from "@/features/deliveries/queries";
-import { CreateDeliveryForm } from "./components/create-delivery-form";
 
 export default async function ManageDeliveriesPage() {
   const [users, locations, contacts] = await Promise.all([getAssignableUsers(), getDeliveryLocations(), getDeliveryContacts()]);
