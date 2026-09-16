@@ -23,7 +23,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(delivery.location.address)}`;
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-24">
+    <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-6">
       <div className="mb-6 space-y-2">
         <Link href={`/routes/${routeIdNumber}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← Route
@@ -52,9 +52,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
         <section className="rounded-lg border p-4">
           <h2 className="mb-2 font-semibold">Tank details</h2>
 
-          <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-            {delivery.tankDetails || "No tank details."}
-          </p>
+          <p className="whitespace-pre-wrap text-sm text-muted-foreground">{delivery.tankDetails || "No tank details."}</p>
         </section>
 
         <section className="rounded-lg border p-4">
@@ -87,6 +85,41 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
               </a>
             </div>
           </section>
+        )}
+
+        {delivery.docket ? (
+          <section className="rounded-lg border p-4">
+            <h2 className="mb-3 font-semibold">Docket</h2>
+
+            <dl className="space-y-2 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Volume</dt>
+                <dd>{delivery.docket.volume}</dd>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Batch number</dt>
+                <dd>{delivery.docket.batchNumber}</dd>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Representative</dt>
+                <dd>{delivery.docket.repName}</dd>
+              </div>
+
+              <div>
+                <dt className="text-muted-foreground">Signature</dt>
+                <dd className="mt-1">{delivery.docket.repSignature}</dd>
+              </div>
+            </dl>
+          </section>
+        ) : (
+          <Link
+            href={`/routes/${routeIdNumber}/deliveries/${deliveryIdNumber}/docket`}
+            className="block rounded-lg bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground"
+          >
+            Create docket
+          </Link>
         )}
       </div>
     </main>

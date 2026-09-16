@@ -28,13 +28,9 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
   const users = user.role === "MANAGER" ? await getUsers() : [];
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-24">
+    <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-6">
       <div className="mb-6 space-y-2">
-        <h1 className="text-2xl font-semibold">Routes</h1>
-
-        <p className="text-sm text-muted-foreground">
-          {user.role === "MANAGER" ? "View upcoming delivery routes." : "Your upcoming delivery routes."}
-        </p>
+        <h1 className="text-2xl font-semibold">Upcoming Routes</h1>
       </div>
 
       {user.role === "MANAGER" && (

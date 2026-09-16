@@ -20,11 +20,7 @@ export function CreateDeliveryForm({ users, locations, contacts, action }: Creat
   const [selectedLocationId, setSelectedLocationId] = useState("");
 
   const selectedLocation = locations.find(location => location.id === Number(selectedLocationId));
-
-  const customerContacts = selectedLocation
-    ? contacts.filter(contact => contact.customerId === selectedLocation.customerId)
-    : [];
-
+  const customerContacts = selectedLocation ? contacts.filter(contact => contact.customerId === selectedLocation.customerId) : [];
   const defaultContactId = customerContacts.length > 0 ? String(customerContacts[0].id) : "";
 
   return (
@@ -34,13 +30,7 @@ export function CreateDeliveryForm({ users, locations, contacts, action }: Creat
           Date
         </label>
 
-        <input
-          id="date"
-          name="date"
-          type="date"
-          required
-          className="w-full rounded-md border bg-background px-3 py-2"
-        />
+        <input id="date" name="date" type="date" required className="w-full rounded-md border bg-background px-3 py-2" />
       </div>
 
       <div className="space-y-2">
@@ -48,12 +38,7 @@ export function CreateDeliveryForm({ users, locations, contacts, action }: Creat
           Driver
         </label>
 
-        <select
-          id="assignedUserId"
-          name="assignedUserId"
-          required
-          className="w-full rounded-md border bg-background px-3 py-2"
-        >
+        <select id="assignedUserId" name="assignedUserId" required className="w-full rounded-md border bg-background px-3 py-2">
           <option value="">Select a driver</option>
 
           {users.map(user => (
@@ -121,12 +106,7 @@ export function CreateDeliveryForm({ users, locations, contacts, action }: Creat
           Tank details
         </label>
 
-        <textarea
-          id="tankDetails"
-          name="tankDetails"
-          rows={4}
-          className="w-full rounded-md border bg-background px-3 py-2"
-        />
+        <textarea id="tankDetails" name="tankDetails" rows={4} className="w-full rounded-md border bg-background px-3 py-2" />
       </div>
 
       <div className="space-y-2">

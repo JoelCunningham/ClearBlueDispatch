@@ -1,7 +1,7 @@
 import { requireRouteAccess } from "@/lib/auth/authorization";
 import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/prisma/db";
-import { DeliveryDetail } from "./types";
+import { DeliveryDetail, DeliverySummary } from "./types";
 
 export async function getAssignableUsers() {
   await requireRole("MANAGER");
@@ -55,6 +55,8 @@ export async function getDelivery(routeId: number, deliveryId: number): Promise<
   const delivery = await db.orm.public.Delivery.where({ id: deliveryId, routeId })
     .include("location")
     .include("contact")
+    .include("route")
+    .include("docket")
     .first();
   if (!delivery) return null;
 
@@ -66,15 +68,66 @@ export async function getDelivery(routeId: number, deliveryId: number): Promise<
     position: delivery.position,
     notes: delivery.notes,
     tankDetails: delivery.tankDetails,
+    date: delivery.route?.date ?? "",
+
     location: {
       address: location.address,
       customerName: location.customer.name
     },
+
     contact: delivery.contact
       ? {
           name: delivery.contact.name,
           phoneNumber: delivery.contact.phoneNumber
         }
+      : null,
+
+    docket: delivery.docket
+      ? {
+          id: delivery.docket.id,
+          volume: delivery.docket.volume,
+          batchNumber: delivery.docket.batchNumber,
+          repName: delivery.docket.repName,
+          repSignature: delivery.docket.repSignature
+        }
       : null
   };
+}
+
+export async function getDeliveries(): Promise<DeliverySummary[]> {
+  await requireRole("MANAGER");
+
+  const deliveries = await db.orm.public.Delivery.include("location", location => location.include("customer"))
+    .include("contact")
+    .include("route", route => route.include("assignedUser"))
+    .all();
+
+  return deliveries
+    .map(delivery => {
+      if (!delivery.route) {
+        throw new Error(`Delivery ${delivery.id} has no route.`);
+      }
+
+      if (!delivery.location) {
+        throw new Error(`Delivery ${delivery.id} has no location.`);
+      }
+
+      if (!delivery.location.customer) {
+        throw new Error(`Location ${delivery.location.id} has no customer.`);
+      }
+
+      if (!delivery.route.assignedUser) {
+        throw new Error(`Route ${delivery.route.id} has no assigned user.`);
+      }
+
+      return {
+        id: delivery.id,
+        date: delivery.route.date,
+        customerName: delivery.location.customer.name,
+        locationAddress: delivery.location.address,
+        contactName: delivery.contact?.name ?? null,
+        assignedUserName: delivery.route.assignedUser.name
+      };
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
 }

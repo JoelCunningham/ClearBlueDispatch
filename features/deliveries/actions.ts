@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/prisma/db";
@@ -12,12 +13,8 @@ export async function createDelivery(input: CreateDeliveryInput) {
   await requireRole("MANAGER");
 
   const result = createDeliverySchema.safeParse(input);
-
   if (!result.success) {
-    return {
-      success: false,
-      error: "Invalid delivery details."
-    };
+    return { success: false, error: "Invalid delivery details." };
   }
 
   const { assignedUserId, date, locationId, contactId, notes, tankDetails } = result.data;
@@ -29,7 +26,6 @@ export async function createDelivery(input: CreateDeliveryInput) {
 
     if (contactId !== undefined) {
       const contact = await tx.orm.public.Contact.first({ id: contactId });
-
       if (!contact) throw new Error("Contact not found.");
 
       if (contact.customerId !== location.customerId) {
@@ -58,19 +54,12 @@ export async function createDelivery(input: CreateDeliveryInput) {
       tankDetails
     });
 
-    return {
-      routeId: route.id,
-      deliveryId: delivery.id
-    };
+    return { routeId: route.id, deliveryId: delivery.id };
   });
 
   revalidatePath("/routes");
   revalidatePath(`/routes/${resultData.routeId}`);
   revalidatePath("/manage/deliveries");
 
-  return {
-    success: true,
-    routeId: resultData.routeId,
-    deliveryId: resultData.deliveryId
-  };
+  redirect(`/routes/${resultData.routeId}`);
 }

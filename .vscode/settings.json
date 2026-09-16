@@ -2,6 +2,9 @@
     "cSpell.words": [
         "Geist",
         "shadcn",
-        "Timestamptz"
+        "Timestamptz",
+        "Timetz",
+        "unboundedint",
+        "uniques"
     ]
 }

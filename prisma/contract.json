@@ -65,6 +65,13 @@
                   "kind": "scalar"
                 }
               },
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -124,6 +131,9 @@
               "fields": {
                 "customerId": {
                   "column": "customerId"
+                },
+                "deleted": {
+                  "column": "deleted"
                 },
                 "id": {
                   "column": "id"
@@ -534,6 +544,13 @@
                   "kind": "scalar"
                 }
               },
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -582,6 +599,9 @@
                 },
                 "customerId": {
                   "column": "customerId"
+                },
+                "deleted": {
+                  "column": "deleted"
                 },
                 "id": {
                   "column": "id"
@@ -783,6 +803,15 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -929,6 +958,7 @@
                   }
                 },
                 {
+                  "onDelete": "restrict",
                   "source": {
                     "columns": [
                       "locationId"
@@ -945,6 +975,7 @@
                   }
                 },
                 {
+                  "onDelete": "restrict",
                   "source": {
                     "columns": [
                       "contactId"
@@ -1130,6 +1161,15 @@
                 "customerId": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
+                  "nullable": false
+                },
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
                   "nullable": false
                 },
                 "id": {
@@ -1334,7 +1374,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "30dbf9ea60f14ba627e79519f0a0e37efa2e2eac21f2c33cdf9e0445e5d65b36"
+    "storageHash": "4b7cbf5bf4ac43749e0dd01457179edf0740ff27911993f451eff270e7e4101e"
   },
   "capabilities": {
     "postgres": {

@@ -501,10 +501,9 @@ export namespace Models {
     notes: CodecTypes['pg/text@1']['output'];
     tankDetails: CodecTypes['pg/text@1']['output'];
     contact: public_Contact | null;
-    docket: public_Docket | null;
     location: public_Location;
     route: public_Route;
-    readonly [RelationKeys]?: 'contact' | 'docket' | 'location' | 'route';
+    readonly [RelationKeys]?: 'contact' | 'location' | 'route';
   };
   export type public_Docket = {
     id: CodecTypes['pg/int4@1']['output'];
@@ -1224,18 +1223,6 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['contactId'];
                   readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly docket: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Docket';
-                };
-                readonly cardinality: '1:1';
-                readonly nullable: true;
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['deliveryId'];
                 };
               };
               readonly location: {

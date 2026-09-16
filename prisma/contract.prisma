@@ -35,13 +35,13 @@ model Delivery {
   route   Route @relation(fields: [routeId], references: [id])
   routeId Int
 
-  docket Docket?
-
-  location   Location @relation(fields: [locationId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
   locationId Int
 
-  contact   Contact? @relation(fields: [contactId], references: [id])
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: Restrict)
   contactId Int?
+
+  docket Docket?
 
   position    Int
   notes       String
@@ -67,6 +67,7 @@ model Location {
   customerId Int
 
   address String
+  deleted Boolean @default(false)
 
   deliveries Delivery[]
 }
@@ -90,6 +91,7 @@ model Contact {
 
   name        String
   phoneNumber String
+  deleted     Boolean @default(false)
 
   deliveries Delivery[]
 }

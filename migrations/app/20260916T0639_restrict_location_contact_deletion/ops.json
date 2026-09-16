@@ -1,0 +1,28 @@
+[
+  {
+    "id": "restrict-delivery-location-contact-delete",
+    "label": "Restrict deletion of locations and contacts referenced by deliveries",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Verify delivery foreign keys currently exist",
+        "sql": "\n            SELECT\n              EXISTS (\n                SELECT 1\n                FROM pg_constraint\n                WHERE conname = 'delivery_contactId_fkey'\n                  AND conrelid = 'public.delivery'::regclass\n              )\n              AND\n              EXISTS (\n                SELECT 1\n                FROM pg_constraint\n                WHERE conname = 'delivery_locationId_fkey'\n                  AND conrelid = 'public.delivery'::regclass\n              ) AS ok\n          "
+      }
+    ],
+    "execute": [
+      {
+        "description": "Recreate delivery foreign keys with RESTRICT",
+        "sql": "\n            ALTER TABLE \"delivery\"\n            DROP CONSTRAINT \"delivery_contactId_fkey\";\n\n            ALTER TABLE \"delivery\"\n            DROP CONSTRAINT \"delivery_locationId_fkey\";\n\n            ALTER TABLE \"delivery\"\n            ADD CONSTRAINT \"delivery_contactId_fkey\"\n            FOREIGN KEY (\"contactId\")\n            REFERENCES \"contact\"(\"id\")\n            ON DELETE RESTRICT\n            ON UPDATE CASCADE;\n\n            ALTER TABLE \"delivery\"\n            ADD CONSTRAINT \"delivery_locationId_fkey\"\n            FOREIGN KEY (\"locationId\")\n            REFERENCES \"location\"(\"id\")\n            ON DELETE RESTRICT\n            ON UPDATE CASCADE;\n          "
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify delivery foreign keys use RESTRICT",
+        "sql": "\n            SELECT\n              EXISTS (\n                SELECT 1\n                FROM pg_constraint\n                WHERE conname = 'delivery_contactId_fkey'\n                  AND conrelid = 'public.delivery'::regclass\n                  AND confdeltype = 'r'\n              )\n              AND\n              EXISTS (\n                SELECT 1\n                FROM pg_constraint\n                WHERE conname = 'delivery_locationId_fkey'\n                  AND conrelid = 'public.delivery'::regclass\n                  AND confdeltype = 'r'\n              ) AS ok\n          "
+      }
+    ]
+  }
+]

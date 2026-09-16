@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'4b7cbf5bf4ac43749e0dd01457179edf0740ff27911993f451eff270e7e4101e'>;
+  StorageHashBase<'1aff90c9ebed9f8c33a951d6c7d1044cd34fd6ab6b31e64dfdf0034de0e3f1bc'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -246,7 +246,6 @@ export type FieldOutputTypes = {
       readonly customerId: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly phoneNumber: CodecTypes['pg/text@1']['output'];
-      readonly deleted: CodecTypes['pg/bool@1']['output'];
     };
     readonly Customer: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -279,7 +278,6 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly customerId: CodecTypes['pg/int4@1']['output'];
       readonly address: CodecTypes['pg/text@1']['output'];
-      readonly deleted: CodecTypes['pg/bool@1']['output'];
     };
     readonly Route: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -304,7 +302,6 @@ export type FieldInputTypes = {
       readonly customerId: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly phoneNumber: CodecTypes['pg/text@1']['input'];
-      readonly deleted: CodecTypes['pg/bool@1']['input'];
     };
     readonly Customer: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -337,7 +334,6 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly customerId: CodecTypes['pg/int4@1']['input'];
       readonly address: CodecTypes['pg/text@1']['input'];
-      readonly deleted: CodecTypes['pg/bool@1']['input'];
     };
     readonly Route: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -359,7 +355,6 @@ export type StorageColumnTypes = {
   readonly public: {
     readonly contact: {
       readonly customerId: CodecTypes['pg/int4@1']['output'];
-      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly phoneNumber: CodecTypes['pg/text@1']['output'];
@@ -394,7 +389,6 @@ export type StorageColumnTypes = {
     readonly location: {
       readonly address: CodecTypes['pg/text@1']['output'];
       readonly customerId: CodecTypes['pg/int4@1']['output'];
-      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
     };
     readonly route: {
@@ -417,7 +411,6 @@ export type StorageColumnInputTypes = {
   readonly public: {
     readonly contact: {
       readonly customerId: CodecTypes['pg/int4@1']['input'];
-      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly phoneNumber: CodecTypes['pg/text@1']['input'];
@@ -452,7 +445,6 @@ export type StorageColumnInputTypes = {
     readonly location: {
       readonly address: CodecTypes['pg/text@1']['input'];
       readonly customerId: CodecTypes['pg/int4@1']['input'];
-      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
     };
     readonly route: {
@@ -501,10 +493,9 @@ export namespace Models {
     notes: CodecTypes['pg/text@1']['output'];
     tankDetails: CodecTypes['pg/text@1']['output'];
     contact: public_Contact | null;
-    docket: public_Docket | null;
     location: public_Location;
     route: public_Route;
-    readonly [RelationKeys]?: 'contact' | 'docket' | 'location' | 'route';
+    readonly [RelationKeys]?: 'contact' | 'location' | 'route';
   };
   export type public_Docket = {
     id: CodecTypes['pg/int4@1']['output'];
@@ -520,7 +511,6 @@ export namespace Models {
     id: CodecTypes['pg/int4@1']['output'];
     customerId: CodecTypes['pg/int4@1']['output'];
     address: CodecTypes['pg/text@1']['output'];
-    deleted: CodecTypes['pg/bool@1']['output'];
     customer: public_Customer;
     deliveries: public_Delivery[];
     readonly [RelationKeys]?: 'customer' | 'deliveries';
@@ -539,7 +529,6 @@ export namespace Models {
     customerId: CodecTypes['pg/int4@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
     phoneNumber: CodecTypes['pg/text@1']['output'];
-    deleted: CodecTypes['pg/bool@1']['output'];
     customer: public_Customer;
     deliveries: public_Delivery[];
     readonly [RelationKeys]?: 'customer' | 'deliveries';
@@ -609,15 +598,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
-                };
-                readonly deleted: {
-                  readonly nativeType: 'bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
-                  };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -898,15 +878,6 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
-                readonly deleted: {
-                  readonly nativeType: 'bool';
-                  readonly codecId: 'pg/bool@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
-                  };
-                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
@@ -1080,10 +1051,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly deleted: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
             };
             readonly relations: {
               readonly customer: {
@@ -1118,7 +1085,6 @@ type ContractBase = Omit<
                 readonly customerId: { readonly column: 'customerId' };
                 readonly name: { readonly column: 'name' };
                 readonly phoneNumber: { readonly column: 'phoneNumber' };
-                readonly deleted: { readonly column: 'deleted' };
               };
             };
           };
@@ -1224,18 +1190,6 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['contactId'];
                   readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly docket: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Docket';
-                };
-                readonly cardinality: '1:1';
-                readonly nullable: true;
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['deliveryId'];
                 };
               };
               readonly location: {
@@ -1384,10 +1338,6 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly deleted: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
-              };
             };
             readonly relations: {
               readonly customer: {
@@ -1421,7 +1371,6 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly customerId: { readonly column: 'customerId' };
                 readonly address: { readonly column: 'address' };
-                readonly deleted: { readonly column: 'deleted' };
               };
             };
           };

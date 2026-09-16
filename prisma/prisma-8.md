@@ -25,11 +25,9 @@ model User {
 Every model you define in your contract can be queried from your app. Your editor will autocomplete the query methods and show you what type each model field is:
 
 ```typescript
-import { db } from './prisma/db';
+import { db } from "./prisma/db";
 
-const user = await db.orm.public.User
-  .where({ email: 'alice@example.com' })
-  .first();
+const user = await db.orm.public.User.where({ email: "alice@example.com" }).first();
 
 // Your editor will show the type of user as
 // { id: number; email: string; username: string | null; name: string | null; createdAt: Date; posts: Post[] } | null
@@ -49,17 +47,17 @@ If you use a framework like Next.js or Vite, the Prisma ORM plugin will do this 
 [`prisma.config.ts`](prisma.config.ts) tells the CLI where your contract lives and how to connect to your database. It loads environment variables from `.env` automatically:
 
 ```typescript
-import 'dotenv/config';
-import { definePrismaConfig } from '@prisma/cli-engine';
-import { defineConfig as ormConfig } from '@prisma/orm-postgres/config';
+import "dotenv/config";
+import { definePrismaConfig } from "@prisma/cli-engine";
+import { defineConfig as ormConfig } from "@prisma/orm-postgres/config";
 
 export default definePrismaConfig({
   orm: ormConfig({
-    contract: './prisma/contract.prisma',
+    contract: "./prisma/contract.prisma",
     db: {
-      connection: process.env['DATABASE_URL']!,
-    },
-  }),
+      connection: process.env["DATABASE_URL"]!
+    }
+  })
 });
 ```
 
@@ -79,20 +77,21 @@ You can customize how your environment variables are loaded by changing or remov
 npx prisma db init             # Create tables in the database
 npx prisma contract emit       # Update contract.json and contract.d.ts
 npx prisma migration status    # Show migration status
+npx prisma migration check     # Validate migration
 npx prisma migration plan      # Create migration plan
 npx prisma db migrate          # Execute migrations
-npx prisma db verify           # Verify migrations                                           
+npx prisma db verify           # Verify migrations
 ```
 
 ### Files
 
-| File | Purpose |
-|---|---|
-| [`prisma/contract.prisma`](prisma/contract.prisma) | Your data contract — define your models here |
-| [`prisma.config.ts`](prisma.config.ts) | CLI configuration |
-| [`prisma/db.ts`](prisma/db.ts) | Database client — `import { db } from './prisma/db'` |
-| `prisma/contract.json` | Compiled contract (generated) |
-| `prisma/contract.d.ts` | Contract types (generated) |
+| File                                               | Purpose                                              |
+| -------------------------------------------------- | ---------------------------------------------------- |
+| [`prisma/contract.prisma`](prisma/contract.prisma) | Your data contract — define your models here         |
+| [`prisma.config.ts`](prisma.config.ts)             | CLI configuration                                    |
+| [`prisma/db.ts`](prisma/db.ts)                     | Database client — `import { db } from './prisma/db'` |
+| `prisma/contract.json`                             | Compiled contract (generated)                        |
+| `prisma/contract.d.ts`                             | Contract types (generated)                           |
 
 ### Workflow
 

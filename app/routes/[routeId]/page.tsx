@@ -24,7 +24,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
   });
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-24">
+    <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-6">
       <div className="mb-6 space-y-2">
         <Link href="/routes" className="text-sm text-muted-foreground hover:text-foreground">
           ← Routes
