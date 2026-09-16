@@ -16,7 +16,7 @@ export async function createDelivery(input: CreateDeliveryInput) {
   if (!result.success) {
     return {
       success: false,
-      error: "Invalid delivery details.",
+      error: "Invalid delivery details."
     };
   }
 
@@ -42,7 +42,7 @@ export async function createDelivery(input: CreateDeliveryInput) {
     if (!route) {
       route = await tx.orm.public.Route.create({
         assignedUserId,
-        date,
+        date
       });
     }
 
@@ -55,12 +55,12 @@ export async function createDelivery(input: CreateDeliveryInput) {
       contactId,
       position,
       notes,
-      tankDetails,
+      tankDetails
     });
 
     return {
       routeId: route.id,
-      deliveryId: delivery.id,
+      deliveryId: delivery.id
     };
   });
 
@@ -71,6 +71,6 @@ export async function createDelivery(input: CreateDeliveryInput) {
   return {
     success: true,
     routeId: resultData.routeId,
-    deliveryId: resultData.deliveryId,
+    deliveryId: resultData.deliveryId
   };
 }

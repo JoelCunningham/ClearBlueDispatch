@@ -22,7 +22,7 @@ if (role !== "DRIVER" && role !== "MANAGER") {
 
 const passwordHash = await bcrypt.hash(password, 12);
 const existingUser = await db.orm.public.User.first({
-  email,
+  email
 });
 
 if (existingUser) {
@@ -35,7 +35,7 @@ const user = await db.orm.public.User.create({
   email,
   name,
   role,
-  passwordHash,
+  passwordHash
 });
 
 console.log(`Created ${user.role} user: ${user.email}`);

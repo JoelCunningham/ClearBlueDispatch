@@ -5,12 +5,12 @@ import { getRoutes, getUsers } from "@/features/routes/queries";
 import { requireUser } from "@/lib/auth/require-user";
 
 type RoutesPageProps = {
-  searchParams: Promise<{ assignedUserId?: string; }>;
+  searchParams: Promise<{ assignedUserId?: string }>;
 };
 
 function getToday(): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Melbourne",
+    timeZone: "Australia/Melbourne"
   }).format(new Date());
 }
 
@@ -22,7 +22,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
 
   const routes = await getRoutes({
     fromDate: getToday(),
-    assignedUserId: user.role === "MANAGER" && Number.isInteger(assignedUserId) ? assignedUserId : undefined,
+    assignedUserId: user.role === "MANAGER" && Number.isInteger(assignedUserId) ? assignedUserId : undefined
   });
 
   const users = user.role === "MANAGER" ? await getUsers() : [];
@@ -30,9 +30,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-6 pb-24">
       <div className="mb-6 space-y-2">
-        <h1 className="text-2xl font-semibold">
-          Routes
-        </h1>
+        <h1 className="text-2xl font-semibold">Routes</h1>
 
         <p className="text-sm text-muted-foreground">
           {user.role === "MANAGER" ? "View upcoming delivery routes." : "Your upcoming delivery routes."}
@@ -47,13 +45,11 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
 
       {routes.length === 0 ? (
         <div className="rounded-lg border p-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            No upcoming routes.
-          </p>
+          <p className="text-sm text-muted-foreground">No upcoming routes.</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {routes.map((route) => (
+          {routes.map(route => (
             <Link
               key={route.id}
               href={`/routes/${route.id}`}
@@ -62,24 +58,17 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-medium">
-                    {new Date(`${route.date}T00:00:00`,).toLocaleDateString(
-                      "en-AU",
-                      {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                      },
-                    )}
+                    {new Date(`${route.date}T00:00:00`).toLocaleDateString("en-AU", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long"
+                    })}
                   </p>
 
-                  <p className="text-sm text-muted-foreground">
-                    {route.assignedUserName}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{route.assignedUserName}</p>
                 </div>
 
-                <span className="text-muted-foreground">
-                  →
-                </span>
+                <span className="text-muted-foreground">→</span>
               </div>
             </Link>
           ))}

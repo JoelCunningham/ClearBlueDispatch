@@ -10,7 +10,7 @@ export async function getAssignableUsers() {
 
   return users.map(user => ({
     id: user.id,
-    name: user.name,
+    name: user.name
   }));
 }
 
@@ -29,7 +29,7 @@ export async function getDeliveryLocations() {
       address: location.address,
       suburb: addressParts.length >= 3 ? addressParts[addressParts.length - 3] : location.address,
       customerId: location.customerId,
-      customerName: location.customer.name,
+      customerName: location.customer.name
     };
   });
 }
@@ -45,14 +45,17 @@ export async function getDeliveryContacts(customerId?: number) {
     id: contact.id,
     name: contact.name,
     phoneNumber: contact.phoneNumber,
-    customerId: contact.customerId,
+    customerId: contact.customerId
   }));
 }
 
 export async function getDelivery(routeId: number, deliveryId: number): Promise<DeliveryDetail | null> {
   await requireRouteAccess(routeId);
 
-  const delivery = await db.orm.public.Delivery.where({ id: deliveryId, routeId }).include("location").include("contact").first();
+  const delivery = await db.orm.public.Delivery.where({ id: deliveryId, routeId })
+    .include("location")
+    .include("contact")
+    .first();
   if (!delivery) return null;
 
   const location = await db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first();
@@ -65,13 +68,13 @@ export async function getDelivery(routeId: number, deliveryId: number): Promise<
     tankDetails: delivery.tankDetails,
     location: {
       address: location.address,
-      customerName: location.customer.name,
+      customerName: location.customer.name
     },
     contact: delivery.contact
       ? {
           name: delivery.contact.name,
-          phoneNumber: delivery.contact.phoneNumber,
+          phoneNumber: delivery.contact.phoneNumber
         }
-      : null,
+      : null
   };
 }

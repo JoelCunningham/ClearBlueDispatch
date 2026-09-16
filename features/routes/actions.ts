@@ -12,7 +12,7 @@ export async function reorderDeliveries(routeId: number, deliveryIds: number[]) 
   if (deliveries.length !== deliveryIds.length) {
     return {
       success: false,
-      error: "Invalid delivery order.",
+      error: "Invalid delivery order."
     };
   }
 
@@ -20,7 +20,7 @@ export async function reorderDeliveries(routeId: number, deliveryIds: number[]) 
   if (deliveryIds.some(id => !existingIds.has(id)) || new Set(deliveryIds).size !== deliveryIds.length) {
     return {
       success: false,
-      error: "Invalid delivery order.",
+      error: "Invalid delivery order."
     };
   }
 
@@ -28,18 +28,18 @@ export async function reorderDeliveries(routeId: number, deliveryIds: number[]) 
     for (let index = 0; index < deliveryIds.length; index++) {
       await tx.orm.public.Delivery.where({
         id: deliveryIds[index],
-        routeId,
+        routeId
       }).update({
-        position: -(index + 1),
+        position: -(index + 1)
       });
     }
 
     for (let index = 0; index < deliveryIds.length; index++) {
       await tx.orm.public.Delivery.where({
         id: deliveryIds[index],
-        routeId,
+        routeId
       }).update({
-        position: index + 1,
+        position: index + 1
       });
     }
   });

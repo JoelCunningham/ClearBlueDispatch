@@ -6,7 +6,7 @@ export const createDeliverySchema = z.object({
   locationId: z.coerce.number().int().positive(),
   contactId: z.coerce.number().int().positive().optional(),
   notes: z.string().trim(),
-  tankDetails: z.string().trim(),
+  tankDetails: z.string().trim()
 });
 
 export type CreateDeliveryInput = z.infer<typeof createDeliverySchema>;

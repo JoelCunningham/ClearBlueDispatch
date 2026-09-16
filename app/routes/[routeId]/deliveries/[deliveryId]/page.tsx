@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { getDelivery } from "@/features/deliveries/queries";
 
 type DeliveryPageProps = {
-  params: Promise<{ routeId: string; deliveryId: string; }>;
+  params: Promise<{ routeId: string; deliveryId: string }>;
 };
 
-export default async function DeliveryPage({ params, }: DeliveryPageProps) {
+export default async function DeliveryPage({ params }: DeliveryPageProps) {
   const { routeId, deliveryId } = await params;
 
   const routeIdNumber = Number(routeId);
@@ -20,17 +20,12 @@ export default async function DeliveryPage({ params, }: DeliveryPageProps) {
   const delivery = await getDelivery(routeIdNumber, deliveryIdNumber);
   if (!delivery) notFound();
 
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    delivery.location.address,
-  )}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(delivery.location.address)}`;
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-24">
       <div className="mb-6 space-y-2">
-        <Link
-          href={`/routes/${routeIdNumber}`}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
+        <Link href={`/routes/${routeIdNumber}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← Route
         </Link>
 
@@ -40,10 +35,7 @@ export default async function DeliveryPage({ params, }: DeliveryPageProps) {
           </div>
 
           <div>
-            <h1 className="text-2xl font-semibold">
-              {delivery.location.customerName}
-            </h1>
-
+            <h1 className="text-2xl font-semibold">{delivery.location.customerName}</h1>
             <a
               href={mapsUrl}
               target="_blank"
@@ -57,11 +49,8 @@ export default async function DeliveryPage({ params, }: DeliveryPageProps) {
       </div>
 
       <div className="space-y-4">
-
         <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-semibold">
-            Tank details
-          </h2>
+          <h2 className="mb-2 font-semibold">Tank details</h2>
 
           <p className="whitespace-pre-wrap text-sm text-muted-foreground">
             {delivery.tankDetails || "No tank details."}
@@ -69,26 +58,18 @@ export default async function DeliveryPage({ params, }: DeliveryPageProps) {
         </section>
 
         <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-semibold">
-            Notes
-          </h2>
+          <h2 className="mb-2 font-semibold">Notes</h2>
 
-          <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-            {delivery.notes || "No notes."}
-          </p>
+          <p className="whitespace-pre-wrap text-sm text-muted-foreground">{delivery.notes || "No notes."}</p>
         </section>
-        
+
         {delivery.contact && (
           <section className="rounded-lg border p-4">
-            <h2 className="mb-3 font-semibold">
-              Contact
-            </h2>
+            <h2 className="mb-3 font-semibold">Contact</h2>
 
             <p>{delivery.contact.name}</p>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              {delivery.contact.phoneNumber}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{delivery.contact.phoneNumber}</p>
 
             <div className="mt-4 grid grid-cols-2 gap-2">
               <a

@@ -12,12 +12,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: {
           label: "Email",
-          type: "email",
+          type: "email"
         },
         password: {
           label: "Password",
-          type: "password",
-        },
+          type: "password"
+        }
       },
       async authorize(credentials) {
         if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") {
@@ -25,7 +25,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const user = await db.orm.public.User.first({
-          email: credentials.email,
+          email: credentials.email
         });
 
         if (!user) {
@@ -42,13 +42,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id.toString(),
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: user.role
         };
-      },
-    }),
+      }
+    })
   ],
   session: {
-    strategy: "jwt",
+    strategy: "jwt"
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -65,6 +65,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.role = token.role as "DRIVER" | "MANAGER";
 
       return session;
-    },
-  },
+    }
+  }
 });

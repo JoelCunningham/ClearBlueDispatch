@@ -28,7 +28,7 @@ export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary
     id: route.id,
     assignedUserId: route.assignedUserId,
     assignedUserName: route.assignedUser.name,
-    date: route.date,
+    date: route.date
   }));
 }
 
@@ -36,12 +36,17 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
   const route = await requireRouteAccess(routeId);
   if (!route) return null;
 
-  const routeWithDetails = await db.orm.public.Route.where({ id: routeId }).include("assignedUser").include("deliveries").first();
+  const routeWithDetails = await db.orm.public.Route.where({ id: routeId })
+    .include("assignedUser")
+    .include("deliveries")
+    .first();
 
   if (!routeWithDetails) return null;
 
   const deliveries = [...routeWithDetails.deliveries].sort((a, b) => a.position - b.position);
-  const locations = await Promise.all(deliveries.map(delivery => db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first()));
+  const locations = await Promise.all(
+    deliveries.map(delivery => db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first())
+  );
 
   return {
     id: routeWithDetails.id,
@@ -59,10 +64,10 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
         location: {
           id: location.id,
           address: location.address,
-          customerName: location.customer.name,
-        },
+          customerName: location.customer.name
+        }
       };
-    }),
+    })
   };
 }
 
@@ -73,6 +78,6 @@ export async function getUsers(): Promise<UserSummary[]> {
 
   return users.map(user => ({
     id: user.id,
-    name: user.name,
+    name: user.name
   }));
 }

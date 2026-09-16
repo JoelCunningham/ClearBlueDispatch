@@ -8,6 +8,6 @@ export async function requireRole(role: UserRole) {
   const user = await requireUser();
 
   if (user.role !== role) redirect("/routes");
-  
+
   return user;
 }

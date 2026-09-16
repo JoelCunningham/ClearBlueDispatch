@@ -46,7 +46,10 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
     setDeliveries(nextDeliveries);
 
     startTransition(async () => {
-      const result = await reorderDeliveries(routeId, nextDeliveries.map(delivery => delivery.id));
+      const result = await reorderDeliveries(
+        routeId,
+        nextDeliveries.map(delivery => delivery.id)
+      );
       if (!result.success) setDeliveries(previousDeliveries);
     });
   }
@@ -57,27 +60,16 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
         const mapsUrl = getGoogleMapsUrl(delivery.location.address);
 
         return (
-          <div
-            key={delivery.id}
-            className="flex items-stretch gap-3 rounded-lg border bg-card p-3"
-          >
-            <Link
-              href={`/routes/${routeId}/deliveries/${delivery.id}`}
-              className="block"
-            >
+          <div key={delivery.id} className="flex items-stretch gap-3 rounded-lg border bg-card p-3">
+            <Link href={`/routes/${routeId}/deliveries/${delivery.id}`} className="block">
               <div className="flex size-10 shrink-0 items-center justify-center self-start rounded-full bg-primary text-sm font-semibold text-primary-foreground">
                 {delivery.position}
               </div>
             </Link>
 
             <div className="min-w-0 flex-1">
-              <Link
-                href={`/routes/${routeId}/deliveries/${delivery.id}`}
-                className="block"
-              >
-                <h3 className="font-semibold hover:underline">
-                  {delivery.location.customerName}
-                </h3>
+              <Link href={`/routes/${routeId}/deliveries/${delivery.id}`} className="block">
+                <h3 className="font-semibold hover:underline">{delivery.location.customerName}</h3>
               </Link>
 
               <a
@@ -93,10 +85,7 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
             <div className="flex shrink-0 flex-col gap-1">
               <button
                 type="button"
-                onClick={() => {
-                  console.log("UP CLICKED");
-                  moveDelivery(index, -1);
-                }}
+                onClick={() => moveDelivery(index, -1)}
                 disabled={index === 0 || isPending}
                 className="flex size-8 items-center justify-center rounded-md border text-sm disabled:opacity-30"
                 aria-label={`Move delivery ${delivery.position} up`}

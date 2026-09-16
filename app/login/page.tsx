@@ -28,7 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       await signIn("credentials", {
         email,
         password,
-        redirectTo: callbackUrl,
+        redirectTo: callbackUrl
       });
     } catch (error) {
       if (error instanceof AuthError) {
@@ -43,27 +43,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <main className="flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-sm space-y-6">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold">
-            Sign in
-          </h1>
+          <h1 className="text-2xl font-semibold">Sign in</h1>
 
-          <p className="text-sm text-muted-foreground">
-            Sign in to Clear Blue Dispatch.
-          </p>
+          <p className="text-sm text-muted-foreground">Sign in to Clear Blue Dispatch.</p>
         </div>
 
-        {params.error && (
-          <p className="text-sm text-destructive">
-            {params.error}
-          </p>
-        )}
+        {params.error && <p className="text-sm text-destructive">{params.error}</p>}
 
         <form action={login} className="space-y-4">
           <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="email" className="text-sm font-medium">
               Email
             </label>
 
@@ -78,10 +67,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium"
-            >
+            <label htmlFor="password" className="text-sm font-medium">
               Password
             </label>
 
@@ -95,10 +81,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-md bg-primary px-4 py-2 text-primary-foreground"
-          >
+          <button type="submit" className="w-full rounded-md bg-primary px-4 py-2 text-primary-foreground">
             Sign in
           </button>
         </form>
