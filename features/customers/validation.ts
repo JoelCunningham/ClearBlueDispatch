@@ -13,7 +13,7 @@ const customerContactSchema = z.object({
 
 const customerInvoiceEmailSchema = z.object({
   id: z.coerce.number().int().positive().optional(),
-  emailAddress: z.string().trim().email()
+  emailAddress: z.email()
 });
 
 const customerFormSchema = z.object({
@@ -21,7 +21,7 @@ const customerFormSchema = z.object({
   rate: z.coerce.number().nonnegative(),
   locations: z.array(customerLocationSchema),
   contacts: z.array(customerContactSchema),
-  invoiceEmails: z.array(customerInvoiceEmailSchema)
+  emails: z.array(customerInvoiceEmailSchema)
 });
 
 export const createCustomerSchema = customerFormSchema;

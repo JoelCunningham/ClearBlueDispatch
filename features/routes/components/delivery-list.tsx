@@ -1,9 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useTransition } from "react";
 
+import Card from "@/components/wrappers/card";
+import List from "@/components/wrappers/list";
 import { reorderDeliveries } from "@/features/routes/actions";
+import { getFullName } from "@/lib/utils/customer-util";
+import { suppressEvent } from "@/lib/utils/event-utils";
+import MoveButton from "./move-botton";
 
 type Delivery = {
   id: number;
@@ -20,17 +24,14 @@ type DeliveryListProps = {
   deliveries: Delivery[];
 };
 
-function getGoogleMapsUrl(address: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-}
-
-export function DeliveryList({ routeId, deliveries: initialDeliveries }: DeliveryListProps) {
+export default function DeliveryList({ routeId, deliveries: initialDeliveries }: DeliveryListProps) {
   const [deliveries, setDeliveries] = useState(initialDeliveries);
   const [isPending, startTransition] = useTransition();
 
-  function moveDelivery(index: number, direction: -1 | 1) {
-    const newIndex = index + direction;
+  function moveDelivery(e: React.MouseEvent<HTMLButtonElement>, index: number, direction: -1 | 1) {
+    suppressEvent(e);
 
+    const newIndex = index + direction;
     if (newIndex < 0 || newIndex >= deliveries.length || isPending) return;
 
     const previousDeliveries = deliveries;
@@ -44,7 +45,6 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
     });
 
     setDeliveries(nextDeliveries);
-
     startTransition(async () => {
       const result = await reorderDeliveries(
         routeId,
@@ -55,57 +55,21 @@ export function DeliveryList({ routeId, deliveries: initialDeliveries }: Deliver
   }
 
   return (
-    <div className="space-y-3">
-      {deliveries.map((delivery, index) => {
-        const mapsUrl = getGoogleMapsUrl(delivery.location.address);
-
-        return (
-          <div key={delivery.id} className="flex items-stretch gap-3 rounded-lg border bg-card p-3">
-            <Link href={`/routes/${routeId}/deliveries/${delivery.id}`} className="block">
-              <div className="flex size-10 shrink-0 items-center justify-center self-start rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                {delivery.position}
-              </div>
-            </Link>
-
-            <div className="min-w-0 flex-1">
-              <Link href={`/routes/${routeId}/deliveries/${delivery.id}`} className="block">
-                <h3 className="font-semibold hover:underline">{delivery.location.customerName}</h3>
-              </Link>
-
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-1 block text-sm text-muted-foreground hover:text-foreground hover:underline"
-              >
-                {delivery.location.address}
-              </a>
-            </div>
-
-            <div className="flex shrink-0 flex-col gap-1">
-              <button
-                type="button"
-                onClick={() => moveDelivery(index, -1)}
-                disabled={index === 0 || isPending}
-                className="flex size-8 items-center justify-center rounded-md border text-sm disabled:opacity-30"
-                aria-label={`Move delivery ${delivery.position} up`}
-              >
-                ↑
-              </button>
-
-              <button
-                type="button"
-                disabled={index === deliveries.length - 1 || isPending}
-                onClick={() => moveDelivery(index, 1)}
-                className="flex size-8 items-center justify-center rounded-md border text-sm disabled:opacity-30"
-                aria-label={`Move delivery ${delivery.position} down`}
-              >
-                ↓
-              </button>
-            </div>
+    <List title="Deliveries" subtitle={`${deliveries.length} ${deliveries.length === 1 ? "delivery" : "deliveries"}`}>
+      {deliveries.map((delivery, index) => (
+        <Card
+          key={delivery.id.toString()}
+          href={`/deliveries/${delivery.id}`}
+          title={getFullName(delivery.location.customerName, delivery.location.address)}
+          subtitle={delivery.location.address}
+          avatarText={delivery.position.toString()}
+        >
+          <div className="flex flex-col gap-1">
+            <MoveButton index={index} items={deliveries.length} isPending={isPending} isUp={true} onClick={moveDelivery} />
+            <MoveButton index={index} items={deliveries.length} isPending={isPending} isUp={false} onClick={moveDelivery} />
           </div>
-        );
-      })}
-    </div>
+        </Card>
+      ))}
+    </List>
   );
 }

@@ -41,7 +41,7 @@ export async function createCustomer(input: CreateCustomerInput) {
       });
     }
 
-    for (const invoiceEmail of result.data.invoiceEmails) {
+    for (const invoiceEmail of result.data.emails) {
       if (invoiceEmail.id !== undefined) {
         throw new Error("New customers cannot contain existing invoice emails.");
       }
@@ -55,10 +55,7 @@ export async function createCustomer(input: CreateCustomerInput) {
   revalidatePath("/manage/customers");
   revalidatePath("/manage");
 
-  return {
-    success: true,
-    customerId: customer.id
-  };
+  redirect(`/manage/customers/${customer.id}`);
 }
 
 export async function updateCustomer(input: UpdateCustomerInput) {
@@ -69,7 +66,7 @@ export async function updateCustomer(input: UpdateCustomerInput) {
     return { success: false, error: "Invalid customer details." };
   }
 
-  const { customerId, name, rate, locations, contacts, invoiceEmails } = result.data;
+  const { customerId, name, rate, locations, contacts, emails: invoiceEmails } = result.data;
 
   try {
     await db.transaction(async tx => {

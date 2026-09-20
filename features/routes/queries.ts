@@ -15,7 +15,7 @@ export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary
 
   let query = db.orm.public.Route.where(route => route.date.gte(options.fromDate))
     .include("assignedUser")
-    .orderBy(route => route.date.asc());
+    .orderBy(route => route.date.desc());
 
   if (user.role === "DRIVER") {
     query = query.where({ assignedUserId: Number(user.id) });
@@ -36,10 +36,7 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
   const route = await requireRouteAccess(routeId);
   if (!route) return null;
 
-  const routeWithDetails = await db.orm.public.Route.where({ id: routeId })
-    .include("assignedUser")
-    .include("deliveries")
-    .first();
+  const routeWithDetails = await db.orm.public.Route.where({ id: routeId }).include("assignedUser").include("deliveries").first();
 
   if (!routeWithDetails) return null;
 

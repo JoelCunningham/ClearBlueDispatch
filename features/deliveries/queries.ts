@@ -21,17 +21,12 @@ export async function getDeliveryLocations() {
     .orderBy(location => location.address.asc())
     .all();
 
-  return locations.map(location => {
-    const addressParts = location.address.split(",").map(part => part.trim());
-
-    return {
-      id: location.id,
-      address: location.address,
-      suburb: addressParts.length >= 3 ? addressParts[addressParts.length - 3] : location.address,
-      customerId: location.customerId,
-      customerName: location.customer.name
-    };
-  });
+  return locations.map(location => ({
+    id: location.id,
+    address: location.address,
+    customerId: location.customerId,
+    customerName: location.customer.name
+  }));
 }
 
 export async function getDeliveryContacts(customerId?: number) {
@@ -49,16 +44,16 @@ export async function getDeliveryContacts(customerId?: number) {
   }));
 }
 
-export async function getDelivery(routeId: number, deliveryId: number): Promise<DeliveryDetail | null> {
-  await requireRouteAccess(routeId);
-
-  const delivery = await db.orm.public.Delivery.where({ id: deliveryId, routeId })
+export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | null> {
+  const delivery = await db.orm.public.Delivery.where({ id: deliveryId })
     .include("location")
     .include("contact")
     .include("route")
     .include("docket")
     .first();
   if (!delivery) return null;
+
+  await requireRouteAccess(delivery.routeId);
 
   const location = await db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first();
   if (!location) throw new Error(`Location ${delivery.locationId} not found.`);
@@ -69,6 +64,7 @@ export async function getDelivery(routeId: number, deliveryId: number): Promise<
     notes: delivery.notes,
     tankDetails: delivery.tankDetails,
     date: delivery.route?.date ?? "",
+    routeId: delivery.routeId,
 
     location: {
       address: location.address,

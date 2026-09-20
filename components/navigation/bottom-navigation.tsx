@@ -26,7 +26,7 @@ export function BottomNavigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-t bg-background sticky bottom-0">
+    <nav className="border-t bg-background shrink-0">
       <div className="mx-auto flex max-w-lg">
         {navigationItems.map(item => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);

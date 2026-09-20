@@ -10,7 +10,6 @@ export type CreateDeliveryInput = {
 export type DeliveryLocationOption = {
   id: number;
   address: string;
-  suburb: string;
   customerId: number;
   customerName: string;
 };
@@ -28,6 +27,7 @@ export type DeliveryDetail = {
   notes: string;
   tankDetails: string;
   date: string;
+  routeId: number;
 
   location: {
     address: string;

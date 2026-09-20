@@ -1,5 +1,7 @@
+import Heading from "@/components/wrappers/heading";
+import Page from "@/components/wrappers/page";
 import { createDelivery } from "@/features/deliveries/actions";
-import { CreateDeliveryForm } from "@/features/deliveries/components/create-delivery-form";
+import { DeliveryForm } from "@/components/forms/delivery-form";
 import { getAssignableUsers, getDeliveryContacts, getDeliveryLocations } from "@/features/deliveries/queries";
 
 export default async function ManageDeliveriesPage() {
@@ -26,13 +28,13 @@ export default async function ManageDeliveriesPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-6">
-      <div className="mb-6 space-y-2">
-        <h1 className="text-2xl font-semibold">Create delivery</h1>
-        <p className="text-sm text-muted-foreground">Add a delivery to a driver&apos;s route.</p>
-      </div>
-
-      <CreateDeliveryForm users={users} locations={locations} contacts={contacts} action={submitDelivery} />
-    </main>
+    <Page>
+      <Heading
+        title="Create delivery"
+        subtitle="Add a delivery to a driver's route."
+        backLink={{ text: "deliveries", href: "/manage/deliveries" }}
+      />
+      <DeliveryForm users={users} locations={locations} contacts={contacts} action={submitDelivery} />
+    </Page>
   );
 }

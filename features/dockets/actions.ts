@@ -3,14 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireRole } from "@/lib/auth/require-role";
 import { db } from "@/prisma/db";
 
 import { CreateDocketInput, createDocketSchema } from "./validation";
 
-export async function createDocket(input: CreateDocketInput & { routeId: number }) {
-  await requireRole("DRIVER");
-
+export async function createDocket(input: CreateDocketInput) {
   const result = createDocketSchema.safeParse(input);
   if (!result.success) {
     return { success: false, error: "Invalid docket details." };
@@ -32,7 +29,7 @@ export async function createDocket(input: CreateDocketInput & { routeId: number 
     return { success: false, error: error instanceof Error ? error.message : "Unable to create docket." };
   }
 
-  revalidatePath(`/routes/${input.routeId}/deliveries/${deliveryId}`);
+  revalidatePath(`/deliveries/${deliveryId}`);
 
-  redirect(`/routes/${input.routeId}/deliveries/${deliveryId}`);
+  redirect(`/deliveries/${deliveryId}`);
 }

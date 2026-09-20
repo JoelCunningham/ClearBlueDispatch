@@ -1,7 +1,7 @@
-import Link from "next/link";
-
+import CustomerForm from "@/components/forms/customer-form";
+import Heading from "@/components/wrappers/heading";
+import Page from "@/components/wrappers/page";
 import { createCustomer } from "@/features/customers/actions";
-import { CustomerForm } from "@/features/customers/components/customer-form";
 
 export default function CreateCustomerPage() {
   async function submitCustomer(input: Parameters<typeof createCustomer>[0]) {
@@ -10,18 +10,9 @@ export default function CreateCustomerPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-6">
-      <div className="mb-6 space-y-2">
-        <Link href="/manage/customers" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Customers
-        </Link>
-
-        <h1 className="text-2xl font-semibold">Create customer</h1>
-
-        <p className="text-sm text-muted-foreground">Add a new customer and their delivery information.</p>
-      </div>
-
+    <Page>
+      <Heading title="Create customer" backLink={{ text: "customers", href: "/manage/customers" }} />
       <CustomerForm action={submitCustomer} />
-    </main>
+    </Page>
   );
 }

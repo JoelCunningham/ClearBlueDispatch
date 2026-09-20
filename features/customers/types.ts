@@ -13,7 +13,7 @@ export type CustomerFormInput = {
     phoneNumber: string;
   }[];
 
-  invoiceEmails: {
+  emails: {
     id?: number;
     emailAddress: string;
   }[];
@@ -54,18 +54,21 @@ export type CustomerDetail = {
   invoiceEmails: InvoiceEmailSummary[];
 };
 
-export type LocationFormItem = {
+export type LocationItem = {
   id?: number;
   address: string;
+  clientId?: string;
 };
 
-export type ContactFormItem = {
+export type ContactItem = {
   id?: number;
   name: string;
   phoneNumber: string;
+  clientId?: string;
 };
 
-export type InvoiceEmailFormItem = {
+export type InvoiceEmailItem = {
   id?: number;
   emailAddress: string;
+  clientId?: string;
 };
