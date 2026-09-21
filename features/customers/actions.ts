@@ -52,10 +52,10 @@ export async function createCustomer(input: CreateCustomerInput) {
     return customer;
   });
 
-  revalidatePath("/manage/customers");
+  revalidatePath("/customers");
   revalidatePath("/manage");
 
-  redirect(`/manage/customers/${customer.id}`);
+  redirect(`/customers/${customer.id}`);
 }
 
 export async function updateCustomer(input: UpdateCustomerInput) {
@@ -150,10 +150,10 @@ export async function updateCustomer(input: UpdateCustomerInput) {
     return { success: false, error: error instanceof Error ? error.message : "Unable to save customer." };
   }
 
-  revalidatePath("/manage/customers");
-  revalidatePath(`/manage/customers/${customerId}`);
-  revalidatePath(`/manage/customers/${customerId}/edit`);
+  revalidatePath("/customers");
+  revalidatePath(`/customers/${customerId}`);
+  revalidatePath(`/customers/${customerId}/edit`);
   revalidatePath("/manage");
 
-  redirect(`/manage/customers/${result.data.customerId}`);
+  redirect(`/customers/${result.data.customerId}`);
 }

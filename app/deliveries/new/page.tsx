@@ -18,7 +18,7 @@ export default async function ManageDeliveriesPage() {
       <Heading
         title="Create delivery"
         subtitle="Add a delivery to a driver's route."
-        backLink={{ text: "deliveries", href: "/manage/deliveries" }}
+        backLink={{ text: "deliveries", href: "/deliveries" }}
       />
       <DeliveryForm users={users} locations={locations} contacts={contacts} action={submitDelivery} />
     </Page>

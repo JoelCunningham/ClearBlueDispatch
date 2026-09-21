@@ -59,7 +59,7 @@ export async function createDelivery(input: CreateDeliveryInput) {
 
   revalidatePath("/routes");
   revalidatePath(`/routes/${resultData.routeId}`);
-  revalidatePath("/manage/deliveries");
+  revalidatePath("/deliveries");
 
   redirect(`/routes/${resultData.routeId}`);
 }

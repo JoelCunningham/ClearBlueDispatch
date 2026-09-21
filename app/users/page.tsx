@@ -14,7 +14,7 @@ export default async function ManageUsersPage() {
 
       <List emptyText="No users have been created yet.">
         {users.map(user => (
-          <Card key={user.id} title={user.name} subtitle={capitalise(user.role)} href={`/manage/users/${user.id}`} />
+          <Card key={user.id} title={user.name} subtitle={capitalise(user.role)} href={`/users/${user.id}`} />
         ))}
       </List>
     </Page>

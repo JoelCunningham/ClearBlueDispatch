@@ -14,7 +14,7 @@ export default async function ManageCustomersPage() {
       <Heading
         title="Manage Customers"
         backLink={{ text: "manage", href: "/manage" }}
-        actionLink={{ text: "Create", href: "/manage/customers/new" }}
+        actionLink={{ text: "Create", href: "/customers/new" }}
       />
       <List emptyText="No customers have been created yet.">
         {customers.map(customer => {
@@ -26,7 +26,7 @@ export default async function ManageCustomersPage() {
                 key={customer.id}
                 title={customer.name}
                 subtitle={`$${customer.rate.toFixed(2)} per litre`}
-                href={`/manage/customers/${customer.id}`}
+                href={`/customers/${customer.id}`}
               />
             </div>
           );

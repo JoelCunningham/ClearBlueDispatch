@@ -37,8 +37,9 @@ export async function updateUser(input: UpdateUserInput) {
 
   await db.orm.public.User.where({ id: userId }).update({ name, email, role });
 
-  revalidatePath(`/manage/users/${userId}`);
-  redirect(`/manage/users/${userId}`);
+  revalidatePath("/users");
+  revalidatePath(`/users/${userId}`);
+  redirect(`/users/${userId}`);
 }
 
 export async function changeOwnPassword(input: ChangeOwnPasswordInput) {
@@ -89,8 +90,9 @@ export async function resetUserPassword(input: ResetUserPasswordInput) {
   const passwordHash = await bcrypt.hash(newPassword, 12);
   await db.orm.public.User.where({ id: userId }).update({ passwordHash });
 
-  revalidatePath(`/manage/users/${userId}`);
-  redirect(`/manage/users/${userId}`);
+  revalidatePath("/users");
+  revalidatePath(`/users/${userId}`);
+  redirect(`/users/${userId}`);
 }
 
 export async function updateOwnProfile(input: UpdateOwnProfileInput) {

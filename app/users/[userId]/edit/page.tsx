@@ -49,7 +49,7 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-6">
       <div className="mb-6 space-y-2">
-        <Link href={`/manage/users/${user.id}`} className="text-sm text-muted-foreground hover:text-foreground">
+        <Link href={`/users/${user.id}`} className="text-sm text-muted-foreground hover:text-foreground">
           ← User Profile
         </Link>
 

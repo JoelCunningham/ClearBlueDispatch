@@ -23,7 +23,7 @@ export default async function EditCustomerPage({ params }: PageProps) {
 
   return (
     <Page>
-      <Heading title="Edit customer" backLink={{ text: "customers", href: "/manage/customers" }} />
+      <Heading title="Edit customer" backLink={{ text: "customers", href: "/customers" }} />
       <CustomerForm customer={customer} action={submitCustomer} />
     </Page>
   );

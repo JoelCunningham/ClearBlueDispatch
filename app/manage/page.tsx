@@ -9,10 +9,10 @@ export default async function ManagePage() {
   return (
     <Page>
       <Heading title="Manage" subtitle="Manage customers, deliveries, and dockets." />
-      <Card href="/manage/deliveries" title="Deliveries" subtitle="Create and manage deliveries." />
-      <Card href="/manage/customers" title="Customers" subtitle="Create and manage customers." />
-      <Card href="/manage/dockets" title="Dockets" subtitle="View and manage dockets." />
-      <Card href="/manage/users" title="Users" subtitle="Manage app users and their roles." />
+      <Card href="/deliveries" title="Deliveries" subtitle="Create and manage deliveries." />
+      <Card href="/customers" title="Customers" subtitle="Create and manage customers." />
+      <Card href="/dockets" title="Dockets" subtitle="View and manage dockets." />
+      <Card href="/users" title="Users" subtitle="Manage app users and their roles." />
     </Page>
   );
 }

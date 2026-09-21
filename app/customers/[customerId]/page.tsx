@@ -23,8 +23,8 @@ export default async function CustomerPage({ params }: PageProps) {
       <Heading
         title={customer.name}
         subtitle={`$${customer.rate.toFixed(2)} per litre`}
-        backLink={{ text: "customers", href: "/manage/customers" }}
-        actionLink={{ text: "Edit", href: `/manage/customers/${customer.id}/edit` }}
+        backLink={{ text: "customers", href: "/customers" }}
+        actionLink={{ text: "Edit", href: `/customers/${customer.id}/edit` }}
       />
       <List title="Locations" emptyText="No locations.">
         {customer.locations.map(location => (

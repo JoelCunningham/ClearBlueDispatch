@@ -12,11 +12,7 @@ export default async function ManageDeliveriesPage() {
 
   return (
     <Page>
-      <Heading
-        title="Deliveries"
-        backLink={{ text: "manage", href: "/manage" }}
-        actionLink={{ text: "Create", href: "/manage/deliveries/new" }}
-      />
+      <Heading title="Deliveries" backLink={{ text: "manage", href: "/manage" }} actionLink={{ text: "Create", href: "/deliveries/new" }} />
       <List emptyText="No deliveries have been created yet.">
         {deliveries.map((delivery, index) => {
           const previousDate = deliveries[index - 1]?.date;
