@@ -90,7 +90,7 @@ export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | 
   };
 }
 
-export async function getDeliveries(): Promise<DeliverySummary[]> {
+export async function getDeliveries(search?: string): Promise<DeliverySummary[]> {
   await requireRole("MANAGER");
 
   const deliveries = await db.orm.public.Delivery.include("location", location => location.include("customer"))
@@ -98,7 +98,7 @@ export async function getDeliveries(): Promise<DeliverySummary[]> {
     .include("route", route => route.include("assignedUser"))
     .all();
 
-  return deliveries
+  const summaries = deliveries
     .map(delivery => {
       if (!delivery.route) {
         throw new Error(`Delivery ${delivery.id} has no route.`);
@@ -126,6 +126,15 @@ export async function getDeliveries(): Promise<DeliverySummary[]> {
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date));
+
+  const query = search?.trim().toLowerCase();
+  if (!query) return summaries;
+
+  return summaries.filter(delivery =>
+    [delivery.date, delivery.customerName, delivery.locationAddress, delivery.contactName ?? "", delivery.assignedUserName].some(value =>
+      value.toLowerCase().includes(query)
+    )
+  );
 }
 
 export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeliveryInput | null> {

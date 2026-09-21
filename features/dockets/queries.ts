@@ -1,7 +1,7 @@
 import { db } from "@/prisma/db";
 import type { DocketDetail, DocketSummary } from "./types";
 
-export async function getDockets(): Promise<DocketSummary[]> {
+export async function getDockets(search?: string): Promise<DocketSummary[]> {
   const dockets = await db.orm.public.Docket.include("delivery", delivery =>
     delivery.include("route").include("location", location => location.include("customer"))
   ).all();
@@ -23,7 +23,12 @@ export async function getDockets(): Promise<DocketSummary[]> {
     });
   }
 
-  return summaries.sort((a, b) => b.date.localeCompare(a.date));
+  summaries.sort((a, b) => b.date.localeCompare(a.date));
+
+  const query = search?.trim().toLowerCase();
+  if (!query) return summaries;
+
+  return summaries.filter(docket => [docket.customerName, docket.address, docket.date].some(value => value.toLowerCase().includes(query)));
 }
 
 export async function getDocket(docketId: number): Promise<DocketDetail | null> {

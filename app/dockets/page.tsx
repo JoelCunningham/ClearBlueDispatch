@@ -1,3 +1,4 @@
+import { SearchBar } from "@/components/inputs/search-bar";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import List from "@/components/wrappers/list";
@@ -7,16 +8,21 @@ import { requireRole } from "@/lib/auth/authorization";
 import { dateToLongFormat } from "@/lib/utils/date-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 
-export default async function ManageDocketsPage() {
+type DocketsPageProps = {
+  searchParams: Promise<{ search?: string }>;
+};
+
+export default async function DocketsPage({ searchParams }: DocketsPageProps) {
   await requireRole("MANAGER");
 
-  const dockets = await getDockets();
+  const { search } = await searchParams;
+  const dockets = await getDockets(search);
 
   return (
     <Page>
       <Heading title="Dockets" subtitle="View and manage delivery dockets." />
-
-      <List emptyText="No dockets have been created yet.">
+      <SearchBar placeholder="Search dockets..." />
+      <List emptyText={search ? "No dockets match your search." : "No dockets have been created yet."}>
         {dockets.map(docket => (
           <Card
             key={docket.id}

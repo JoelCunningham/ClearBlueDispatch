@@ -1,13 +1,22 @@
+import { SearchBar } from "@/components/inputs/search-bar";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import List from "@/components/wrappers/list";
 import ListSeparator from "@/components/wrappers/list-seperator";
 import Page from "@/components/wrappers/page";
 import { getCustomers } from "@/features/customers/queries";
+import { requireRole } from "@/lib/auth/authorization";
 import { getFirstLetter } from "@/lib/utils/string-utils";
 
-export default async function ManageCustomersPage() {
-  const customers = await getCustomers();
+interface CustomersPageProps {
+  searchParams: Promise<{ search?: string }>;
+}
+
+export default async function CustomersPage({ searchParams }: CustomersPageProps) {
+  requireRole("MANAGER");
+
+  const { search } = await searchParams;
+  const customers = await getCustomers(search);
 
   return (
     <Page>
@@ -16,7 +25,8 @@ export default async function ManageCustomersPage() {
         backLink={{ text: "manage", href: "/manage" }}
         actionLink={{ text: "Create", href: "/customers/new" }}
       />
-      <List emptyText="No customers have been created yet.">
+      <SearchBar placeholder="Search customers..." />
+      <List emptyText={search ? "No customers match your search." : "No customers have been created yet."}>
         {customers.map(customer => {
           const previousLetter = getFirstLetter(customers[customers.indexOf(customer) - 1]?.name);
           return (

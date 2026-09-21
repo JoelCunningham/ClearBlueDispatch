@@ -3,16 +3,21 @@ import { db } from "@/prisma/db";
 
 import type { CustomerDetail, CustomerSummary } from "./types";
 
-export async function getCustomers(): Promise<CustomerSummary[]> {
+export async function getCustomers(search?: string): Promise<CustomerSummary[]> {
   await requireRole("MANAGER");
 
   const customers = await db.orm.public.Customer.orderBy(customer => customer.name.asc()).all();
 
-  return customers.map(customer => ({
+  const summaries = customers.map(customer => ({
     id: customer.id,
     name: customer.name,
     rate: customer.rate
   }));
+
+  const query = search?.trim().toLowerCase();
+  if (!query) return summaries;
+
+  return customers.filter(customer => [customer.name].some(value => value.toLowerCase().includes(query)));
 }
 
 export async function getCustomer(customerId: number): Promise<CustomerDetail | null> {

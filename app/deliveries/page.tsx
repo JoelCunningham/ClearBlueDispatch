@@ -1,3 +1,4 @@
+import { SearchBar } from "@/components/inputs/search-bar";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import List from "@/components/wrappers/list";
@@ -8,15 +9,21 @@ import { requireRole } from "@/lib/auth/authorization";
 import { dateToLongYearFormat } from "@/lib/utils/date-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 
-export default async function ManageDeliveriesPage() {
+type DeliveriesPageProps = {
+  searchParams: Promise<{ search?: string }>;
+};
+
+export default async function DeliveriesPage({ searchParams }: DeliveriesPageProps) {
   await requireRole("MANAGER");
 
-  const deliveries = await getDeliveries();
+  const { search } = await searchParams;
+  const deliveries = await getDeliveries(search);
 
   return (
     <Page>
       <Heading title="Deliveries" backLink={{ text: "manage", href: "/manage" }} actionLink={{ text: "Create", href: "/deliveries/new" }} />
-      <List emptyText="No deliveries have been created yet.">
+      <SearchBar placeholder="Search deliveries..." />
+      <List emptyText={search ? "No deliveries match your search." : "No deliveries have been created yet."}>
         {deliveries.map((delivery, index) => {
           const previousDate = deliveries[index - 1]?.date;
           return (

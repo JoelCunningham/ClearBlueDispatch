@@ -1,7 +1,13 @@
+import React from "react";
 import InputWrapper from "./input-wrapper";
 
+interface SuffixProps {
+  icon: React.ReactNode;
+  onClick?: () => void;
+}
+
 interface InputProps {
-  type: "text" | "email" | "password" | "date" | "tel" | "number";
+  type: "text" | "email" | "password" | "date" | "tel" | "number" | "search";
   id: string;
   label?: string;
   required?: boolean;
@@ -12,6 +18,9 @@ interface InputProps {
   minNumber?: number;
   minLength?: number;
   prefix?: string;
+  suffix?: SuffixProps;
+  value?: string | number;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function BasicInput({
@@ -25,12 +34,15 @@ export default function BasicInput({
   step,
   minNumber,
   minLength,
-  prefix
+  prefix,
+  suffix,
+  value,
+  onChange
 }: InputProps) {
   return (
     <InputWrapper id={id} label={label}>
-      <div className="flex">
-        {prefix && <span className="rounded-l-md border border-r-0 justify-center p-2 ">{prefix}</span>}
+      <div className="flex rounded-md border bg-background disabled:bg-muted focus:ring-2 focus:ring-ring">
+        {prefix && <span className="justify-center p-2">{prefix}</span>}
         <input
           id={id}
           name={id}
@@ -42,8 +54,15 @@ export default function BasicInput({
           step={step}
           min={minNumber}
           minLength={minLength}
-          className={`w-full rounded-md border bg-background px-3 py-2 disabled:bg-muted ${prefix ? "border-l-0 rounded-l-none pl-0" : ""}`}
+          value={value}
+          onChange={onChange}
+          className="w-full px-3 py-2 focus:outline-none"
         />
+        {suffix && (
+          <span className="justify-center p-2" onClick={suffix.onClick}>
+            {suffix.icon}
+          </span>
+        )}
       </div>
     </InputWrapper>
   );
