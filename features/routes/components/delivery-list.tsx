@@ -62,7 +62,7 @@ export default function DeliveryList({ routeId, deliveries: initialDeliveries }:
           href={`/deliveries/${delivery.id}`}
           title={getCustomerName(delivery.location.customerName, delivery.location.address)}
           subtitle={delivery.location.address}
-          avatarText={delivery.position.toString()}
+          avatar={delivery.position.toString()}
         >
           <div className="flex flex-col gap-1">
             <MoveButton index={index} items={deliveries.length} isPending={isPending} isUp={true} onClick={moveDelivery} />

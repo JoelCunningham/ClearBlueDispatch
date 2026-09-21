@@ -9,13 +9,17 @@ import { DocketFormInput } from "@/features/dockets/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 
 type DocketFormProps = {
-  docketNumber: number;
+  number?: number;
   date: string;
   customerName: string;
+  volume?: number;
+  batchNumber?: string;
+  repName?: string;
+  repSignature?: string;
   action: (input: DocketFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export default function DocketForm({ docketNumber, date, customerName, action }: DocketFormProps) {
+export default function DocketForm({ number, date, customerName, action, volume, batchNumber, repName, repSignature }: DocketFormProps) {
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -44,16 +48,15 @@ export default function DocketForm({ docketNumber, date, customerName, action }:
   }
 
   return (
-    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText="Create docket">
-      <section className="-mt-2 grid grid-cols-2 gap-x-4 gap-y-4 rounded-lg border bg-muted/30 p-4 text-sm">
-        <LineItem name="Docket number" value={`#${docketNumber}`} vertical />
-        <LineItem name="Date" value={date} vertical />
-        <LineItem name="Customer" value={customerName} vertical />
+    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={number ? "Save changes" : "Create docket"}>
+      <section className="-mt-2 space-y-3 rounded-lg border bg-muted/30 p-4 text-sm">
+        <LineItem name="Date" value={date} />
+        <LineItem name="Customer" value={customerName} />
       </section>
-      <BasicInput type="number" id="volume" label="Volume" minNumber={1} step={1} />
-      <BasicInput type="number" id="batchNumber" label="Batch number" minNumber={1} step={1} />
-      <BasicInput type="text" id="repName" label="Name" />
-      <BasicInput type="text" id="repSignature" label="Signature" />
+      <BasicInput type="number" id="volume" label="Volume" minNumber={1} step={1} initial={volume} />
+      <BasicInput type="number" id="batchNumber" label="Batch number" minNumber={1} step={1} initial={batchNumber} />
+      <BasicInput type="text" id="repName" label="Name" initial={repName} />
+      <BasicInput type="text" id="repSignature" label="Signature" initial={repSignature} />
     </Form>
   );
 }

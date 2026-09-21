@@ -1,16 +1,16 @@
 import { Calendar, MapPin } from "lucide-react";
 
-import PhoneButtons from "@/components/buttons/phone-buttons";
 import LinkButton from "@/components/buttons/link-button";
+import PhoneButtons from "@/components/buttons/phone-buttons";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import LineItem from "@/components/wrappers/line-item";
 import List from "@/components/wrappers/list";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
-import { getCustomerName } from "@/lib/utils/string-utils";
 import { dateToLongFormat } from "@/lib/utils/date-utils";
 import { getGoogleMapsUrl } from "@/lib/utils/maps-utils";
+import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
 type DeliveryPageProps = {
@@ -42,7 +42,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
       </Card>
 
       {delivery.docket ? (
-        <Card title="Docket" childrenPosition="bottom">
+        <Card title="Docket" childrenPosition="bottom" href={`/dockets/${delivery.docket.id}`}>
           <List>
             <LineItem name="Volume" value={delivery.docket.volume.toString()} />
             <LineItem name="Batch number" value={delivery.docket.batchNumber} />
@@ -51,7 +51,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
           </List>
         </Card>
       ) : (
-        <LinkButton text="Create docket" href={`/deliveries/${deliveryIdNumber}/docket`} />
+        <LinkButton text="Create docket" href={`/dockets/new/${deliveryIdNumber}`} />
       )}
     </Page>
   );

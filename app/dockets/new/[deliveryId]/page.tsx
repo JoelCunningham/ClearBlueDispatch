@@ -3,7 +3,7 @@ import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
 import { createDocket } from "@/features/dockets/actions";
-import { DocketFormInput } from "@/features/dockets/types";
+import { CreateDocketInput } from "@/features/dockets/types";
 import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
@@ -18,7 +18,7 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
   const customerName = getCustomerName(delivery.location.customerName, delivery.location.address);
 
-  async function submitDocket(input: DocketFormInput) {
+  async function submitDocket(input: CreateDocketInput) {
     "use server";
     return await createDocket({ deliveryId: deliveryIdNumber, ...input });
   }
@@ -26,7 +26,7 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
   return (
     <Page>
       <Heading title="Create docket" backLink={{ text: "delivery", href: `/deliveries/${deliveryIdNumber}` }} />
-      <DocketForm docketNumber={delivery.id} date={delivery.date} customerName={customerName} action={submitDocket} />
+      <DocketForm date={delivery.date} customerName={customerName} action={submitDocket} />
     </Page>
   );
 }

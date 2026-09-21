@@ -11,7 +11,7 @@ type PasswordFormProps = {
   action: (input: { currentPassword?: string; newPassword: string }) => Promise<{ success: boolean; error?: string }>;
 };
 
-export function PasswordForm({ requireCurrentPassword, action }: PasswordFormProps) {
+export default function PasswordForm({ requireCurrentPassword, action }: PasswordFormProps) {
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 

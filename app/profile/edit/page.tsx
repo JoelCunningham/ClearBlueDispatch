@@ -1,5 +1,5 @@
-import { PasswordForm } from "@/components/forms/password-form";
-import { UserForm } from "@/components/forms/user-form";
+import PasswordForm from "@/components/forms/password-form";
+import UserForm from "@/components/forms/user-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { changeOwnPassword, updateOwnProfile } from "@/features/users/actions";

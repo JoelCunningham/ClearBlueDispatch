@@ -4,8 +4,8 @@ import List from "@/components/wrappers/list";
 import ListSeparator from "@/components/wrappers/list-seperator";
 import Page from "@/components/wrappers/page";
 import { getDeliveries } from "@/features/deliveries/queries";
-import { getCustomerName } from "@/lib/utils/string-utils";
 import { dateToLongYearFormat } from "@/lib/utils/date-utils";
+import { getCustomerName } from "@/lib/utils/string-utils";
 
 export default async function ManageDeliveriesPage() {
   const deliveries = await getDeliveries();

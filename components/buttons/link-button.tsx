@@ -1,14 +1,14 @@
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
-interface ButtonLinkProps {
+interface LinkButtonProps {
   text?: string;
   icon?: LucideIcon;
   href: string;
   secondary?: boolean;
 }
 
-export default function LinkButton({ text, icon: Icon, href, secondary }: ButtonLinkProps) {
+export default function LinkButton({ text, icon: Icon, href, secondary }: LinkButtonProps) {
   return (
     <Link
       href={href}

@@ -1,18 +1,15 @@
 export type CustomerFormInput = {
   name: string;
   rate: number;
-
   locations: {
     id?: number;
     address: string;
   }[];
-
   contacts: {
     id?: number;
     name: string;
     phoneNumber: string;
   }[];
-
   emails: {
     id?: number;
     emailAddress: string;
@@ -29,29 +26,23 @@ export type CustomerSummary = {
   rate: number;
 };
 
-export type LocationSummary = {
-  id: number;
-  address: string;
-};
-
-export type ContactSummary = {
-  id: number;
-  name: string;
-  phoneNumber: string;
-};
-
-export type InvoiceEmailSummary = {
-  id: number;
-  emailAddress: string;
-};
-
 export type CustomerDetail = {
   id: number;
   name: string;
   rate: number;
-  locations: LocationSummary[];
-  contacts: ContactSummary[];
-  invoiceEmails: InvoiceEmailSummary[];
+  locations: {
+    id: number;
+    address: string;
+  }[];
+  contacts: {
+    id: number;
+    name: string;
+    phoneNumber: string;
+  }[];
+  invoiceEmails: {
+    id: number;
+    emailAddress: string;
+  }[];
 };
 
 export type LocationItem = {

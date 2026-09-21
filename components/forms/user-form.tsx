@@ -17,7 +17,7 @@ type UserFormProps = {
   action: (input: UpdateUserInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export function UserForm({ name, email, role, canEditRole, action }: UserFormProps) {
+export default function UserForm({ name, email, role, canEditRole, action }: UserFormProps) {
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 

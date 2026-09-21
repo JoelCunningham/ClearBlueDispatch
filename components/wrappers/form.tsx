@@ -12,7 +12,7 @@ interface FormProps {
 
 export default function Form({ title, isSaving, error, onSubmit, submitText, children }: FormProps) {
   return (
-    <form onSubmit={onSubmit} className={`space-y-3 ${title ? "rounded-lg border p-4" : ""}`}>
+    <form onSubmit={onSubmit} className={`w-full space-y-3 ${title ? "rounded-lg border p-4" : ""}`}>
       {title && <h2 className="mb-4 font-semibold">{title}</h2>}
       {children}
       {error && <ErrorAlert text={error} />}
