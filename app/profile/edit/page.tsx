@@ -3,7 +3,7 @@ import UserForm from "@/components/forms/user-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { changeOwnPassword, updateOwnProfile } from "@/features/users/actions";
-import { UpdateOwnProfileInput } from "@/features/users/types";
+import { PasswordFormInput, UpdateOwnProfileInput } from "@/features/users/types";
 import { requireUser } from "@/lib/auth/authorization";
 
 export default async function EditProfilePage() {
@@ -14,7 +14,7 @@ export default async function EditProfilePage() {
     return updateOwnProfile({ ...input, userId: user.id });
   }
 
-  async function changePassword(input: { currentPassword?: string; newPassword: string }) {
+  async function changePassword(input: PasswordFormInput) {
     "use server";
     return changeOwnPassword({ ...input });
   }

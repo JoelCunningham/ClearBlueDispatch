@@ -15,18 +15,17 @@ export type UpdateUserInput = {
   role: UserRole;
 };
 
-export type ChangeOwnPasswordInput = {
-  currentPassword?: string;
-  newPassword: string;
-};
-
-export type ResetUserPasswordInput = {
-  userId: number;
-  newPassword: string;
-};
-
 export type UpdateOwnProfileInput = {
   name: string;
   email: string;
   userId: number;
 };
+
+export type PasswordFormInput = {
+  currentPassword?: string;
+  newPassword: string;
+};
+
+export type ChangeOwnPasswordInput = PasswordFormInput;
+
+export type ResetUserPasswordInput = PasswordFormInput & { userId: number };

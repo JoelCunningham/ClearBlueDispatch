@@ -5,13 +5,13 @@ interface SelectInputProps {
   label: string;
   items: { id: number | string; name: string }[];
   placeholder?: string;
-  defaultValue?: string;
+  initial?: string;
   onChange?: (value: string) => void;
   required?: boolean;
   disabled?: boolean;
 }
 
-export default function SelectInput({ id, label, items, placeholder, defaultValue, required, disabled }: SelectInputProps) {
+export default function SelectInput({ id, label, items, placeholder, initial, required, disabled }: SelectInputProps) {
   return (
     <InputWrapper id={id} label={label}>
       <select
@@ -19,7 +19,7 @@ export default function SelectInput({ id, label, items, placeholder, defaultValu
         name={id}
         required={required}
         disabled={disabled}
-        defaultValue={defaultValue}
+        defaultValue={initial}
         className="w-full rounded-md border bg-background px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">{placeholder || "Select an option"}</option>

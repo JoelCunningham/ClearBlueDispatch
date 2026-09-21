@@ -1,4 +1,4 @@
-export type CreateDeliveryInput = {
+export type DeliveryFormInput = {
   assignedUserId: number;
   date: string;
   locationId: number;
@@ -6,6 +6,10 @@ export type CreateDeliveryInput = {
   notes: string;
   tankDetails: string;
 };
+
+export type CreateDeliveryInput = DeliveryFormInput;
+
+export type UpdateDeliveryInput = DeliveryFormInput & { deliveryId: number };
 
 export type DeliveryLocationOption = {
   id: number;

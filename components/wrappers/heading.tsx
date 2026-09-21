@@ -1,6 +1,9 @@
 import { LucideIcon, MoveLeft } from "lucide-react";
 import Link from "next/link";
 
+import { checkUserRole } from "@/lib/auth/authorization";
+import { UserRole } from "@/types/next-auth";
+
 interface HeadingProps {
   title: string;
   subtitle?: string;
@@ -13,12 +16,15 @@ interface HeadingProps {
 interface LinkProps {
   text: string;
   href: string;
+  role?: UserRole;
 }
 
-export default function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, backLink, actionLink, children }: HeadingProps) {
+export default async function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, backLink, actionLink, children }: HeadingProps) {
+  const role = await checkUserRole();
+
   return (
     <div className="mb-6 space-y-2 w-full">
-      {backLink && (
+      {backLink && (backLink.role ? role === backLink.role : true) && (
         <Link href={backLink.href} className="text-sm text-muted-foreground hover:text-foreground">
           <MoveLeft className="inline-block h-4 w-4" /> Back to {backLink.text}
         </Link>
@@ -31,11 +37,8 @@ export default function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, b
             {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
-        {actionLink && (
-          <Link
-            href={actionLink.href}
-            className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
+        {actionLink && (actionLink.role ? role === actionLink.role : true) && (
+          <Link href={actionLink.href} className="shrink-0 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
             {actionLink.text}
           </Link>
         )}

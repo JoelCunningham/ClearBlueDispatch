@@ -10,3 +10,15 @@ export const createDeliverySchema = z.object({
 });
 
 export type CreateDeliveryInput = z.infer<typeof createDeliverySchema>;
+
+export const updateDeliverySchema = z.object({
+  deliveryId: z.coerce.number().int().positive(),
+  assignedUserId: z.coerce.number().int().positive(),
+  date: z.string().trim().min(1),
+  locationId: z.coerce.number().int().positive(),
+  contactId: z.coerce.number().int().positive().optional(),
+  notes: z.string(),
+  tankDetails: z.string()
+});
+
+export type UpdateDeliveryInput = z.infer<typeof updateDeliverySchema>;

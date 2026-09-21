@@ -1,7 +1,7 @@
 import { requireRouteAccess } from "@/lib/auth/authorization";
 import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
-import { DeliveryDetail, DeliverySummary } from "./types";
+import { DeliveryDetail, DeliverySummary, UpdateDeliveryInput } from "./types";
 
 export async function getAssignableUsers() {
   await requireRole("MANAGER");
@@ -126,4 +126,21 @@ export async function getDeliveries(): Promise<DeliverySummary[]> {
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeliveryInput | null> {
+  const delivery = await db.orm.public.Delivery.where({ id: deliveryId }).include("route").first();
+  if (!delivery) return null;
+
+  if (!delivery.route) throw new Error(`Route not found for delivery ${deliveryId}.`);
+
+  return {
+    deliveryId: delivery.id,
+    assignedUserId: delivery.route.assignedUserId,
+    date: delivery.route.date,
+    locationId: delivery.locationId,
+    contactId: delivery.contactId ?? undefined,
+    notes: delivery.notes,
+    tankDetails: delivery.tankDetails
+  };
 }

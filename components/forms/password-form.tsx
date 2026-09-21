@@ -4,11 +4,12 @@ import { useState } from "react";
 
 import BasicInput from "@/components/inputs/basic-input";
 import Form from "@/components/wrappers/form";
+import { PasswordFormInput } from "@/features/users/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 
 type PasswordFormProps = {
   requireCurrentPassword: boolean;
-  action: (input: { currentPassword?: string; newPassword: string }) => Promise<{ success: boolean; error?: string }>;
+  action: (input: PasswordFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
 export default function PasswordForm({ requireCurrentPassword, action }: PasswordFormProps) {

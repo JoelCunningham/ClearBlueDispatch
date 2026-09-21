@@ -61,7 +61,7 @@ export default function UserForm({ name, email, role, canEditRole, action }: Use
           { id: "MANAGER", name: "Manager" }
         ]}
         disabled={!canEditRole}
-        defaultValue={role.toString()}
+        initial={role.toString()}
         required
       />
     </Form>

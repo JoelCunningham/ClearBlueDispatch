@@ -31,6 +31,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
         subtitle={`${dateToLongFormat(delivery.date)} • Stop #${delivery.position}`}
         subtitleIcon={Calendar}
         backLink={{ text: "route", href: `/routes/${delivery.routeId}` }}
+        actionLink={{ text: "Edit", href: `/deliveries/${deliveryIdNumber}/edit`, role: "MANAGER" }}
       />
 
       <LinkButton text={delivery.location.address} icon={MapPin} href={getGoogleMapsUrl(delivery.location.address)} />

@@ -6,7 +6,7 @@ import BasicInput from "@/components/inputs/basic-input";
 import SelectInput from "@/components/inputs/select-input";
 import TextAreaInput from "@/components/inputs/textarea-input";
 import Form from "@/components/wrappers/form";
-import { CreateDeliveryInput, DeliveryContactOption, DeliveryLocationOption } from "@/features/deliveries/types";
+import { DeliveryContactOption, DeliveryFormInput, DeliveryLocationOption } from "@/features/deliveries/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 
@@ -19,10 +19,27 @@ type DeliveryFormProps = {
   users: UserOption[];
   locations: DeliveryLocationOption[];
   contacts: DeliveryContactOption[];
-  action: (input: CreateDeliveryInput) => Promise<{ success: boolean; error?: string }>;
+  action: (input: DeliveryFormInput) => Promise<{ success: boolean; error?: string }>;
+  date?: string;
+  userId?: number;
+  locationId?: number;
+  contactId?: number;
+  tankDetails?: string;
+  notes?: string;
 };
 
-export default function DeliveryForm({ users, locations, contacts, action }: DeliveryFormProps) {
+export default function DeliveryForm({
+  users,
+  locations,
+  contacts,
+  action,
+  date,
+  userId,
+  locationId,
+  contactId,
+  tankDetails,
+  notes
+}: DeliveryFormProps) {
   const [selectedLocationId, setSelectedLocationId] = useState("");
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +61,7 @@ export default function DeliveryForm({ users, locations, contacts, action }: Del
       const formData = new FormData(event.currentTarget);
       const contactIdVal = formData.get("contactId");
 
-      const input: CreateDeliveryInput = {
+      const input: DeliveryFormInput = {
         assignedUserId: Number(formData.get("assignedUserId") ?? 0),
         date: String(formData.get("date") ?? ""),
         locationId: Number(formData.get("locationId") ?? 0),
@@ -63,13 +80,14 @@ export default function DeliveryForm({ users, locations, contacts, action }: Del
   }
 
   return (
-    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText="Create delivery">
-      <BasicInput type="date" id="date" label="Date" required />
+    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={userId ? "Save changes" : "Create delivery"}>
+      <BasicInput type="date" id="date" label="Date" initial={date} required />
       <SelectInput
         id="assignedUserId"
         label="Driver"
         items={users.map(user => ({ id: user.id, name: user.name }))}
         placeholder="Select a driver"
+        initial={userId?.toString()}
         required
       />
       <SelectInput
@@ -78,6 +96,7 @@ export default function DeliveryForm({ users, locations, contacts, action }: Del
         items={locations.map(location => ({ id: location.id, name: getCustomerName(location.customerName, location.address) }))}
         onChange={setSelectedLocationId}
         placeholder="Select a location"
+        initial={locationId?.toString()}
         required
       />
       <SelectInput
@@ -87,9 +106,10 @@ export default function DeliveryForm({ users, locations, contacts, action }: Del
         required={customerContacts.length > 0}
         disabled={!selectedLocation}
         placeholder={contactPlaceholder}
+        initial={contactId?.toString()}
       />
-      <TextAreaInput id="tankDetails" label="Tank details" />
-      <TextAreaInput id="notes" label="Notes" />
+      <TextAreaInput id="tankDetails" label="Tank details" initial={tankDetails} />
+      <TextAreaInput id="notes" label="Notes" initial={notes} />
     </Form>
   );
 }

@@ -4,6 +4,7 @@ import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { resetUserPassword, updateUser } from "@/features/users/actions";
 import { getUser } from "@/features/users/queries";
+import { PasswordFormInput, UpdateUserInput } from "@/features/users/types";
 import { requireRole } from "@/lib/auth/authorization";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
@@ -20,13 +21,13 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
 
   const isSelf = manager.id === user.id;
 
-  async function updateUserDetails(input: { name: string; email: string; role: "DRIVER" | "MANAGER" }) {
+  async function updateUserDetails(input: UpdateUserInput) {
     "use server";
     if (!user) return { success: false, error: "User not found." };
     return updateUser({ ...input, userId: user.id });
   }
 
-  async function resetPassword(input: { currentPassword?: string; newPassword: string }) {
+  async function resetPassword(input: PasswordFormInput) {
     "use server";
     if (!user) return { success: false, error: "User not found." };
     return resetUserPassword({ userId: user.id, newPassword: input.newPassword });

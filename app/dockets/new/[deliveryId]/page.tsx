@@ -4,6 +4,7 @@ import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
 import { createDocket } from "@/features/dockets/actions";
 import { CreateDocketInput } from "@/features/dockets/types";
+import { requireRole } from "@/lib/auth/authorization";
 import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
@@ -12,6 +13,8 @@ type DocketPageProps = {
 };
 
 export default async function CreateDocketPage({ params }: DocketPageProps) {
+  await requireRole("MANAGER");
+
   const { deliveryId } = await params;
 
   const deliveryIdNumber = idOrNotFound(deliveryId);
