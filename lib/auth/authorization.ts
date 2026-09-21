@@ -1,7 +1,32 @@
 import { redirect } from "next/navigation";
 
+import { auth } from "@/auth";
 import { db } from "@/prisma/db";
-import { requireUser } from "@/lib/auth/require-user";
+import { UserRole } from "@/types/next-auth";
+
+export async function requireUser() {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+  return session.user;
+}
+
+export async function requireRole(role: UserRole) {
+  const user = await requireUser();
+  if (user.role !== role) redirect("/routes");
+  return user;
+}
+
+export async function checkUser() {
+  const session = await auth();
+  if (!session?.user) return null;
+  return session.user;
+}
+
+export async function checkUserRole() {
+  const user = await checkUser();
+  if (!user) return null;
+  return user.role;
+}
 
 export async function requireRouteAccess(routeId: number) {
   const user = await requireUser();

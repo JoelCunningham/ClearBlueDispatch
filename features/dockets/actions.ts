@@ -30,6 +30,5 @@ export async function createDocket(input: CreateDocketInput) {
   }
 
   revalidatePath(`/deliveries/${deliveryId}`);
-
   redirect(`/deliveries/${deliveryId}`);
 }

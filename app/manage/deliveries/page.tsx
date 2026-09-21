@@ -4,7 +4,7 @@ import List from "@/components/wrappers/list";
 import ListSeparator from "@/components/wrappers/list-seperator";
 import Page from "@/components/wrappers/page";
 import { getDeliveries } from "@/features/deliveries/queries";
-import { getFullName } from "@/lib/utils/customer-util";
+import { getCustomerName } from "@/lib/utils/string-utils";
 import { dateToLongYearFormat } from "@/lib/utils/date-utils";
 
 export default async function ManageDeliveriesPage() {
@@ -14,7 +14,6 @@ export default async function ManageDeliveriesPage() {
     <Page>
       <Heading
         title="Deliveries"
-        subtitle="Manage deliveries and their docket information."
         backLink={{ text: "manage", href: "/manage" }}
         actionLink={{ text: "Create", href: "/manage/deliveries/new" }}
       />
@@ -25,7 +24,7 @@ export default async function ManageDeliveriesPage() {
             <div key={delivery.id}>
               {delivery.date !== previousDate && <ListSeparator title={dateToLongYearFormat(delivery.date)} />}
               <Card
-                title={getFullName(delivery.customerName, delivery.locationAddress)}
+                title={getCustomerName(delivery.customerName, delivery.locationAddress)}
                 subtitle={delivery.assignedUserName}
                 href={`/deliveries/${delivery.id}`}
               />

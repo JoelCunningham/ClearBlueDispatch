@@ -1,5 +1,5 @@
 import { requireRouteAccess } from "@/lib/auth/authorization";
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 import { DeliveryDetail, DeliverySummary } from "./types";
 

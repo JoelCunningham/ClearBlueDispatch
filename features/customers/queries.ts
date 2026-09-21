@@ -1,4 +1,4 @@
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 
 import type { CustomerDetail, CustomerSummary } from "./types";
@@ -31,9 +31,7 @@ export async function getCustomer(customerId: number): Promise<CustomerDetail | 
     name: customer.name,
     rate: customer.rate,
 
-    locations: customer.locations
-      .filter(location => !location.deleted)
-      .map(location => ({ id: location.id, address: location.address })),
+    locations: customer.locations.filter(location => !location.deleted).map(location => ({ id: location.id, address: location.address })),
 
     contacts: customer.contacts
       .filter(contact => !contact.deleted)

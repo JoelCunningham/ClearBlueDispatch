@@ -1,32 +1,59 @@
 "use client";
 
-import SubmitButton from "@/components/buttons/submit-button";
-import NumberInput from "@/components/inputs/number-input";
-import TextInput from "@/components/inputs/text-input";
+import { useState } from "react";
+
+import BasicInput from "@/components/inputs/basic-input";
+import Form from "@/components/wrappers/form";
 import LineItem from "@/components/wrappers/line-item";
+import { DocketFormInput } from "@/features/dockets/types";
+import { suppressEvent } from "@/lib/utils/event-utils";
 
 type DocketFormProps = {
   docketNumber: number;
   date: string;
   customerName: string;
-  action: (formData: FormData) => void | Promise<void>;
+  action: (input: DocketFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export function DocketForm({ docketNumber, date, customerName, action }: DocketFormProps) {
+export default function DocketForm({ docketNumber, date, customerName, action }: DocketFormProps) {
+  const [error, setError] = useState<string>();
+  const [isSaving, setIsSaving] = useState(false);
+
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+    suppressEvent(event);
+    setError(undefined);
+    setIsSaving(true);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+
+      const input: DocketFormInput = {
+        volume: Number(formData.get("volume") ?? 0),
+        batchNumber: String(formData.get("batchNumber") ?? ""),
+        repName: String(formData.get("repName") ?? ""),
+        repSignature: String(formData.get("repSignature") ?? "")
+      };
+
+      const result = await action(input);
+      if (!result.success) setError(result.error ?? "Unable to create docket.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to create docket.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
-    <form action={action} className="space-y-3">
-      <section className="rounded-lg border bg-muted/30 p-4 grid grid-cols-2 gap-x-4 gap-y-4 text-sm -mt-2">
+    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText="Create docket">
+      <section className="-mt-2 grid grid-cols-2 gap-x-4 gap-y-4 rounded-lg border bg-muted/30 p-4 text-sm">
         <LineItem name="Docket number" value={`#${docketNumber}`} vertical />
         <LineItem name="Date" value={date} vertical />
         <LineItem name="Customer" value={customerName} vertical />
       </section>
-
-      <NumberInput id="volume" label="Volume" />
-      <NumberInput id="batchNumber" label="Batch number" />
-      <TextInput id="repName" label="Name" />
-      <TextInput id="repSignature" label="Signature" />
-
-      <SubmitButton text="Create docket" />
-    </form>
+      <BasicInput type="number" id="volume" label="Volume" minNumber={1} step={1} />
+      <BasicInput type="number" id="batchNumber" label="Batch number" minNumber={1} step={1} />
+      <BasicInput type="text" id="repName" label="Name" />
+      <BasicInput type="text" id="repSignature" label="Signature" />
+    </Form>
   );
 }

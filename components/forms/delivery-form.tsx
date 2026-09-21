@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 
-import SubmitButton from "@/components/buttons/submit-button";
-import DateInput from "@/components/inputs/date-input";
+import BasicInput from "@/components/inputs/basic-input";
 import SelectInput from "@/components/inputs/select-input";
 import TextAreaInput from "@/components/inputs/textarea-input";
-import { DeliveryContactOption, DeliveryLocationOption } from "@/features/deliveries/types";
-import { getFullName } from "@/lib/utils/customer-util";
+import Form from "@/components/wrappers/form";
+import { CreateDeliveryInput, DeliveryContactOption, DeliveryLocationOption } from "@/features/deliveries/types";
+import { suppressEvent } from "@/lib/utils/event-utils";
+import { getCustomerName } from "@/lib/utils/string-utils";
 
 type UserOption = {
   id: number;
@@ -18,11 +19,13 @@ type DeliveryFormProps = {
   users: UserOption[];
   locations: DeliveryLocationOption[];
   contacts: DeliveryContactOption[];
-  action: (formData: FormData) => void | Promise<void>;
+  action: (input: CreateDeliveryInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export function DeliveryForm({ users, locations, contacts, action }: DeliveryFormProps) {
+export default function DeliveryForm({ users, locations, contacts, action }: DeliveryFormProps) {
   const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [error, setError] = useState<string>();
+  const [isSaving, setIsSaving] = useState(false);
 
   const selectedLocation = locations.find(location => location.id === Number(selectedLocationId));
   const customerContacts = selectedLocation ? contacts.filter(contact => contact.customerId === selectedLocation.customerId) : [];
@@ -32,21 +35,50 @@ export function DeliveryForm({ users, locations, contacts, action }: DeliveryFor
       : "No contacts available"
     : "Select a location first";
 
+  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+    suppressEvent(event);
+    setError(undefined);
+    setIsSaving(true);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const contactIdVal = formData.get("contactId");
+
+      const input: CreateDeliveryInput = {
+        assignedUserId: Number(formData.get("assignedUserId") ?? 0),
+        date: String(formData.get("date") ?? ""),
+        locationId: Number(formData.get("locationId") ?? 0),
+        contactId: contactIdVal ? Number(contactIdVal) : undefined,
+        notes: String(formData.get("notes") ?? ""),
+        tankDetails: String(formData.get("tankDetails") ?? "")
+      };
+
+      const result = await action(input);
+      if (!result.success) setError(result.error ?? "Unable to create delivery.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to create delivery.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
-    <form action={action} className="space-y-3">
-      <DateInput id="date" label="Date" />
+    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText="Create delivery">
+      <BasicInput type="date" id="date" label="Date" required />
       <SelectInput
         id="assignedUserId"
         label="Driver"
         items={users.map(user => ({ id: user.id, name: user.name }))}
         placeholder="Select a driver"
+        required
       />
       <SelectInput
         id="locationId"
         label="Location"
-        items={locations.map(location => ({ id: location.id, name: getFullName(location.customerName, location.address) }))}
+        items={locations.map(location => ({ id: location.id, name: getCustomerName(location.customerName, location.address) }))}
         onChange={setSelectedLocationId}
         placeholder="Select a location"
+        required
       />
       <SelectInput
         id="contactId"
@@ -58,8 +90,6 @@ export function DeliveryForm({ users, locations, contacts, action }: DeliveryFor
       />
       <TextAreaInput id="tankDetails" label="Tank details" />
       <TextAreaInput id="notes" label="Notes" />
-
-      <SubmitButton text="Create delivery" />
-    </form>
+    </Form>
   );
 }

@@ -1,6 +1,6 @@
+import { NavigationContainer } from "@/components/navigation/navigation-container";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { BottomNavigation } from "@/components/navigation/bottom-navigation";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex h-dvh flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto">{children}</main>
-        <BottomNavigation />
+        <NavigationContainer />
       </body>
     </html>
   );

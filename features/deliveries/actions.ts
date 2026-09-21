@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 
 import type { CreateDeliveryInput } from "./types";

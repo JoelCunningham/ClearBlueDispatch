@@ -171,7 +171,7 @@ const result = await db.transaction(async tx => {
 Require authentication at the start of a page or query. The helper redirects to `/login` when there is no session:
 
 ```tsx
-import { requireUser } from "@/lib/auth/require-user";
+import { requireUser } from "@/lib/auth/authorization";
 
 export default async function RoutesPage() {
   const user = await requireUser();
@@ -183,7 +183,7 @@ export default async function RoutesPage() {
 For manager-only pages and queries:
 
 ```tsx
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 
 export default async function ManagePage() {
   const manager = await requireRole("MANAGER");
@@ -237,7 +237,7 @@ Mutations are server-only, authorize before writing, validate with Zod, write th
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 import { createCustomerSchema } from "./validation";
 

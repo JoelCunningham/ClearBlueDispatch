@@ -2,24 +2,16 @@
 
 import { useState } from "react";
 
+import DeleteButton from "@/components/buttons/delete-button";
+import MiniForm from "@/components/forms/mini-form";
+import BasicInput from "@/components/inputs/basic-input";
+import Form from "@/components/wrappers/form";
 import type { ContactItem, CustomerDetail, CustomerFormInput, InvoiceEmailItem, LocationItem } from "@/features/customers/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
-import ErrorAlert from "../alerts/error-alert";
-import DeleteButton from "../buttons/delete-button";
-import SubmitButton from "../buttons/submit-button";
-import EmailInput from "../inputs/email-input";
-import NumberInput from "../inputs/number-input";
-import TelInput from "../inputs/tel-input";
-import TextInput from "../inputs/text-input";
-import MiniForm from "./mini-form";
 
 type CustomerFormProps = {
   customer?: CustomerDetail;
-  action: (input: CustomerFormInput) => Promise<{
-    success: boolean;
-    customerId?: number;
-    error?: string;
-  }>;
+  action: (input: CustomerFormInput) => Promise<{ success: boolean; customerId?: number; error?: string }>;
 };
 
 export default function CustomerForm({ customer, action }: CustomerFormProps) {
@@ -50,14 +42,12 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
         contacts: contacts.map((contact, index) => ({
           ...(contact.id !== undefined && { id: contact.id }),
           name: contact.id !== undefined ? contact.name : String(formData.get(`contacts.${index}.name`) ?? ""),
-          phoneNumber:
-            contact.id !== undefined ? contact.phoneNumber : String(formData.get(`contacts.${index}.phoneNumber`) ?? "")
+          phoneNumber: contact.id !== undefined ? contact.phoneNumber : String(formData.get(`contacts.${index}.phoneNumber`) ?? "")
         })),
 
         emails: emails.map((email, index) => ({
           ...(email.id !== undefined && { id: email.id }),
-          emailAddress:
-            email.id !== undefined ? email.emailAddress : String(formData.get(`invoiceEmails.${index}.emailAddress`) ?? "")
+          emailAddress: email.id !== undefined ? email.emailAddress : String(formData.get(`invoiceEmails.${index}.emailAddress`) ?? "")
         }))
       };
 
@@ -95,10 +85,18 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <TextInput id="name" label="Customer name" defaultValue={customer?.name ?? ""} required />
-      <NumberInput id="rate" label="Delivery rate" defaultValue={customer?.rate ?? 0} min={0} step={0.01} prefix="$" required />
-
+    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={customer ? "Save changes" : "Create customer"}>
+      <BasicInput type="text" id="name" label="Customer name" initial={customer?.name ?? ""} required />
+      <BasicInput
+        type="number"
+        id="rate"
+        label="Delivery rate"
+        initial={customer?.rate ?? 0}
+        minNumber={0}
+        step={0.01}
+        prefix="$"
+        required
+      />
       <MiniForm title="Locations" subtitle="Add locations for deliveries." onAdd={addLocation}>
         {locations.length === 0 ? (
           <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">No locations added.</div>
@@ -107,10 +105,11 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
             {locations.map((location, index) => (
               <div key={location.clientId === undefined ? location.id : location.clientId} className="flex gap-2">
                 {location.id !== undefined && <input type="hidden" name={`locations.${index}.id`} value={location.id} />}
-                <TextInput
+                <BasicInput
+                  type="text"
                   id={`locations.${index}.address`}
                   placeholder="Address"
-                  defaultValue={location.address}
+                  initial={location.address}
                   disabled={location.id !== undefined}
                   required
                 />
@@ -120,29 +119,27 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
           </div>
         )}
       </MiniForm>
-
       <MiniForm title="Contacts" subtitle="Add contacts for this customer." onAdd={addContact}>
         {contacts.length === 0 ? (
           <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">No contacts added.</div>
         ) : (
           <div className="space-y-3">
             {contacts.map((contact, index) => (
-              <div
-                key={contact.clientId === undefined ? contact.id : contact.clientId}
-                className="space-y-3 rounded-md border p-3"
-              >
+              <div key={contact.clientId === undefined ? contact.id : contact.clientId} className="space-y-3 rounded-md border p-3">
                 {contact.id !== undefined && <input type="hidden" name={`contacts.${index}.id`} value={contact.id} />}
-                <TextInput
+                <BasicInput
+                  type="text"
                   id={`contacts.${index}.name`}
                   placeholder="Name"
-                  defaultValue={contact.name}
+                  initial={contact.name}
                   disabled={contact.id !== undefined}
                   required
                 />
-                <TelInput
+                <BasicInput
+                  type="tel"
                   id={`contacts.${index}.phoneNumber`}
                   placeholder="Phone number"
-                  defaultValue={contact.phoneNumber}
+                  initial={contact.phoneNumber}
                   disabled={contact.id !== undefined}
                   required
                 />
@@ -152,23 +149,19 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
           </div>
         )}
       </MiniForm>
-
       <MiniForm title="Invoice emails" subtitle="Add addresses to receive invoices." onAdd={addInvoiceEmail}>
         {emails.length === 0 ? (
-          <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
-            No invoice emails added.
-          </div>
+          <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">No invoice emails added.</div>
         ) : (
           <div className="space-y-3">
             {emails.map((invoiceEmail, index) => (
               <div key={invoiceEmail.clientId === undefined ? invoiceEmail.id : invoiceEmail.clientId} className="flex gap-2">
-                {invoiceEmail.id !== undefined && (
-                  <input type="hidden" name={`invoiceEmails.${index}.id`} value={invoiceEmail.id} />
-                )}
-                <EmailInput
+                {invoiceEmail.id !== undefined && <input type="hidden" name={`invoiceEmails.${index}.id`} value={invoiceEmail.id} />}
+                <BasicInput
+                  type="email"
                   id={`invoiceEmails.${index}.emailAddress`}
                   placeholder="Email address"
-                  defaultValue={invoiceEmail.emailAddress}
+                  initial={invoiceEmail.emailAddress}
                   disabled={invoiceEmail.id !== undefined}
                   required
                 />
@@ -178,10 +171,6 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
           </div>
         )}
       </MiniForm>
-
-      {error && <ErrorAlert text={error} />}
-
-      <SubmitButton isSubmitting={isSaving} text={customer ? "Save changes" : "Create customer"} />
-    </form>
+    </Form>
   );
 }

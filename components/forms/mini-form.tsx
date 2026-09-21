@@ -1,4 +1,4 @@
-import AddButton from "../buttons/add-button";
+import AddButton from "@/components/buttons/add-button";
 
 interface MiniFormProps {
   title: string;

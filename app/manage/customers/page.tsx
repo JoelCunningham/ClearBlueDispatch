@@ -4,7 +4,7 @@ import List from "@/components/wrappers/list";
 import ListSeparator from "@/components/wrappers/list-seperator";
 import Page from "@/components/wrappers/page";
 import { getCustomers } from "@/features/customers/queries";
-import { getFirstLetter } from "@/lib/utils/customer-util";
+import { getFirstLetter } from "@/lib/utils/string-utils";
 
 export default async function ManageCustomersPage() {
   const customers = await getCustomers();
@@ -13,7 +13,6 @@ export default async function ManageCustomersPage() {
     <Page>
       <Heading
         title="Manage Customers"
-        subtitle="Manage customers and their delivery information."
         backLink={{ text: "manage", href: "/manage" }}
         actionLink={{ text: "Create", href: "/manage/customers/new" }}
       />

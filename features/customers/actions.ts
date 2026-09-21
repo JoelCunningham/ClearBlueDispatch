@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 
 import { redirect } from "next/navigation";

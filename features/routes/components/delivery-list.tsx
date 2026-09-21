@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import Card from "@/components/wrappers/card";
 import List from "@/components/wrappers/list";
 import { reorderDeliveries } from "@/features/routes/actions";
-import { getFullName } from "@/lib/utils/customer-util";
+import { getCustomerName } from "@/lib/utils/string-utils";
 import { suppressEvent } from "@/lib/utils/event-utils";
 import MoveButton from "./move-botton";
 
@@ -60,7 +60,7 @@ export default function DeliveryList({ routeId, deliveries: initialDeliveries }:
         <Card
           key={delivery.id.toString()}
           href={`/deliveries/${delivery.id}`}
-          title={getFullName(delivery.location.customerName, delivery.location.address)}
+          title={getCustomerName(delivery.location.customerName, delivery.location.address)}
           subtitle={delivery.location.address}
           avatarText={delivery.position.toString()}
         >

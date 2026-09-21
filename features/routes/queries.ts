@@ -1,9 +1,9 @@
 import { db } from "@/prisma/db";
-import { requireUser } from "@/lib/auth/require-user";
+import { requireUser } from "@/lib/auth/authorization";
 
 import type { RouteDetail, RouteSummary, UserSummary } from "./types";
 import { requireRouteAccess } from "@/lib/auth/authorization";
-import { requireRole } from "@/lib/auth/require-role";
+import { requireRole } from "@/lib/auth/authorization";
 
 type GetRoutesOptions = {
   fromDate: string;

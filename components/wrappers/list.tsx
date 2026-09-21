@@ -1,5 +1,5 @@
 import React from "react";
-import InfoAlert from "../alerts/info-alert";
+import InfoAlert from "@/components/alerts/info-alert";
 
 interface ListProps {
   title?: string;

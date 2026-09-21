@@ -5,7 +5,8 @@ import ListSeparator from "@/components/wrappers/list-seperator";
 import Page from "@/components/wrappers/page";
 import UserFilter from "@/features/routes/components/user-filter";
 import { getRoutes, getUsers } from "@/features/routes/queries";
-import { requireUser } from "@/lib/auth/require-user";
+import { requireUser } from "@/lib/auth/authorization";
+
 import { dateToLongFormat, dateToWeekFormat, getToday } from "@/lib/utils/date-utils";
 import { idOrUndefined } from "@/lib/utils/validation-utils";
 import { getISOWeek } from "date-fns";
@@ -27,9 +28,7 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
 
   return (
     <Page>
-      <Heading title="Upcoming Routes">
-        {user.role === "MANAGER" && <UserFilter users={users} selectedUserId={assignedUserId} />}
-      </Heading>
+      <Heading title="Upcoming Routes">{user.role === "MANAGER" && <UserFilter users={users} selectedUserId={assignedUserId} />}</Heading>
       <List emptyText="No upcoming routes.">
         {routes.map((route, index) => {
           const previousWeek = getISOWeek(routes[index - 1]?.date);

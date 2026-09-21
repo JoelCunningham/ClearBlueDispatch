@@ -8,7 +8,7 @@ import LineItem from "@/components/wrappers/line-item";
 import List from "@/components/wrappers/list";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
-import { getFullName } from "@/lib/utils/customer-util";
+import { getCustomerName } from "@/lib/utils/string-utils";
 import { dateToLongFormat } from "@/lib/utils/date-utils";
 import { getGoogleMapsUrl } from "@/lib/utils/maps-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
@@ -27,7 +27,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
   return (
     <Page>
       <Heading
-        title={getFullName(delivery.location.customerName, delivery.location.address)}
+        title={getCustomerName(delivery.location.customerName, delivery.location.address)}
         subtitle={`${dateToLongFormat(delivery.date)} • Stop #${delivery.position}`}
         subtitleIcon={Calendar}
         backLink={{ text: "route", href: `/routes/${delivery.routeId}` }}

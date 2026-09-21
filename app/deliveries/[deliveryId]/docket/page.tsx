@@ -1,9 +1,10 @@
+import DocketForm from "@/components/forms/docket-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
 import { createDocket } from "@/features/dockets/actions";
-import { DocketForm } from "@/components/forms/docket-form";
-import { getFullName } from "@/lib/utils/customer-util";
+import { DocketFormInput } from "@/features/dockets/types";
+import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
 type DocketPageProps = {
@@ -15,23 +16,11 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
 
   const deliveryIdNumber = idOrNotFound(deliveryId);
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
-  const customerName = getFullName(delivery.location.customerName, delivery.location.address);
+  const customerName = getCustomerName(delivery.location.customerName, delivery.location.address);
 
-  async function submitDocket(formData: FormData) {
+  async function submitDocket(input: DocketFormInput) {
     "use server";
-
-    const volume = formData.get("volume");
-    const batchNumber = formData.get("batchNumber");
-    const repName = formData.get("repName");
-    const repSignature = formData.get("repSignature");
-
-    await createDocket({
-      deliveryId: deliveryIdNumber,
-      volume: typeof volume === "string" ? Number(volume) : 0,
-      batchNumber: typeof batchNumber === "string" ? batchNumber : "",
-      repName: typeof repName === "string" ? repName : "",
-      repSignature: typeof repSignature === "string" ? repSignature : ""
-    });
+    return await createDocket({ deliveryId: deliveryIdNumber, ...input });
   }
 
   return (
