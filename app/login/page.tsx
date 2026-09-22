@@ -1,4 +1,5 @@
 import { AuthError } from "next-auth";
+import Image from "next/image";
 
 import { signIn } from "@/auth";
 import LoginForm from "@/components/forms/login-form";
@@ -30,6 +31,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <Page centred>
+      <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
       <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
       <LoginForm initialError={params.error} action={login} />
     </Page>

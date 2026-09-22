@@ -41,7 +41,7 @@ export default function BasicInput({
 }: InputProps) {
   return (
     <InputWrapper id={id} label={label}>
-      <div className="flex rounded-md border bg-background disabled:bg-muted focus:ring-2 focus:ring-ring">
+      <div className="flex rounded-md border bg-background disabled:bg-muted focus-within:ring-2 focus-within:ring-ring">
         {prefix && <span className="justify-center p-2">{prefix}</span>}
         <input
           id={id}

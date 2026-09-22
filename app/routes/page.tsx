@@ -35,7 +35,12 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
           return (
             <div key={route.id}>
               {getISOWeek(route.date) !== previousWeek && <ListSeparator title={`Week ${dateToWeekFormat(route.date)}`} />}
-              <Card href={`/routes/${route.id}`} title={dateToLongFormat(route.date)} subtitle={route.assignedUserName} />
+              <Card
+                href={`/routes/${route.id}`}
+                title={dateToLongFormat(route.date)}
+                subtitle={route.assignedUserName}
+                avatar={new Date(route.date).getDate()}
+              />
             </div>
           );
         })}
