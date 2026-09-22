@@ -1,6 +1,6 @@
-import Link from "next/link";
-
 import DeliveryForm from "@/components/forms/delivery-form";
+import Heading from "@/components/wrappers/heading";
+import Page from "@/components/wrappers/page";
 import { updateDelivery } from "@/features/deliveries/actions";
 import { getAssignableUsers, getDeliveryContacts, getDeliveryForEdit, getDeliveryLocations } from "@/features/deliveries/queries";
 import { DeliveryFormInput } from "@/features/deliveries/types";
@@ -8,9 +8,7 @@ import { requireRole } from "@/lib/auth/authorization";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
 type EditDeliveryPageProps = {
-  params: Promise<{
-    deliveryId: string;
-  }>;
+  params: Promise<{ deliveryId: string }>;
 };
 
 export default async function EditDeliveryPage({ params }: EditDeliveryPageProps) {
@@ -29,19 +27,8 @@ export default async function EditDeliveryPage({ params }: EditDeliveryPageProps
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-6 pb-6">
-      <div className="mb-6 space-y-2">
-        <Link href={`/manage/deliveries/${delivery.deliveryId}`} className="text-sm text-muted-foreground hover:text-foreground">
-          ← Delivery
-        </Link>
-
-        <div className="pt-2">
-          <h1 className="text-2xl font-semibold">Edit Delivery</h1>
-
-          <p className="text-sm text-muted-foreground">Update the delivery details and route assignment.</p>
-        </div>
-      </div>
-
+    <Page>
+      <Heading title="Edit Delivery" backFallback={`/deliveries/${delivery.deliveryId}`} />
       <DeliveryForm
         users={users}
         locations={locations}
@@ -54,6 +41,6 @@ export default async function EditDeliveryPage({ params }: EditDeliveryPageProps
         tankDetails={delivery.tankDetails}
         action={submitDelivery}
       />
-    </main>
+    </Page>
   );
 }

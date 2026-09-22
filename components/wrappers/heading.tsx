@@ -1,6 +1,7 @@
-import { LucideIcon, MoveLeft } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
+import BackButton from "@/components/buttons/back-button";
 import { checkUserRole } from "@/lib/auth/authorization";
 import { UserRole } from "@/types/next-auth";
 
@@ -8,7 +9,7 @@ interface HeadingProps {
   title: string;
   subtitle?: string;
   subtitleIcon?: LucideIcon;
-  backLink?: LinkProps;
+  backFallback?: string;
   actionLink?: LinkProps;
   children?: React.ReactNode;
 }
@@ -19,17 +20,13 @@ interface LinkProps {
   role?: UserRole;
 }
 
-export default async function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, backLink, actionLink, children }: HeadingProps) {
+export default async function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, backFallback, actionLink, children }: HeadingProps) {
   const role = await checkUserRole();
 
   return (
     <div className="mb-6 space-y-2 w-full">
-      {backLink && (backLink.role ? role === backLink.role : true) && (
-        <Link href={backLink.href} className="text-sm text-muted-foreground hover:text-foreground">
-          <MoveLeft className="inline-block h-4 w-4" /> Back to {backLink.text}
-        </Link>
-      )}
-      <div className="flex items-start justify-between gap-4 mt-2 w-full">
+      {backFallback && <BackButton fallbackHref={backFallback} />}
+      <div className="flex items-start justify-between gap-4 w-full">
         <div>
           <h1 className="text-2xl font-semibold mb-1 w-full">{title}</h1>
           <div className="flex items-center gap-1">

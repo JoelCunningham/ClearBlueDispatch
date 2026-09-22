@@ -19,8 +19,8 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
       <Heading
         title={user.name}
         subtitle="View this user's account details."
+        backFallback="/users"
         actionLink={{ text: "Edit", href: `/users/${userIdNumber}/edit` }}
-        backLink={{ text: "Users", href: "/users" }}
       />
       <ProfileDetails email={user.email} role={user.role} dateCreated={user.createdAt} />
     </Page>

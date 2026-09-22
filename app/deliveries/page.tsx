@@ -21,7 +21,7 @@ export default async function DeliveriesPage({ searchParams }: DeliveriesPagePro
 
   return (
     <Page>
-      <Heading title="Deliveries" backLink={{ text: "manage", href: "/manage" }} actionLink={{ text: "Create", href: "/deliveries/new" }} />
+      <Heading title="Deliveries" backFallback="/manage" actionLink={{ text: "Create", href: "/deliveries/new" }} />
       <SearchBar placeholder="Search deliveries..." />
       <List emptyText={search ? "No deliveries match your search." : "No deliveries have been created yet."}>
         {deliveries.map((delivery, index) => {

@@ -11,7 +11,7 @@ export default function CreateCustomerPage() {
 
   return (
     <Page>
-      <Heading title="Create customer" backLink={{ text: "customers", href: "/customers" }} />
+      <Heading title="Create customer" backFallback="/customers" />
       <CustomerForm action={submitCustomer} />
     </Page>
   );

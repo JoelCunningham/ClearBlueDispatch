@@ -18,11 +18,7 @@ export default async function CreateDeliveryPage() {
 
   return (
     <Page>
-      <Heading
-        title="Create delivery"
-        subtitle="Add a delivery to a driver's route."
-        backLink={{ text: "deliveries", href: "/deliveries" }}
-      />
+      <Heading title="Create delivery" subtitle="Add a delivery to a driver's route." backFallback="/deliveries" />
       <DeliveryForm users={users} locations={locations} contacts={contacts} action={submitDelivery} />
     </Page>
   );

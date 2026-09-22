@@ -30,7 +30,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
         title={getCustomerName(delivery.location.customerName, delivery.location.address)}
         subtitle={`${dateToLongFormat(delivery.date)} • Stop #${delivery.position}`}
         subtitleIcon={Calendar}
-        backLink={{ text: "route", href: `/routes/${delivery.routeId}` }}
+        backFallback={`/routes/${delivery.routeId}`}
         actionLink={{ text: "Edit", href: `/deliveries/${deliveryIdNumber}/edit`, role: "MANAGER" }}
       />
 

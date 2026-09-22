@@ -21,7 +21,7 @@ export default async function EditProfilePage() {
 
   return (
     <Page>
-      <Heading title="Edit Profile" subtitle="Manage your account details and password" backLink={{ text: "Profile", href: "/profile" }} />
+      <Heading title="Edit Profile" subtitle="Manage your account details and password" backFallback="/profile" />
       {user.role === "MANAGER" && (
         <UserForm name={user.name} email={user.email} role={user.role} canEditRole={false} action={updateProfile} />
       )}

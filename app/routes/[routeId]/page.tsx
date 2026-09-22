@@ -21,7 +21,7 @@ export default async function RoutePage({ params }: RoutePageProps) {
 
   return (
     <Page>
-      <Heading title={title} subtitle={route.assignedUserName} subtitleIcon={User} backLink={{ text: "routes", href: "/routes" }} />
+      <Heading title={title} subtitle={route.assignedUserName} subtitleIcon={User} backFallback="/routes" />
       {route.deliveries.length === 0 ? (
         <InfoAlert text="No deliveries for this route." />
       ) : (

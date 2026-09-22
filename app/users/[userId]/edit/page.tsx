@@ -35,7 +35,7 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
 
   return (
     <Page>
-      <Heading title="Edit User" backLink={{ text: "Users", href: "/users" }} />
+      <Heading title="Edit User" backFallback="/users" />
       <UserForm name={user.name} email={user.email} role={user.role} canEditRole={!isSelf} action={updateUserDetails} />
       <PasswordForm requireCurrentPassword={false} action={resetPassword} />
     </Page>

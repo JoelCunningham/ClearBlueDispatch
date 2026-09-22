@@ -28,7 +28,7 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
 
   return (
     <Page>
-      <Heading title="Create docket" backLink={{ text: "delivery", href: `/deliveries/${deliveryIdNumber}` }} />
+      <Heading title="Create docket" backFallback={`/deliveries/${deliveryIdNumber}`} />
       <DocketForm date={delivery.date} customerName={customerName} action={submitDocket} />
     </Page>
   );

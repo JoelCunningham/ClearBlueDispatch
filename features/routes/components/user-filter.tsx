@@ -10,7 +10,7 @@ type UserFilterProps = {
 export default function UserFilter({ users, selectedUserId }: UserFilterProps) {
   return (
     <form method="get">
-      <div className="relative w-fit flex">
+      <div className="relative w-fit flex -mt-3">
         <ChevronDown />
         <select
           id="assignedUserId"

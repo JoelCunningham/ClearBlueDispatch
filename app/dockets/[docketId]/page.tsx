@@ -23,11 +23,7 @@ export default async function DocketPage({ params }: DocketPageProps) {
 
   return (
     <Page>
-      <Heading
-        title={`Docket #${docket.id}`}
-        backLink={{ href: "/dockets", text: "dockets" }}
-        actionLink={{ href: `/dockets/${docket.id}/edit`, text: "Edit" }}
-      />
+      <Heading title={`Docket #${docket.id}`} backFallback="/dockets" actionLink={{ href: `/dockets/${docket.id}/edit`, text: "Edit" }} />
       <Card>
         <List>
           <LineItem name="Date" value={dateToLongFormat(docket.date)} vertical />

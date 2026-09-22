@@ -26,7 +26,7 @@ export default async function EditDocketPage({ params }: EditDocketPageProps) {
 
   return (
     <Page>
-      <Heading title={`Edit Docket #${docket.id}`} backLink={{ text: "docket", href: `/dockets/${docket.id}` }} />
+      <Heading title={`Edit Docket #${docket.id}`} backFallback={`/dockets/${docket.id}`} />
       <DocketForm
         number={docket.id}
         date={docket.date}

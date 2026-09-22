@@ -20,11 +20,7 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
 
   return (
     <Page>
-      <Heading
-        title="Manage Customers"
-        backLink={{ text: "manage", href: "/manage" }}
-        actionLink={{ text: "Create", href: "/customers/new" }}
-      />
+      <Heading title="Manage Customers" backFallback="/manage" actionLink={{ text: "Create", href: "/customers/new" }} />
       <SearchBar placeholder="Search customers..." />
       <List emptyText={search ? "No customers match your search." : "No customers have been created yet."}>
         {customers.map(customer => {
