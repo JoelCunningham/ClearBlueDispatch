@@ -4,6 +4,10 @@ export function getCustomerName(customerName: string, address: string): string {
   return `${customerName} (${suburb})`;
 }
 
+export function getDocketNumber(docketId: number): string {
+  return `#${docketId.toString().padStart(6, "0")}`;
+}
+
 export function getFirstLetter(name: string): string | undefined {
   if (!name || name.length === 0) return undefined;
   const firstChar = name.charAt(0).toUpperCase();
