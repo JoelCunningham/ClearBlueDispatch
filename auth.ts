@@ -30,6 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
+          sessionVersion: user.sessionVersion,
           createdAt: new Date(user.createdAt.epochMilliseconds)
         };
       }
@@ -44,6 +45,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.role = user.role;
         token.createdAt = user.createdAt;
+        token.sessionVersion = user.sessionVersion;
       }
       return token;
     },
@@ -52,6 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = token.id as string;
       session.user.role = token.role as UserRole;
       session.user.createdAt = token.createdAt as Date;
+      session.user.sessionVersion = token.sessionVersion as number;
       return session;
     }
   }

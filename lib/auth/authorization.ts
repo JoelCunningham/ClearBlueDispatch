@@ -7,9 +7,14 @@ import { UserRole } from "@/types/next-auth";
 export async function requireUser() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+
+  const user = await db.orm.public.User.first({ id: Number(session.user.id) });
+  if (!user) redirect("/login");
+
+  if (user.sessionVersion !== session.user.sessionVersion) redirect("/login");
+
   return session.user;
 }
-
 export async function requireRole(role: UserRole) {
   const user = await requireUser();
   if (user.role !== role) redirect("/routes");

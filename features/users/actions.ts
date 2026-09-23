@@ -35,7 +35,14 @@ export async function updateUser(input: UpdateUserInput) {
     return { success: false, error: "You cannot remove your own manager role." };
   }
 
-  await db.orm.public.User.where({ id: userId }).update({ name, email, role });
+  const roleChanged = existingUser.role !== role;
+
+  await db.orm.public.User.where({ id: userId }).update({
+    name,
+    email,
+    role,
+    ...(roleChanged ? { sessionVersion: existingUser.sessionVersion + 1 } : {})
+  });
 
   revalidatePath("/users");
   revalidatePath(`/users/${userId}`);
@@ -67,7 +74,7 @@ export async function changeOwnPassword(input: ChangeOwnPasswordInput) {
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
-  await db.orm.public.User.where({ id: user.id }).update({ passwordHash });
+  await db.orm.public.User.where({ id: user.id }).update({ passwordHash, sessionVersion: user.sessionVersion + 1 });
 
   revalidatePath("/profile");
   redirect("/profile");
@@ -88,7 +95,7 @@ export async function resetUserPassword(input: ResetUserPasswordInput) {
   }
 
   const passwordHash = await bcrypt.hash(newPassword, 12);
-  await db.orm.public.User.where({ id: userId }).update({ passwordHash });
+  await db.orm.public.User.where({ id: userId }).update({ passwordHash, sessionVersion: user.sessionVersion + 1 });
 
   revalidatePath("/users");
   revalidatePath(`/users/${userId}`);

@@ -8,6 +8,7 @@ declare module "next-auth" {
       id: string;
       role: UserRole;
       createdAt: Date;
+      sessionVersion: number;
     } & DefaultSession.User;
   }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
     id: string;
     role: UserRole;
     createdAt: Date;
+    sessionVersion: number;
   }
 }
 
@@ -22,6 +24,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: UserRole;
-    createdAt?: string | Date;
+    createdAt: Date;
+    sessionVersion: number;
   }
 }
