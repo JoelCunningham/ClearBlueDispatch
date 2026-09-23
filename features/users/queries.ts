@@ -10,7 +10,7 @@ export async function getUsers(): Promise<UserSummary[]> {
     name: user.name,
     email: user.email,
     role: user.role,
-    createdAt: new Date(user.createdAt)
+    createdAt: user.createdAt
   }));
 }
 
@@ -23,6 +23,6 @@ export async function getUser(userId: number): Promise<UserSummary | null> {
     name: user.name,
     email: user.email,
     role: user.role,
-    createdAt: new Date(user.createdAt)
+    createdAt: user.createdAt
   };
 }

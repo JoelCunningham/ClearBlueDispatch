@@ -151,6 +151,13 @@
           },
           "Customer": {
             "fields": {
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -222,6 +229,9 @@
             },
             "storage": {
               "fields": {
+                "deleted": {
+                  "column": "deleted"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -242,6 +252,13 @@
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
                   "kind": "scalar"
                 }
               },
@@ -359,6 +376,9 @@
                 "contactId": {
                   "column": "contactId"
                 },
+                "deleted": {
+                  "column": "deleted"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -391,6 +411,13 @@
                   "kind": "scalar"
                 }
               },
+              "comments": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "deliveryId": {
                 "nullable": false,
                 "type": {
@@ -415,7 +442,7 @@
               "repSignature": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
+                  "codecId": "pg/bytea@1",
                   "kind": "scalar"
                 }
               },
@@ -450,6 +477,9 @@
                 "batchNumber": {
                   "column": "batchNumber"
                 },
+                "comments": {
+                  "column": "comments"
+                },
                 "deliveryId": {
                   "column": "deliveryId"
                 },
@@ -476,6 +506,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
                   "kind": "scalar"
                 }
               },
@@ -516,6 +553,9 @@
               "fields": {
                 "customerId": {
                   "column": "customerId"
+                },
+                "deleted": {
+                  "column": "deleted"
                 },
                 "emailAddress": {
                   "column": "emailAddress"
@@ -623,7 +663,7 @@
               "date": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/date-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
               },
@@ -689,7 +729,14 @@
               "createdAt": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "deleted": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
                   "kind": "scalar"
                 }
               },
@@ -734,10 +781,17 @@
                   "plane": "domain"
                 }
               },
+              "sessionVersion": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "kind": "scalar"
                 }
               }
@@ -764,6 +818,9 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "deleted": {
+                  "column": "deleted"
+                },
                 "email": {
                   "column": "email"
                 },
@@ -778,6 +835,9 @@
                 },
                 "role": {
                   "column": "role"
+                },
+                "sessionVersion": {
+                  "column": "sessionVersion"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -869,6 +929,15 @@
             },
             "customer": {
               "columns": {
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -904,6 +973,15 @@
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
+                },
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
                 },
                 "id": {
                   "codecId": "pg/int4@1",
@@ -1032,6 +1110,11 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "comments": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "deliveryId": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
@@ -1052,8 +1135,8 @@
                   "nullable": false
                 },
                 "repSignature": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
+                  "codecId": "pg/bytea@1",
+                  "nativeType": "bytea",
                   "nullable": false
                 },
                 "volume": {
@@ -1099,6 +1182,15 @@
                 "customerId": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
+                  "nullable": false
+                },
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
                   "nullable": false
                 },
                 "emailAddress": {
@@ -1225,8 +1317,8 @@
                   "nullable": false
                 },
                 "date": {
-                  "codecId": "pg/date-string@1",
-                  "nativeType": "date",
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
                   "nullable": false
                 },
                 "id": {
@@ -1291,12 +1383,21 @@
               ],
               "columns": {
                 "createdAt": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
                   },
                   "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "deleted": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
                   "nullable": false
                 },
                 "email": {
@@ -1334,8 +1435,17 @@
                     "plane": "storage"
                   }
                 },
+                "sessionVersion": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "updatedAt": {
-                  "codecId": "pg/timestamptz-string@1",
+                  "codecId": "pg/timestamptz-temporal@1",
                   "default": {
                     "expression": "now()",
                     "kind": "function"
@@ -1374,7 +1484,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "4b7cbf5bf4ac43749e0dd01457179edf0740ff27911993f451eff270e7e4101e"
+    "storageHash": "9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721"
   },
   "capabilities": {
     "postgres": {

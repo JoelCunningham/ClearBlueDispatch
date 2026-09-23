@@ -1,5 +1,4 @@
-import { requireRouteAccess } from "@/lib/auth/authorization";
-import { requireRole } from "@/lib/auth/authorization";
+import { requireRole, requireRouteAccess } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 import { DeliveryDetail, DeliverySummary, UpdateDeliveryInput } from "./types";
 
@@ -20,6 +19,10 @@ export async function getDeliveryLocations() {
   const locations = await db.orm.public.Location.include("customer")
     .orderBy(location => location.address.asc())
     .all();
+
+  if (locations.some(location => !location.customer)) {
+    throw new Error("Some locations are missing associated customers.");
+  }
 
   return locations.map(location => ({
     id: location.id,
@@ -46,7 +49,7 @@ export async function getDeliveryContacts(customerId?: number) {
 
 export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | null> {
   const delivery = await db.orm.public.Delivery.where({ id: deliveryId })
-    .include("location")
+    .include("location", location => location.include("customer"))
     .include("contact")
     .include("route")
     .include("docket")
@@ -54,21 +57,21 @@ export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | 
   if (!delivery) return null;
 
   await requireRouteAccess(delivery.routeId);
-
-  const location = await db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first();
-  if (!location) throw new Error(`Location ${delivery.locationId} not found.`);
+  if (!delivery.location) throw new Error(`Location ${delivery.locationId} not found.`);
+  if (!delivery.location.customer) throw new Error(`Customer ${delivery.location.customerId} not found for ${delivery.location.id}.`);
+  if (!delivery.route) throw new Error(`Route ${delivery.routeId} not found for ${delivery.id}.`);
 
   return {
     id: delivery.id,
     position: delivery.position,
     notes: delivery.notes,
     tankDetails: delivery.tankDetails,
-    date: delivery.route?.date ?? "",
+    date: delivery.route.date,
     routeId: delivery.routeId,
 
     location: {
-      address: location.address,
-      customerName: location.customer.name
+      address: delivery.location.address,
+      customerName: delivery.location.customer.name
     },
 
     contact: delivery.contact
@@ -83,8 +86,7 @@ export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | 
           id: delivery.docket.id,
           volume: delivery.docket.volume,
           batchNumber: delivery.docket.batchNumber,
-          repName: delivery.docket.repName,
-          repSignature: delivery.docket.repSignature
+          repName: delivery.docket.repName
         }
       : null
   };
@@ -125,14 +127,14 @@ export async function getDeliveries(search?: string): Promise<DeliverySummary[]>
         assignedUserName: delivery.route.assignedUser.name
       };
     })
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => Temporal.Instant.compare(b.date, a.date));
 
   const query = search?.trim().toLowerCase();
   if (!query) return summaries;
 
   return summaries.filter(delivery =>
-    [delivery.date, delivery.customerName, delivery.locationAddress, delivery.contactName ?? "", delivery.assignedUserName].some(value =>
-      value.toLowerCase().includes(query)
+    [delivery.date.toString(), delivery.customerName, delivery.locationAddress, delivery.contactName ?? "", delivery.assignedUserName].some(
+      value => value.toLowerCase().includes(query)
     )
   );
 }
@@ -146,7 +148,7 @@ export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeli
   return {
     deliveryId: delivery.id,
     assignedUserId: delivery.route.assignedUserId,
-    date: delivery.route.date,
+    date: delivery.route.date.toLocaleString("en-AU"),
     locationId: delivery.locationId,
     contactId: delivery.contactId ?? undefined,
     notes: delivery.notes,

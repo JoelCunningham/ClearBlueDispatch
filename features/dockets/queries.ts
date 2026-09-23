@@ -23,12 +23,14 @@ export async function getDockets(search?: string): Promise<DocketSummary[]> {
     });
   }
 
-  summaries.sort((a, b) => b.date.localeCompare(a.date));
+  summaries.sort((a, b) => Temporal.Instant.compare(b.date, a.date));
 
   const query = search?.trim().toLowerCase();
   if (!query) return summaries;
 
-  return summaries.filter(docket => [docket.customerName, docket.address, docket.date].some(value => value.toLowerCase().includes(query)));
+  return summaries.filter(docket =>
+    [docket.customerName, docket.address, docket.date.toString()].some(value => value.toLowerCase().includes(query))
+  );
 }
 
 export async function getDocket(docketId: number): Promise<DocketDetail | null> {
@@ -50,6 +52,7 @@ export async function getDocket(docketId: number): Promise<DocketDetail | null> 
     address: docket.delivery.location.address,
     volume: docket.volume,
     batchNumber: docket.batchNumber,
+    comments: docket.comments ?? undefined,
     repName: docket.repName,
     repSignature: docket.repSignature
   };

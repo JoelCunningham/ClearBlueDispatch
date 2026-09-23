@@ -1,12 +1,13 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/30dbf9ea60f14ba627e79519f0a0e37efa2e2eac21f2c33cdf9e0445e5d65b36/contract';
-import endContract from '../../snapshots/30dbf9ea60f14ba627e79519f0a0e37efa2e2eac21f2c33cdf9e0445e5d65b36/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721/contract';
+import endContract from '../../snapshots/9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
   checkExpression,
   col,
   fn,
+  lit,
   primaryKey,
 } from '@prisma/orm-postgres/migration';
 
@@ -21,6 +22,11 @@ export default class M extends Migration<never, End> {
         table: 'contact',
         columns: [
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('phoneNumber', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -31,6 +37,11 @@ export default class M extends Migration<never, End> {
         schema: 'public',
         table: 'customer',
         columns: [
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('rate', 'float8', { notNull: true, codecRef: { codecId: 'pg/float8@1' } }),
@@ -42,6 +53,11 @@ export default class M extends Migration<never, End> {
         table: 'delivery',
         columns: [
           col('contactId', 'int4', { codecRef: { codecId: 'pg/int4@1' } }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('locationId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('notes', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -56,10 +72,11 @@ export default class M extends Migration<never, End> {
         table: 'docket',
         columns: [
           col('batchNumber', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('comments', 'text', { codecRef: { codecId: 'pg/text@1' } }),
           col('deliveryId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('repName', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
-          col('repSignature', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('repSignature', 'bytea', { notNull: true, codecRef: { codecId: 'pg/bytea@1' } }),
           col('volume', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
         ],
         constraints: [primaryKey(['id'])],
@@ -69,6 +86,11 @@ export default class M extends Migration<never, End> {
         table: 'invoiceEmail',
         columns: [
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('emailAddress', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
         ],
@@ -80,6 +102,11 @@ export default class M extends Migration<never, End> {
         columns: [
           col('address', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
         ],
         constraints: [primaryKey(['id'])],
@@ -89,7 +116,10 @@ export default class M extends Migration<never, End> {
         table: 'route',
         columns: [
           col('assignedUserId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
-          col('date', 'date', { notNull: true, codecRef: { codecId: 'pg/date-string@1' } }),
+          col('date', 'timestamptz', {
+            notNull: true,
+            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
         ],
         constraints: [primaryKey(['id'])],
@@ -101,17 +131,27 @@ export default class M extends Migration<never, End> {
           col('createdAt', 'timestamptz', {
             notNull: true,
             default: fn('now()'),
-            codecRef: { codecId: 'pg/timestamptz-string@1' },
+            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
+          }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
           }),
           col('email', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('passwordHash', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('role', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('sessionVersion', 'int4', {
+            notNull: true,
+            default: lit(0),
+            codecRef: { codecId: 'pg/int4@1' },
+          }),
           col('updatedAt', 'timestamptz', {
             notNull: true,
             default: fn('now()'),
-            codecRef: { codecId: 'pg/timestamptz-string@1' },
+            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
           }),
         ],
         constraints: [
@@ -204,6 +244,7 @@ export default class M extends Migration<never, End> {
           name: 'delivery_locationId_fkey',
           columns: ['locationId'],
           references: { schema: 'public', table: 'location', columns: ['id'] },
+          onDelete: 'restrict',
         },
       }),
       this.addForeignKey({
@@ -213,6 +254,7 @@ export default class M extends Migration<never, End> {
           name: 'delivery_contactId_fkey',
           columns: ['contactId'],
           references: { schema: 'public', table: 'contact', columns: ['id'] },
+          onDelete: 'restrict',
         },
       }),
       this.addForeignKey({

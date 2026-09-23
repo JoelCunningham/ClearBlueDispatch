@@ -1,29 +1,28 @@
-import { getISOWeek } from "date-fns/fp/getISOWeek";
-
-export function getToday(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Melbourne"
-  }).format(new Date());
+export function getToday(): Temporal.Instant {
+  return Temporal.Now.instant().toZonedDateTimeISO("Australia/Melbourne").toInstant();
 }
 
-export function dateToLongFormat(dateString: string): string {
-  return new Date(`${dateString}T00:00:00`).toLocaleDateString("en-AU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long"
-  });
+export function getWeekOfYear(date: Temporal.Instant): number {
+  if (!date) return 0;
+  return date.toZonedDateTimeISO("Australia/Melbourne").weekOfYear ?? 0;
 }
 
-export function dateToLongYearFormat(dateString: string): string {
-  return new Date(`${dateString}T00:00:00`).toLocaleDateString("en-AU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
+export function getDayOfMonth(date: Temporal.Instant): number {
+  return date.toZonedDateTimeISO("Australia/Melbourne").day ?? 0;
 }
 
-export function dateToWeekFormat(dateString: string): string {
-  const date = new Date(`${dateString}T00:00:00`);
-  return `${getISOWeek(date)} ${date.getFullYear()}`;
+export function dateToShortFormat(date: Temporal.Instant): string {
+  return date.toLocaleString("en-AU", { day: "numeric", month: "2-digit", year: "numeric" });
+}
+
+export function dateToLongFormat(date: Temporal.Instant): string {
+  return date.toLocaleString("en-AU", { weekday: "long", day: "numeric", month: "long" });
+}
+
+export function dateToLongYearFormat(date: Temporal.Instant): string {
+  return date.toLocaleString("en-AU", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+export function dateToWeekFormat(date: Temporal.Instant): string {
+  return `${date.toZonedDateTimeISO("Australia/Melbourne").weekOfYear} ${date.toZonedDateTimeISO("Australia/Melbourne").year}`;
 }

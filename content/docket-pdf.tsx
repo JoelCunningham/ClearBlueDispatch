@@ -1,23 +1,25 @@
-import { Document, Image, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, Text, View } from "@react-pdf/renderer";
 import { createTw } from "@react-pdf/tailwind";
 
 import { configs } from "@/lib/config/configs";
+import { bufferToDataUrl } from "@/lib/utils/buffer-utils";
+import { dateToShortFormat } from "@/lib/utils/date-utils";
 
 interface DocketPdfProps {
-  number: string;
-  date: string;
+  docketNumber: string;
+  date: Temporal.Instant;
   customerName: string;
   address: string;
   volume: number | string;
   batchNumber: string;
   comments?: string;
   repName: string;
-  signature: string;
-  logo: Buffer | string;
+  repSignature: Uint8Array;
+  logo: Uint8Array;
 }
 
 export default function DocketPdf({
-  number,
+  docketNumber,
   date,
   customerName,
   address,
@@ -25,9 +27,12 @@ export default function DocketPdf({
   batchNumber,
   comments,
   repName,
-  signature,
+  repSignature,
   logo
 }: DocketPdfProps) {
+  const logoSrc = bufferToDataUrl(logo);
+  const repSignatureSrc = bufferToDataUrl(repSignature);
+
   const tw = createTw({
     colors: {
       primary: "#2c4b9b",
@@ -41,7 +46,7 @@ export default function DocketPdf({
   });
   return (
     <Document>
-      <Page size={[420, 595]} style={tw("p-6 text-xs font-sans text-foreground bg-background")}>
+      <Page size={[420, 595]} style={tw("p-6 text-xs text-foreground bg-background")}>
         <View style={tw("flex-row justify-between items-start pb-2")}>
           <View style={tw("flex-col")}>
             <Text style={tw("text-2xl font-bold text-primary -mb-3")}>ClearBlue Solutions</Text>
@@ -57,30 +62,26 @@ export default function DocketPdf({
           </View>
           <View style={tw("items-end")}>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
-            <Image src={logo} style={tw("w-16 h-14")} />
+            <Image src={logoSrc} style={tw("w-16 h-14")} />
           </View>
         </View>
-
         <View style={tw("border-b border-border my-2")} />
-
         <View style={tw("flex-row justify-between items-center my-1.5")}>
           <View style={tw("flex-row border border-border h-6 items-center")}>
             <Text style={tw("w-12 pl-2 font-bold text-muted")}>Date</Text>
             <View style={tw("px-3 border-l border-border h-full justify-center")}>
-              <Text>{date}</Text>
+              <Text>{dateToShortFormat(date)}</Text>
             </View>
           </View>
 
           <View style={tw("flex-row items-baseline")}>
             <Text style={tw("font-bold text-muted text-xs mr-1.5 pb-1")}>Docket Number</Text>
-            <Text style={tw("font-bold text-primary text-sm")}>{number}</Text>
+            <Text style={tw("font-bold text-primary text-sm")}>{docketNumber}</Text>
           </View>
         </View>
-
         <View style={tw("bg-secondary py-1 px-2 mt-1.5")}>
           <Text style={tw("font-bold text-sm text-primary pt-1")}>DELIVERY DOCKET</Text>
         </View>
-
         <View style={tw("border border-border mt-1")}>
           <View style={tw("flex-row border-b border-border min-h-6 items-center")}>
             <View style={tw("w-28 pl-2 font-bold text-muted border-r border-border h-full justify-center")}>
@@ -117,7 +118,6 @@ export default function DocketPdf({
             <Text style={tw("flex-1 pl-3 pr-1.5 text-foreground")}>{comments || ""}</Text>
           </View>
         </View>
-
         <View style={tw("flex-row border border-t-0 border-border h-12")}>
           <View style={tw("flex-1 p-1.5 justify-between border-r border-border")}>
             <Text style={tw("font-bold text-muted text-xs")}>Name</Text>
@@ -126,10 +126,10 @@ export default function DocketPdf({
 
           <View style={tw("flex-1 p-1.5 justify-between")}>
             <Text style={tw("font-bold text-muted text-xs")}>Signature</Text>
-            <Text style={tw("text-xs text-foreground")}>{signature}</Text>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={repSignatureSrc} style={tw("h-7 w-28 object-contain")} />
           </View>
         </View>
-
         <View style={tw("flex-row justify-between mt-5")}>
           <View style={tw("flex-col")}>
             <Text style={tw("font-bold text-primary text-sm")}>CONTACTS</Text>

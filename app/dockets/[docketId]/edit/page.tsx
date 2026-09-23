@@ -5,6 +5,7 @@ import { updateDocket } from "@/features/dockets/actions";
 import { getDocket } from "@/features/dockets/queries";
 import { DocketFormInput } from "@/features/dockets/types";
 import { requireRole } from "@/lib/auth/authorization";
+import { dateToLongYearFormat } from "@/lib/utils/date-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
 type EditDocketPageProps = {
@@ -29,12 +30,12 @@ export default async function EditDocketPage({ params }: EditDocketPageProps) {
       <Heading title={`Edit Docket #${docket.id}`} backFallback={`/dockets/${docket.id}`} />
       <DocketForm
         number={docket.id}
-        date={docket.date}
+        date={dateToLongYearFormat(docket.date)}
         customerName={docket.customerName}
         volume={docket.volume}
         batchNumber={docket.batchNumber}
         repName={docket.repName}
-        repSignature={docket.repSignature}
+        repSignature={undefined}
         action={submitDocket}
       />
     </Page>

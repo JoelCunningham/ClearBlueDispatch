@@ -5,6 +5,7 @@ import { getDelivery } from "@/features/deliveries/queries";
 import { createDocket } from "@/features/dockets/actions";
 import { CreateDocketInput } from "@/features/dockets/types";
 import { requireRole } from "@/lib/auth/authorization";
+import { dateToLongYearFormat } from "@/lib/utils/date-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
@@ -13,8 +14,6 @@ type DocketPageProps = {
 };
 
 export default async function CreateDocketPage({ params }: DocketPageProps) {
-  await requireRole("MANAGER");
-
   const { deliveryId } = await params;
 
   const deliveryIdNumber = idOrNotFound(deliveryId);
@@ -29,7 +28,7 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
   return (
     <Page>
       <Heading title="Create docket" backFallback={`/deliveries/${deliveryIdNumber}`} />
-      <DocketForm date={delivery.date} customerName={customerName} action={submitDocket} />
+      <DocketForm date={dateToLongYearFormat(delivery.date)} customerName={customerName} action={submitDocket} />
     </Page>
   );
 }

@@ -16,6 +16,7 @@ export async function createDelivery(input: CreateDeliveryInput) {
   if (!result.success) return { success: false, error: "Invalid delivery details." };
 
   const { assignedUserId, date, locationId, contactId, notes, tankDetails } = result.data;
+  const temporalDate = Temporal.PlainDate.from(date).toZonedDateTime("UTC").toInstant();
 
   const resultData = await db.transaction(async tx => {
     const location = await tx.orm.public.Location.first({ id: locationId });
@@ -28,8 +29,8 @@ export async function createDelivery(input: CreateDeliveryInput) {
       if (contact.customerId !== location.customerId) throw new Error("Contact does not belong to the location's customer.");
     }
 
-    let route = await tx.orm.public.Route.first({ assignedUserId, date });
-    if (!route) route = await tx.orm.public.Route.create({ assignedUserId, date });
+    let route = await tx.orm.public.Route.first({ assignedUserId, date: temporalDate });
+    if (!route) route = await tx.orm.public.Route.create({ assignedUserId, date: temporalDate });
 
     const existingDeliveries = await tx.orm.public.Delivery.where({ routeId: route.id }).all();
     const position = existingDeliveries.length + 1;
@@ -52,6 +53,7 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
   if (!result.success) return { success: false, error: "Invalid delivery details." };
 
   const { deliveryId, assignedUserId, date, locationId, contactId, notes, tankDetails } = result.data;
+  const temporalDate = Temporal.Instant.from(date);
   let routeId: number;
 
   try {
@@ -71,13 +73,13 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
       const currentRoute = await tx.orm.public.Route.first({ id: delivery.routeId });
       if (!currentRoute) throw new Error("Current route not found.");
 
-      const routeChanged = currentRoute.assignedUserId !== assignedUserId || currentRoute.date !== date;
+      const routeChanged = currentRoute.assignedUserId !== assignedUserId || currentRoute.date !== temporalDate;
       let targetRoute = currentRoute;
 
       if (routeChanged) {
-        const existingRoute = await tx.orm.public.Route.first({ assignedUserId, date });
+        const existingRoute = await tx.orm.public.Route.first({ assignedUserId, date: temporalDate });
         if (!existingRoute) {
-          targetRoute = await tx.orm.public.Route.create({ assignedUserId, date });
+          targetRoute = await tx.orm.public.Route.create({ assignedUserId, date: temporalDate });
         } else {
           targetRoute = existingRoute;
         }

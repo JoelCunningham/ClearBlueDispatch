@@ -41,7 +41,7 @@
     "execute": [
       {
         "description": "create table \"contact\"",
-        "sql": "CREATE TABLE \"public\".\"contact\" (\n  \"customerId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"phoneNumber\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"contact\" (\n  \"customerId\" int4 NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"phoneNumber\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -80,7 +80,7 @@
     "execute": [
       {
         "description": "create table \"customer\"",
-        "sql": "CREATE TABLE \"public\".\"customer\" (\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"rate\" float8 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"customer\" (\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"rate\" float8 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -119,7 +119,7 @@
     "execute": [
       {
         "description": "create table \"delivery\"",
-        "sql": "CREATE TABLE \"public\".\"delivery\" (\n  \"contactId\" int4,\n  \"id\" SERIAL NOT NULL,\n  \"locationId\" int4 NOT NULL,\n  \"notes\" text NOT NULL,\n  \"position\" int4 NOT NULL,\n  \"routeId\" int4 NOT NULL,\n  \"tankDetails\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"delivery\" (\n  \"contactId\" int4,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"locationId\" int4 NOT NULL,\n  \"notes\" text NOT NULL,\n  \"position\" int4 NOT NULL,\n  \"routeId\" int4 NOT NULL,\n  \"tankDetails\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -158,7 +158,7 @@
     "execute": [
       {
         "description": "create table \"docket\"",
-        "sql": "CREATE TABLE \"public\".\"docket\" (\n  \"batchNumber\" text NOT NULL,\n  \"deliveryId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"repName\" text NOT NULL,\n  \"repSignature\" text NOT NULL,\n  \"volume\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"docket\" (\n  \"batchNumber\" text NOT NULL,\n  \"comments\" text,\n  \"deliveryId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"repName\" text NOT NULL,\n  \"repSignature\" bytea NOT NULL,\n  \"volume\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -197,7 +197,7 @@
     "execute": [
       {
         "description": "create table \"invoiceEmail\"",
-        "sql": "CREATE TABLE \"public\".\"invoiceEmail\" (\n  \"customerId\" int4 NOT NULL,\n  \"emailAddress\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"invoiceEmail\" (\n  \"customerId\" int4 NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"emailAddress\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -236,7 +236,7 @@
     "execute": [
       {
         "description": "create table \"location\"",
-        "sql": "CREATE TABLE \"public\".\"location\" (\n  \"address\" text NOT NULL,\n  \"customerId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"location\" (\n  \"address\" text NOT NULL,\n  \"customerId\" int4 NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -275,7 +275,7 @@
     "execute": [
       {
         "description": "create table \"route\"",
-        "sql": "CREATE TABLE \"public\".\"route\" (\n  \"assignedUserId\" int4 NOT NULL,\n  \"date\" date NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"route\" (\n  \"assignedUserId\" int4 NOT NULL,\n  \"date\" timestamptz NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -314,7 +314,7 @@
     "execute": [
       {
         "description": "create table \"user\"",
-        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_0e203bb4\" CHECK (\"role\" IN ('DRIVER', 'MANAGER'))\n)",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text NOT NULL,\n  \"sessionVersion\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_0e203bb4\" CHECK (\"role\" IN ('DRIVER', 'MANAGER'))\n)",
         "params": []
       }
     ],
@@ -838,7 +838,7 @@
     "execute": [
       {
         "description": "add FK \"delivery_locationId_fkey\"",
-        "sql": "ALTER TABLE \"public\".\"delivery\"\nADD CONSTRAINT \"delivery_locationId_fkey\"\nFOREIGN KEY (\"locationId\")\nREFERENCES \"public\".\"location\" (\"id\")"
+        "sql": "ALTER TABLE \"public\".\"delivery\"\nADD CONSTRAINT \"delivery_locationId_fkey\"\nFOREIGN KEY (\"locationId\")\nREFERENCES \"public\".\"location\" (\"id\")\nON DELETE RESTRICT"
       }
     ],
     "postcheck": [
@@ -880,7 +880,7 @@
     "execute": [
       {
         "description": "add FK \"delivery_contactId_fkey\"",
-        "sql": "ALTER TABLE \"public\".\"delivery\"\nADD CONSTRAINT \"delivery_contactId_fkey\"\nFOREIGN KEY (\"contactId\")\nREFERENCES \"public\".\"contact\" (\"id\")"
+        "sql": "ALTER TABLE \"public\".\"delivery\"\nADD CONSTRAINT \"delivery_contactId_fkey\"\nFOREIGN KEY (\"contactId\")\nREFERENCES \"public\".\"contact\" (\"id\")\nON DELETE RESTRICT"
       }
     ],
     "postcheck": [

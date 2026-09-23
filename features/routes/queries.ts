@@ -6,7 +6,7 @@ import { requireRouteAccess } from "@/lib/auth/authorization";
 import { requireRole } from "@/lib/auth/authorization";
 
 type GetRoutesOptions = {
-  fromDate: string;
+  fromDate: Temporal.Instant;
   assignedUserId?: number;
 };
 

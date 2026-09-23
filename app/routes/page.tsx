@@ -1,5 +1,3 @@
-import { getISOWeek } from "date-fns";
-
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import List from "@/components/wrappers/list";
@@ -8,7 +6,7 @@ import Page from "@/components/wrappers/page";
 import UserFilter from "@/features/routes/components/user-filter";
 import { getRoutes, getUsers } from "@/features/routes/queries";
 import { requireUser } from "@/lib/auth/authorization";
-import { dateToLongFormat, dateToWeekFormat, getToday } from "@/lib/utils/date-utils";
+import { dateToLongFormat, dateToWeekFormat, getWeekOfYear, getToday, getDayOfMonth } from "@/lib/utils/date-utils";
 import { idOrUndefined } from "@/lib/utils/validation-utils";
 
 type RoutesPageProps = {
@@ -31,15 +29,15 @@ export default async function RoutesPage({ searchParams }: RoutesPageProps) {
       <Heading title="Upcoming Routes">{user.role === "MANAGER" && <UserFilter users={users} selectedUserId={assignedUserId} />}</Heading>
       <List emptyText="No upcoming routes.">
         {routes.map((route, index) => {
-          const previousWeek = getISOWeek(routes[index - 1]?.date);
+          const previousWeek = getWeekOfYear(routes[index - 1]?.date);
           return (
             <div key={route.id}>
-              {getISOWeek(route.date) !== previousWeek && <ListSeparator title={`Week ${dateToWeekFormat(route.date)}`} />}
+              {getWeekOfYear(route.date) !== previousWeek && <ListSeparator title={`Week ${dateToWeekFormat(route.date)}`} />}
               <Card
                 href={`/routes/${route.id}`}
                 title={dateToLongFormat(route.date)}
                 subtitle={route.assignedUserName}
-                avatar={new Date(route.date).getDate()}
+                avatar={getDayOfMonth(route.date)}
               />
             </div>
           );

@@ -1,3 +1,4 @@
+import { dateToShortFormat } from "@/lib/utils/date-utils";
 import {
   Body,
   Column,
@@ -19,7 +20,7 @@ interface InternalDocketEmailProps {
   number: string;
   customerName: string;
   address: string;
-  date: string;
+  date: Temporal.Instant;
   volume: number | string;
   batchNumber: string;
   repName: string;
@@ -27,7 +28,7 @@ interface InternalDocketEmailProps {
   isUpdate: boolean;
 }
 
-export function InternalDocketEmail({
+export default function InternalDocketEmail({
   number,
   customerName,
   address,
@@ -97,7 +98,7 @@ export function InternalDocketEmail({
                 <strong className="text-muted">Delivery Address:</strong> {address}
               </Text>
               <Text className="text-sm text-foreground my-1">
-                <strong className="text-muted">Delivery Date:</strong> {date}
+                <strong className="text-muted">Delivery Date:</strong> {dateToShortFormat(date)}
               </Text>
               <Text className="text-sm text-foreground my-1">
                 <strong className="text-muted">Volume Delivered:</strong> {volume} L

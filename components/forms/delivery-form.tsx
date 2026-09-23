@@ -81,7 +81,7 @@ export default function DeliveryForm({
 
   return (
     <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={userId ? "Save changes" : "Create delivery"}>
-      <BasicInput type="date" id="date" label="Date" initial={date} required />
+      <BasicInput type="date" id="date" label="Date" initial={date?.toString()} required />
       <SelectInput
         id="assignedUserId"
         label="Driver"

@@ -48,7 +48,6 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
             <LineItem name="Volume" value={delivery.docket.volume.toString()} />
             <LineItem name="Batch number" value={delivery.docket.batchNumber} />
             <LineItem name="Representative" value={delivery.docket.repName} />
-            <LineItem name="Signature" value={delivery.docket.repSignature} />
           </List>
         </Card>
       ) : (

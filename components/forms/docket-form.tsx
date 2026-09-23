@@ -3,9 +3,11 @@
 import { useState } from "react";
 
 import BasicInput from "@/components/inputs/basic-input";
+import SignatureInput from "@/components/inputs/signature-input";
 import Form from "@/components/wrappers/form";
 import LineItem from "@/components/wrappers/line-item";
 import { DocketFormInput } from "@/features/dockets/types";
+import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
 import { suppressEvent } from "@/lib/utils/event-utils";
 
 type DocketFormProps = {
@@ -14,12 +16,23 @@ type DocketFormProps = {
   customerName: string;
   volume?: number;
   batchNumber?: string;
+  comments?: string;
   repName?: string;
   repSignature?: string;
   action: (input: DocketFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export default function DocketForm({ number, date, customerName, action, volume, batchNumber, repName, repSignature }: DocketFormProps) {
+export default function DocketForm({
+  number,
+  date,
+  customerName,
+  action,
+  volume,
+  batchNumber,
+  comments,
+  repName,
+  repSignature
+}: DocketFormProps) {
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -34,8 +47,9 @@ export default function DocketForm({ number, date, customerName, action, volume,
       const input: DocketFormInput = {
         volume: Number(formData.get("volume") ?? 0),
         batchNumber: String(formData.get("batchNumber") ?? ""),
+        comments: String(formData.get("comments") ?? ""),
         repName: String(formData.get("repName") ?? ""),
-        repSignature: String(formData.get("repSignature") ?? "")
+        repSignature: dataUrlToBuffer(String(formData.get("repSignature") ?? ""))
       };
 
       const result = await action(input);
@@ -50,13 +64,14 @@ export default function DocketForm({ number, date, customerName, action, volume,
   return (
     <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={number ? "Save changes" : "Create docket"}>
       <section className="-mt-2 space-y-3 rounded-lg border bg-muted/30 p-4 text-sm">
-        <LineItem name="Date" value={date} />
         <LineItem name="Customer" value={customerName} />
+        <LineItem name="Date" value={date} />
       </section>
       <BasicInput type="number" id="volume" label="Volume" minNumber={1} step={1} initial={volume} />
       <BasicInput type="number" id="batchNumber" label="Batch number" minNumber={1} step={1} initial={batchNumber} />
+      <BasicInput type="text" id="comments" label="Comments" initial={comments} />
       <BasicInput type="text" id="repName" label="Name" initial={repName} />
-      <BasicInput type="text" id="repSignature" label="Signature" initial={repSignature} />
+      <SignatureInput id="repSignature" label="Signature" initial={repSignature} />
     </Form>
   );
 }

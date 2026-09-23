@@ -30,7 +30,7 @@ export type DeliveryDetail = {
   position: number;
   notes: string;
   tankDetails: string;
-  date: string;
+  date: Temporal.Instant;
   routeId: number;
 
   location: {
@@ -48,13 +48,12 @@ export type DeliveryDetail = {
     volume: number;
     batchNumber: string;
     repName: string;
-    repSignature: string;
   } | null;
 };
 
 export type DeliverySummary = {
   id: number;
-  date: string;
+  date: Temporal.Instant;
   customerName: string;
   locationAddress: string;
   contactName: string | null;

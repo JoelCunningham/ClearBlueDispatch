@@ -30,7 +30,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.name,
           role: user.role,
-          createdAt: new Date(user.createdAt)
+          createdAt: new Date(user.createdAt.epochMilliseconds)
         };
       }
     })

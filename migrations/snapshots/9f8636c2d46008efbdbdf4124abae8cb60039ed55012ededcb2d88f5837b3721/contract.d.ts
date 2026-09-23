@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'4b7cbf5bf4ac43749e0dd01457179edf0740ff27911993f451eff270e7e4101e'>;
+  StorageHashBase<'9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -252,6 +252,7 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly rate: CodecTypes['pg/float8@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
     };
     readonly Delivery: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -261,19 +262,22 @@ export type FieldOutputTypes = {
       readonly position: CodecTypes['pg/int4@1']['output'];
       readonly notes: CodecTypes['pg/text@1']['output'];
       readonly tankDetails: CodecTypes['pg/text@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
     };
     readonly Docket: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly volume: CodecTypes['pg/int4@1']['output'];
       readonly batchNumber: CodecTypes['pg/text@1']['output'];
+      readonly comments: CodecTypes['pg/text@1']['output'] | null;
       readonly repName: CodecTypes['pg/text@1']['output'];
-      readonly repSignature: CodecTypes['pg/text@1']['output'];
+      readonly repSignature: CodecTypes['pg/bytea@1']['output'];
       readonly deliveryId: CodecTypes['pg/int4@1']['output'];
     };
     readonly InvoiceEmail: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly customerId: CodecTypes['pg/int4@1']['output'];
       readonly emailAddress: CodecTypes['pg/text@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
     };
     readonly Location: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -284,7 +288,7 @@ export type FieldOutputTypes = {
     readonly Route: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly assignedUserId: CodecTypes['pg/int4@1']['output'];
-      readonly date: CodecTypes['pg/date-string@1']['output'];
+      readonly date: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly User: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -292,8 +296,10 @@ export type FieldOutputTypes = {
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly role: 'DRIVER' | 'MANAGER';
       readonly passwordHash: CodecTypes['pg/text@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
+      readonly sessionVersion: CodecTypes['pg/int4@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
   };
 };
@@ -310,6 +316,7 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly rate: CodecTypes['pg/float8@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
     };
     readonly Delivery: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -319,19 +326,22 @@ export type FieldInputTypes = {
       readonly position: CodecTypes['pg/int4@1']['input'];
       readonly notes: CodecTypes['pg/text@1']['input'];
       readonly tankDetails: CodecTypes['pg/text@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
     };
     readonly Docket: {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly volume: CodecTypes['pg/int4@1']['input'];
       readonly batchNumber: CodecTypes['pg/text@1']['input'];
+      readonly comments: CodecTypes['pg/text@1']['input'] | null;
       readonly repName: CodecTypes['pg/text@1']['input'];
-      readonly repSignature: CodecTypes['pg/text@1']['input'];
+      readonly repSignature: CodecTypes['pg/bytea@1']['input'];
       readonly deliveryId: CodecTypes['pg/int4@1']['input'];
     };
     readonly InvoiceEmail: {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly customerId: CodecTypes['pg/int4@1']['input'];
       readonly emailAddress: CodecTypes['pg/text@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
     };
     readonly Location: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -342,7 +352,7 @@ export type FieldInputTypes = {
     readonly Route: {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly assignedUserId: CodecTypes['pg/int4@1']['input'];
-      readonly date: CodecTypes['pg/date-string@1']['input'];
+      readonly date: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly User: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -350,8 +360,10 @@ export type FieldInputTypes = {
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly role: 'DRIVER' | 'MANAGER';
       readonly passwordHash: CodecTypes['pg/text@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
+      readonly sessionVersion: CodecTypes['pg/int4@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
   };
 };
@@ -365,12 +377,14 @@ export type StorageColumnTypes = {
       readonly phoneNumber: CodecTypes['pg/text@1']['output'];
     };
     readonly customer: {
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly rate: CodecTypes['pg/float8@1']['output'];
     };
     readonly delivery: {
       readonly contactId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly locationId: CodecTypes['pg/int4@1']['output'];
       readonly notes: CodecTypes['pg/text@1']['output'];
@@ -380,14 +394,16 @@ export type StorageColumnTypes = {
     };
     readonly docket: {
       readonly batchNumber: CodecTypes['pg/text@1']['output'];
+      readonly comments: CodecTypes['pg/text@1']['output'] | null;
       readonly deliveryId: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly repName: CodecTypes['pg/text@1']['output'];
-      readonly repSignature: CodecTypes['pg/text@1']['output'];
+      readonly repSignature: CodecTypes['pg/bytea@1']['output'];
       readonly volume: CodecTypes['pg/int4@1']['output'];
     };
     readonly invoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly emailAddress: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
     };
@@ -399,17 +415,19 @@ export type StorageColumnTypes = {
     };
     readonly route: {
       readonly assignedUserId: CodecTypes['pg/int4@1']['output'];
-      readonly date: CodecTypes['pg/date-string@1']['output'];
+      readonly date: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
     };
     readonly user: {
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly email: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly passwordHash: CodecTypes['pg/text@1']['output'];
       readonly role: 'DRIVER' | 'MANAGER';
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly sessionVersion: CodecTypes['pg/int4@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
   };
 };
@@ -423,12 +441,14 @@ export type StorageColumnInputTypes = {
       readonly phoneNumber: CodecTypes['pg/text@1']['input'];
     };
     readonly customer: {
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly rate: CodecTypes['pg/float8@1']['input'];
     };
     readonly delivery: {
       readonly contactId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly locationId: CodecTypes['pg/int4@1']['input'];
       readonly notes: CodecTypes['pg/text@1']['input'];
@@ -438,14 +458,16 @@ export type StorageColumnInputTypes = {
     };
     readonly docket: {
       readonly batchNumber: CodecTypes['pg/text@1']['input'];
+      readonly comments: CodecTypes['pg/text@1']['input'] | null;
       readonly deliveryId: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly repName: CodecTypes['pg/text@1']['input'];
-      readonly repSignature: CodecTypes['pg/text@1']['input'];
+      readonly repSignature: CodecTypes['pg/bytea@1']['input'];
       readonly volume: CodecTypes['pg/int4@1']['input'];
     };
     readonly invoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly emailAddress: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
     };
@@ -457,17 +479,19 @@ export type StorageColumnInputTypes = {
     };
     readonly route: {
       readonly assignedUserId: CodecTypes['pg/int4@1']['input'];
-      readonly date: CodecTypes['pg/date-string@1']['input'];
+      readonly date: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
     };
     readonly user: {
-      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly email: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly passwordHash: CodecTypes['pg/text@1']['input'];
       readonly role: 'DRIVER' | 'MANAGER';
-      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly sessionVersion: CodecTypes['pg/int4@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
   };
 };
@@ -479,15 +503,17 @@ export namespace Models {
     name: CodecTypes['pg/text@1']['output'];
     role: 'DRIVER' | 'MANAGER';
     passwordHash: CodecTypes['pg/text@1']['output'];
-    createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
-    updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
+    sessionVersion: CodecTypes['pg/int4@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     routes: public_Route[];
     readonly [RelationKeys]?: 'routes';
   };
   export type public_Route = {
     id: CodecTypes['pg/int4@1']['output'];
     assignedUserId: CodecTypes['pg/int4@1']['output'];
-    date: CodecTypes['pg/date-string@1']['output'];
+    date: CodecTypes['pg/timestamptz-temporal@1']['output'];
     assignedUser: public_User;
     deliveries: public_Delivery[];
     readonly [RelationKeys]?: 'assignedUser' | 'deliveries';
@@ -500,17 +526,20 @@ export namespace Models {
     position: CodecTypes['pg/int4@1']['output'];
     notes: CodecTypes['pg/text@1']['output'];
     tankDetails: CodecTypes['pg/text@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
     contact: public_Contact | null;
+    docket: public_Docket | null;
     location: public_Location;
     route: public_Route;
-    readonly [RelationKeys]?: 'contact' | 'location' | 'route';
+    readonly [RelationKeys]?: 'contact' | 'docket' | 'location' | 'route';
   };
   export type public_Docket = {
     id: CodecTypes['pg/int4@1']['output'];
     volume: CodecTypes['pg/int4@1']['output'];
     batchNumber: CodecTypes['pg/text@1']['output'];
+    comments: CodecTypes['pg/text@1']['output'] | null;
     repName: CodecTypes['pg/text@1']['output'];
-    repSignature: CodecTypes['pg/text@1']['output'];
+    repSignature: CodecTypes['pg/bytea@1']['output'];
     deliveryId: CodecTypes['pg/int4@1']['output'];
     delivery: public_Delivery;
     readonly [RelationKeys]?: 'delivery';
@@ -528,6 +557,7 @@ export namespace Models {
     id: CodecTypes['pg/int4@1']['output'];
     name: CodecTypes['pg/text@1']['output'];
     rate: CodecTypes['pg/float8@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
     contacts: public_Contact[];
     invoiceEmails: public_InvoiceEmail[];
     locations: public_Location[];
@@ -547,6 +577,7 @@ export namespace Models {
     id: CodecTypes['pg/int4@1']['output'];
     customerId: CodecTypes['pg/int4@1']['output'];
     emailAddress: CodecTypes['pg/text@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
     customer: public_Customer;
     readonly [RelationKeys]?: 'customer';
   };
@@ -665,6 +696,15 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/float8@1';
                   readonly nullable: false;
                 };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [];
@@ -711,6 +751,15 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -795,14 +844,19 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
+                readonly comments: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
                 readonly repName: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
                 readonly repSignature: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
+                  readonly nativeType: 'bytea';
+                  readonly codecId: 'pg/bytea@1';
                   readonly nullable: false;
                 };
                 readonly deliveryId: {
@@ -849,6 +903,15 @@ type ContractBase = Omit<
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
+                };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -949,8 +1012,8 @@ type ContractBase = Omit<
                   readonly nullable: false;
                 };
                 readonly date: {
-                  readonly nativeType: 'date';
-                  readonly codecId: 'pg/date-string@1';
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
                 };
               };
@@ -1010,15 +1073,33 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
                 };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly sessionVersion: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                 };
                 readonly updatedAt: {
                   readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                 };
@@ -1135,6 +1216,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
             };
             readonly relations: {
               readonly contacts: {
@@ -1178,6 +1263,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly name: { readonly column: 'name' };
                 readonly rate: { readonly column: 'rate' };
+                readonly deleted: { readonly column: 'deleted' };
               };
             };
           };
@@ -1211,6 +1297,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
             };
             readonly relations: {
               readonly contact: {
@@ -1223,6 +1313,18 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['contactId'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly docket: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Docket';
+                };
+                readonly cardinality: '1:1';
+                readonly nullable: true;
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['deliveryId'];
                 };
               };
               readonly location: {
@@ -1261,6 +1363,7 @@ type ContractBase = Omit<
                 readonly position: { readonly column: 'position' };
                 readonly notes: { readonly column: 'notes' };
                 readonly tankDetails: { readonly column: 'tankDetails' };
+                readonly deleted: { readonly column: 'deleted' };
               };
             };
           };
@@ -1278,13 +1381,17 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly comments: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly repName: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
               readonly repSignature: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bytea@1' };
               };
               readonly deliveryId: {
                 readonly nullable: false;
@@ -1312,6 +1419,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly volume: { readonly column: 'volume' };
                 readonly batchNumber: { readonly column: 'batchNumber' };
+                readonly comments: { readonly column: 'comments' };
                 readonly repName: { readonly column: 'repName' };
                 readonly repSignature: { readonly column: 'repSignature' };
                 readonly deliveryId: { readonly column: 'deliveryId' };
@@ -1331,6 +1439,10 @@ type ContractBase = Omit<
               readonly emailAddress: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
               };
             };
             readonly relations: {
@@ -1354,6 +1466,7 @@ type ContractBase = Omit<
                 readonly id: { readonly column: 'id' };
                 readonly customerId: { readonly column: 'customerId' };
                 readonly emailAddress: { readonly column: 'emailAddress' };
+                readonly deleted: { readonly column: 'deleted' };
               };
             };
           };
@@ -1424,7 +1537,10 @@ type ContractBase = Omit<
               };
               readonly date: {
                 readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/date-string@1' };
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
               };
             };
             readonly relations: {
@@ -1481,18 +1597,26 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly sessionVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                 };
               };
               readonly updatedAt: {
                 readonly nullable: false;
                 readonly type: {
                   readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
                 };
               };
             };
@@ -1518,6 +1642,8 @@ type ContractBase = Omit<
                 readonly name: { readonly column: 'name' };
                 readonly role: { readonly column: 'role' };
                 readonly passwordHash: { readonly column: 'passwordHash' };
+                readonly deleted: { readonly column: 'deleted' };
+                readonly sessionVersion: { readonly column: 'sessionVersion' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };

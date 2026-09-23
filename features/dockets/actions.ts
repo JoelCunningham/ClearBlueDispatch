@@ -1,26 +1,27 @@
 "use server";
 
 import { renderToBuffer } from "@react-pdf/renderer";
-import { readFile } from "fs/promises";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import path from "path";
 import { render } from "react-email";
 
 import CustomerDocketEmail from "@/content/customer-docket-email";
 import DocketPdf from "@/content/docket-pdf";
+import InternalDocketEmail from "@/content/internal-docket-email";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { getLogoBuffer, getLogoUrl } from "@/lib/utils/image-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { db } from "@/prisma/db";
+import { NextResponse } from "next/server";
+import { pdf } from "pdf-to-img";
 import { UpdateDocketInput } from "./types";
 import { CreateDocketInput, createDocketSchema, updateDocketSchema } from "./validation";
-import { InternalDocketEmail } from "@/content/internal-docket-email";
 
 export async function createDocket(input: CreateDocketInput) {
   const result = createDocketSchema.safeParse(input);
   if (!result.success) return { success: false, error: "Invalid docket details." };
 
-  const { deliveryId, volume, batchNumber, repName, repSignature } = result.data;
+  const { deliveryId, volume, batchNumber, comments, repName, repSignature } = result.data;
   let docketId: number;
 
   try {
@@ -31,7 +32,7 @@ export async function createDocket(input: CreateDocketInput) {
       const existingDocket = await tx.orm.public.Docket.where({ deliveryId }).first();
       if (existingDocket) throw new Error("This delivery already has a docket.");
 
-      const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, repName, repSignature });
+      const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, comments, repName, repSignature });
       return docket.id;
     });
   } catch (error) {
@@ -52,7 +53,7 @@ export async function updateDocket(input: UpdateDocketInput) {
   const result = updateDocketSchema.safeParse(input);
   if (!result.success) return { success: false, error: "Invalid docket details." };
 
-  const { docketId, volume, batchNumber, repName, repSignature } = result.data;
+  const { docketId, volume, batchNumber, comments, repName, repSignature } = result.data;
   let deliveryId: number;
 
   try {
@@ -60,7 +61,7 @@ export async function updateDocket(input: UpdateDocketInput) {
       const docket = await tx.orm.public.Docket.where({ id: docketId }).first();
       if (!docket) throw new Error("Docket not found.");
 
-      await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, repName, repSignature });
+      await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, comments, repName, repSignature });
       return docket.deliveryId;
     });
   } catch (error) {
@@ -96,8 +97,8 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
 
   const docketNumber = getDocketNumber(docket.id);
 
-  const logoBytes = await readFile(path.join(process.cwd(), "public", "icons", "logo.png"));
-  const logoUrl = `${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_APP_URL : "http://localhost:3000"}/icons/logo.png`;
+  const logoUrl = getLogoUrl();
+  const logoBuffer = await getLogoBuffer();
 
   const [managers, invoiceEmails] = await Promise.all([
     db.orm.public.User.where({ role: "MANAGER" }).all(),
@@ -109,15 +110,16 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
 
   const docketPdf = await renderToBuffer(
     DocketPdf({
-      number: docketNumber,
+      docketNumber: docketNumber,
       date: delivery.route.date,
       customerName: delivery.location.customer.name,
       address: delivery.location.address,
       volume: docket.volume,
       batchNumber: docket.batchNumber,
+      comments: docket.comments ?? undefined,
       repName: docket.repName,
-      signature: docket.repSignature,
-      logo: logoBytes
+      repSignature: docket.repSignature,
+      logo: logoBuffer
     })
   );
 

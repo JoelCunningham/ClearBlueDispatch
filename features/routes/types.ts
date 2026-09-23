@@ -2,14 +2,14 @@ export type RouteSummary = {
   id: number;
   assignedUserId: number;
   assignedUserName: string;
-  date: string;
+  date: Temporal.Instant;
 };
 
 export type RouteDetail = {
   id: number;
   assignedUserId: number;
   assignedUserName: string;
-  date: string;
+  date: Temporal.Instant;
   deliveries: {
     id: number;
     position: number;

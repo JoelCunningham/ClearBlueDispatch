@@ -16,11 +16,12 @@ import {
 } from "react-email";
 
 import { configs } from "@/lib/config/configs";
+import { dateToShortFormat } from "@/lib/utils/date-utils";
 
 interface CustomerDocketEmailProps {
   number: string;
   customerName: string;
-  date: string;
+  date: Temporal.Instant;
   volume: number | string;
   batchNumber: string;
   logoUrl: string;
@@ -86,7 +87,7 @@ export default function CustomerDocketEmail({
 
             <Section className="bg-card border-l-4 border-solid border-primary p-4 my-6 rounded-r-md">
               <Text className="text-sm text-foreground my-1">
-                <strong className="text-muted">Date:</strong> {date}
+                <strong className="text-muted">Date:</strong> {dateToShortFormat(date)}
               </Text>
               <Text className="text-sm text-foreground my-1">
                 <strong className="text-muted">Volume Delivered:</strong> {volume} L

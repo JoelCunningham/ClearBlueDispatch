@@ -29,6 +29,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendEmail({ to, subject, html, bcc, attachments }: SendEmailInput) {
+  if (process.env.ENABLE_EMAIL_NOTIFICATIONS !== "true") return;
   const from = process.env.SMTP_FROM;
 
   if (!from) throw new Error("SMTP_FROM is not configured.");

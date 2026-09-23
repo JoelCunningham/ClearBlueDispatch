@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
     },
     browserToTerminal: true
   },
-  allowedDevOrigins: ["192.168.0.15"]
+  allowedDevOrigins: ["192.168.0.15"],
+  serverExternalPackages: ["pdf-to-img", "pdf-lib"]
 };
 
 export default nextConfig;
