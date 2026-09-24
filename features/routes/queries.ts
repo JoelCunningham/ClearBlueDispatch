@@ -6,16 +6,19 @@ import { requireRouteAccess } from "@/lib/auth/authorization";
 import { requireRole } from "@/lib/auth/authorization";
 
 type GetRoutesOptions = {
-  fromDate: Temporal.Instant;
+  fromDate?: Temporal.Instant;
   assignedUserId?: number;
 };
 
 export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary[]> {
   const user = await requireUser();
+  let query = db.orm.public.Route.include("assignedUser")
+    .orderBy(route => route.date.desc())
+    .orderBy(route => route.assignedUserId.desc());
 
-  let query = db.orm.public.Route.where(route => route.date.gte(options.fromDate))
-    .include("assignedUser")
-    .orderBy(route => route.date.desc());
+  if (options.fromDate) {
+    query = query.where(route => route.date.gte(options.fromDate!));
+  }
 
   if (user.role === "DRIVER") {
     query = query.where({ assignedUserId: Number(user.id) });
@@ -27,7 +30,8 @@ export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary
   return routes.map(route => ({
     id: route.id,
     assignedUserId: route.assignedUserId,
-    assignedUserName: route.assignedUser.name,
+    assignedUserName: route.assignedUser?.name,
+    assignedUserDeleted: route.assignedUser?.deleted,
     date: route.date
   }));
 }
@@ -42,14 +46,17 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
 
   const deliveries = [...routeWithDetails.deliveries].sort((a, b) => a.position - b.position);
   const locations = await Promise.all(
-    deliveries.map(delivery => db.orm.public.Location.where({ id: delivery.locationId }).include("customer").first())
+    deliveries.map(delivery => db.orm.public.Location.where({ id: delivery.locationId, deleted: false }).include("customer").first())
   );
 
   return {
     id: routeWithDetails.id,
-    assignedUserId: routeWithDetails.assignedUserId,
-    assignedUserName: routeWithDetails.assignedUser.name,
     date: routeWithDetails.date,
+    user: {
+      id: routeWithDetails.assignedUser.id,
+      name: routeWithDetails.assignedUser.name,
+      deleted: routeWithDetails.assignedUser.deleted
+    },
     deliveries: deliveries.map((delivery, index) => {
       const location = locations[index];
 
@@ -71,7 +78,9 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
 export async function getUsers(): Promise<UserSummary[]> {
   await requireRole("MANAGER");
 
-  const users = await db.orm.public.User.orderBy(user => user.name.asc()).all();
+  const users = await db.orm.public.User.where({ deleted: false })
+    .orderBy(user => user.name.asc())
+    .all();
 
   return users.map(user => ({
     id: user.id,

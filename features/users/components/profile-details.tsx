@@ -12,7 +12,7 @@ type ProfileDetailsProps = {
   dateCreated: Temporal.Instant;
 };
 
-export function ProfileDetails({ name, email, role, dateCreated }: ProfileDetailsProps) {
+export default function ProfileDetails({ name, email, role, dateCreated }: ProfileDetailsProps) {
   return (
     <Card>
       <List>

@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
@@ -11,6 +12,7 @@ export async function requireUser() {
   const user = await db.orm.public.User.first({ id: Number(session.user.id) });
   if (!user) redirect("/login");
 
+  if (user.deleted) redirect("/login");
   if (user.sessionVersion !== session.user.sessionVersion) redirect("/login");
 
   return session.user;
@@ -44,4 +46,12 @@ export async function requireRouteAccess(routeId: number) {
   if (!hasAccess) redirect("/routes");
 
   return route;
+}
+
+export async function hashPassword(password: string) {
+  return await bcrypt.hash(password, 12);
+}
+
+export async function verifyPassword(password: string, passwordHash: string) {
+  return await bcrypt.compare(password, passwordHash);
 }

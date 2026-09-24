@@ -1,11 +1,12 @@
 import { User } from "lucide-react";
 
+import ErrorMessage from "@/components/alerts/error-message";
 import InfoAlert from "@/components/alerts/info-alert";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import DeliveryList from "@/features/routes/components/delivery-list";
 import { getRoute } from "@/features/routes/queries";
-import { dateToLongFormat } from "@/lib/utils/date-utils";
+import { dateToLongFormat, isDatePast } from "@/lib/utils/date-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
 
 type RoutePageProps = {
@@ -17,11 +18,11 @@ export default async function RoutePage({ params }: RoutePageProps) {
 
   const id = idOrNotFound(routeId);
   const route = valueOrNotFound(await getRoute(id));
-  const title = dateToLongFormat(route.date);
 
   return (
     <Page>
-      <Heading title={title} subtitle={route.assignedUserName} subtitleIcon={User} backFallback="/routes" />
+      <Heading title={dateToLongFormat(route.date)} subtitle={route.user.name} subtitleIcon={User} backFallback="/routes" />
+      <ErrorMessage assigned="route" assignee="user" deleted={route.user.deleted} past={isDatePast(route.date)} />
       {route.deliveries.length === 0 ? (
         <InfoAlert text="No deliveries for this route." />
       ) : (

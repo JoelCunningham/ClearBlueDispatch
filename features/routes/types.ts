@@ -2,13 +2,17 @@ export type RouteSummary = {
   id: number;
   assignedUserId: number;
   assignedUserName: string;
+  assignedUserDeleted: boolean;
   date: Temporal.Instant;
 };
 
 export type RouteDetail = {
   id: number;
-  assignedUserId: number;
-  assignedUserName: string;
+  user: {
+    id: number;
+    name: string;
+    deleted: boolean;
+  };
   date: Temporal.Instant;
   deliveries: {
     id: number;
@@ -24,4 +28,9 @@ export type RouteDetail = {
 export type UserSummary = {
   id: number;
   name: string;
+};
+
+export type RoutesFormInput = {
+  assignedUserId: number;
+  date: string;
 };

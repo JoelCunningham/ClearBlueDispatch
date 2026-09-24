@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721/contract';
-import endContract from '../../snapshots/9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689/contract';
+import endContract from '../../snapshots/8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -73,6 +73,11 @@ export default class M extends Migration<never, End> {
         columns: [
           col('batchNumber', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('comments', 'text', { codecRef: { codecId: 'pg/text@1' } }),
+          col('deleted', 'bool', {
+            notNull: true,
+            default: lit(false),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('deliveryId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('repName', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -139,6 +144,11 @@ export default class M extends Migration<never, End> {
             codecRef: { codecId: 'pg/bool@1' },
           }),
           col('email', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('firstLogin', 'bool', {
+            notNull: true,
+            default: lit(true),
+            codecRef: { codecId: 'pg/bool@1' },
+          }),
           col('id', 'SERIAL', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('passwordHash', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),

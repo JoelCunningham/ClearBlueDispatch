@@ -8,39 +8,22 @@ import { db } from "@/prisma/db";
 export async function reorderDeliveries(routeId: number, deliveryIds: number[]) {
   await requireRouteAccess(routeId);
 
-  const deliveries = await db.orm.public.Delivery.where({ routeId }).all();
+  const deliveries = await db.orm.public.Delivery.where({ routeId, deleted: false }).all();
   if (deliveries.length !== deliveryIds.length) {
-    return {
-      success: false,
-      error: "Invalid delivery order."
-    };
+    return { success: false, error: "Invalid delivery order." };
   }
 
   const existingIds = new Set(deliveries.map(delivery => delivery.id));
   if (deliveryIds.some(id => !existingIds.has(id)) || new Set(deliveryIds).size !== deliveryIds.length) {
-    return {
-      success: false,
-      error: "Invalid delivery order."
-    };
+    return { success: false, error: "Invalid delivery order." };
   }
 
   await db.transaction(async tx => {
     for (let index = 0; index < deliveryIds.length; index++) {
-      await tx.orm.public.Delivery.where({
-        id: deliveryIds[index],
-        routeId
-      }).update({
-        position: -(index + 1)
-      });
+      await tx.orm.public.Delivery.where({ id: deliveryIds[index], routeId }).update({ position: -(index + 1) });
     }
-
     for (let index = 0; index < deliveryIds.length; index++) {
-      await tx.orm.public.Delivery.where({
-        id: deliveryIds[index],
-        routeId
-      }).update({
-        position: index + 1
-      });
+      await tx.orm.public.Delivery.where({ id: deliveryIds[index], routeId }).update({ position: index + 1 });
     }
   });
 

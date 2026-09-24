@@ -12,6 +12,7 @@ model User {
   passwordHash   String
 
   deleted        Boolean  @default(false)
+  firstLogin     Boolean  @default(true)
   sessionVersion Int      @default(0)
 
   routes         Route[]
@@ -58,9 +59,9 @@ model Docket {
   volume       Int
   batchNumber  String
   comments     String?
-
   repName      String
   repSignature Bytes
+  deleted      Boolean  @default(false)
 
   delivery     Delivery @relation(fields:[deliveryId], references:[id])
   deliveryId   Int      @unique

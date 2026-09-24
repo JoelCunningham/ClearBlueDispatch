@@ -3,13 +3,13 @@ import UserForm from "@/components/forms/user-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { changeOwnPassword, updateOwnProfile } from "@/features/users/actions";
-import { PasswordFormInput, UpdateOwnProfileInput } from "@/features/users/types";
+import { PasswordFormInput, UserFormInput } from "@/features/users/types";
 import { requireUser } from "@/lib/auth/authorization";
 
 export default async function EditProfilePage() {
   const user = await requireUser();
 
-  async function updateProfile(input: UpdateOwnProfileInput) {
+  async function updateProfile(input: UserFormInput) {
     "use server";
     return updateOwnProfile({ ...input, userId: user.id });
   }

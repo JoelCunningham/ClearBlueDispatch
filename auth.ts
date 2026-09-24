@@ -1,8 +1,8 @@
-import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { authConfig } from "./auth.config";
+import { verifyPassword } from "./lib/auth/authorization";
 import { db } from "./prisma/db";
 import { UserRole } from "./types/next-auth";
 
@@ -21,8 +21,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await db.orm.public.User.first({ email: credentials.email });
         if (!user) return null;
+        if (user.deleted) return null;
 
-        const passwordMatches = await bcrypt.compare(credentials.password, user.passwordHash);
+        const passwordMatches = await verifyPassword(credentials.password, user.passwordHash);
         if (!passwordMatches) return null;
 
         return {

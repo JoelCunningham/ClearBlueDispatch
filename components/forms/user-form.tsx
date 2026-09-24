@@ -5,16 +5,16 @@ import { useState } from "react";
 import BasicInput from "@/components/inputs/basic-input";
 import SelectInput from "@/components/inputs/select-input";
 import Form from "@/components/wrappers/form";
-import { UpdateUserInput } from "@/features/users/types";
+import { UserFormInput } from "@/features/users/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 import { UserRole } from "@/types/next-auth";
 
 type UserFormProps = {
-  name: string;
-  email: string;
-  role: UserRole;
+  name?: string;
+  email?: string;
+  role?: UserRole;
   canEditRole: boolean;
-  action: (input: UpdateUserInput) => Promise<{ success: boolean; error?: string }>;
+  action: (input: UserFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
 export default function UserForm({ name, email, role, canEditRole, action }: UserFormProps) {
@@ -61,7 +61,7 @@ export default function UserForm({ name, email, role, canEditRole, action }: Use
           { id: "MANAGER", name: "Manager" }
         ]}
         disabled={!canEditRole}
-        initial={role.toString()}
+        initial={role?.toString()}
         required
       />
     </Form>

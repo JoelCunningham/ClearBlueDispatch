@@ -158,7 +158,7 @@
     "execute": [
       {
         "description": "create table \"docket\"",
-        "sql": "CREATE TABLE \"public\".\"docket\" (\n  \"batchNumber\" text NOT NULL,\n  \"comments\" text,\n  \"deliveryId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"repName\" text NOT NULL,\n  \"repSignature\" bytea NOT NULL,\n  \"volume\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"docket\" (\n  \"batchNumber\" text NOT NULL,\n  \"comments\" text,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"deliveryId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"repName\" text NOT NULL,\n  \"repSignature\" bytea NOT NULL,\n  \"volume\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -314,7 +314,7 @@
     "execute": [
       {
         "description": "create table \"user\"",
-        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text NOT NULL,\n  \"sessionVersion\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_0e203bb4\" CHECK (\"role\" IN ('DRIVER', 'MANAGER'))\n)",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"email\" text NOT NULL,\n  \"firstLogin\" bool DEFAULT true NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text NOT NULL,\n  \"sessionVersion\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_0e203bb4\" CHECK (\"role\" IN ('DRIVER', 'MANAGER'))\n)",
         "params": []
       }
     ],

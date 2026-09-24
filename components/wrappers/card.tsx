@@ -11,14 +11,15 @@ interface CardProps {
   href?: string;
   children?: React.ReactNode;
   childrenPosition?: "right" | "bottom";
+  colour?: "normal" | "muted" | "error";
 }
 
-export default function Card({ title, subtitle, avatar, avatarText, href, children, childrenPosition = "right" }: CardProps) {
+export default function Card({ title, subtitle, avatar, avatarText, href, children, childrenPosition = "right", colour }: CardProps) {
   const WrapperElement = href ? Link : "div";
   return (
     <WrapperElement
       href={href ? href : "/"}
-      className={`rounded-lg border p-4 transition-colors hover:bg-muted items-center gap-4  ${childrenPosition === "bottom" ? "block" : "flex"}`}
+      className={`rounded-lg border p-4 transition-colors hover:bg-muted items-center gap-4  ${childrenPosition === "bottom" ? "block" : "flex"} ${colour === "error" ? "bg-destructive/20 border-destructive" : colour === "muted" ? "bg-muted" : "bg-background"}`}
     >
       {(avatar || avatarText) && (
         <div className="flex size-10 shrink-0 items-center justify-center self-start rounded-full bg-primary text-md font-semibold text-primary-foreground my-auto">

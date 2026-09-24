@@ -1,7 +1,6 @@
-// npx tsx scripts/create-user.ts "test@example.com" "Test Manager" "YourTestPassword123" MANAGER
+// npx tsx scripts/create-user.ts "joelcunningham1016@gmail.com" "Joel F" "admin" MANAGER
 
-import bcrypt from "bcryptjs";
-
+import { hashPassword } from "@/lib/auth/authorization";
 import { db } from "../prisma/db";
 
 const email = process.argv[2];
@@ -20,22 +19,14 @@ if (role !== "DRIVER" && role !== "MANAGER") {
   process.exit(1);
 }
 
-const passwordHash = await bcrypt.hash(password, 12);
-const existingUser = await db.orm.public.User.first({
-  email
-});
+const passwordHash = await hashPassword(password);
+const existingUser = await db.orm.public.User.first({ email });
 
 if (existingUser) {
   console.error(`A user with email ${email} already exists.`);
-
   process.exit(1);
 }
 
-const user = await db.orm.public.User.create({
-  email,
-  name,
-  role,
-  passwordHash
-});
+const user = await db.orm.public.User.create({ email, name, role, passwordHash });
 
 console.log(`Created ${user.role} user: ${user.email}`);

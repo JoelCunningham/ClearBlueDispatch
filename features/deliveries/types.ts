@@ -9,7 +9,7 @@ export type DeliveryFormInput = {
 
 export type CreateDeliveryInput = DeliveryFormInput;
 
-export type UpdateDeliveryInput = DeliveryFormInput & { deliveryId: number };
+export type UpdateDeliveryInput = DeliveryFormInput & { deliveryId: number; hasDocket: boolean; hasUser: boolean };
 
 export type DeliveryLocationOption = {
   id: number;
@@ -35,12 +35,24 @@ export type DeliveryDetail = {
 
   location: {
     address: string;
-    customerName: string;
+    deleted: boolean;
+  };
+
+  customer: {
+    id: number;
+    name: string;
+    deleted: boolean;
+  };
+
+  user: {
+    id: number;
+    deleted: boolean;
   };
 
   contact: {
     name: string;
     phoneNumber: string;
+    deleted: boolean;
   } | null;
 
   docket: {
@@ -58,4 +70,7 @@ export type DeliverySummary = {
   locationAddress: string;
   contactName: string | null;
   assignedUserName: string;
+  assignedUserDeleted: boolean;
+  locationDeleted: boolean;
+  contactDeleted: boolean;
 };

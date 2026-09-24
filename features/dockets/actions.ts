@@ -9,11 +9,9 @@ import CustomerDocketEmail from "@/content/customer-docket-email";
 import DocketPdf from "@/content/docket-pdf";
 import InternalDocketEmail from "@/content/internal-docket-email";
 import { sendEmail } from "@/lib/email/sendEmail";
-import { getLogoBuffer, getLogoUrl } from "@/lib/utils/image-utils";
+import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { db } from "@/prisma/db";
-import { NextResponse } from "next/server";
-import { pdf } from "pdf-to-img";
 import { UpdateDocketInput } from "./types";
 import { CreateDocketInput, createDocketSchema, updateDocketSchema } from "./validation";
 
@@ -82,10 +80,10 @@ export async function updateDocket(input: UpdateDocketInput) {
 }
 
 async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
-  const docket = await db.orm.public.Docket.where({ id: docketId }).first();
+  const docket = await db.orm.public.Docket.where({ id: docketId, deleted: false }).first();
   if (!docket) throw new Error(`Docket ${docketId} not found.`);
 
-  const delivery = await db.orm.public.Delivery.where({ id: docket.deliveryId })
+  const delivery = await db.orm.public.Delivery.where({ id: docket.deliveryId, deleted: false })
     .include("route")
     .include("location", location => location.include("customer"))
     .first();
@@ -101,8 +99,8 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
   const logoBuffer = await getLogoBuffer();
 
   const [managers, invoiceEmails] = await Promise.all([
-    db.orm.public.User.where({ role: "MANAGER" }).all(),
-    db.orm.public.InvoiceEmail.where({ customerId: delivery.location.customer.id }).all()
+    db.orm.public.User.where({ role: "MANAGER", deleted: false }).all(),
+    db.orm.public.InvoiceEmail.where({ customerId: delivery.location.customer.id, deleted: false }).all()
   ]);
 
   const managerRecipients = managers.map(manager => manager.email);

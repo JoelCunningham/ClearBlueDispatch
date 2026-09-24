@@ -6,7 +6,9 @@ import type { CustomerDetail, CustomerSummary } from "./types";
 export async function getCustomers(search?: string): Promise<CustomerSummary[]> {
   await requireRole("MANAGER");
 
-  const customers = await db.orm.public.Customer.orderBy(customer => customer.name.asc()).all();
+  const customers = await db.orm.public.Customer.where({ deleted: false })
+    .orderBy(customer => customer.name.asc())
+    .all();
 
   const summaries = customers.map(customer => ({
     id: customer.id,
@@ -23,7 +25,7 @@ export async function getCustomers(search?: string): Promise<CustomerSummary[]> 
 export async function getCustomer(customerId: number): Promise<CustomerDetail | null> {
   await requireRole("MANAGER");
 
-  const customer = await db.orm.public.Customer.where({ id: customerId })
+  const customer = await db.orm.public.Customer.where({ id: customerId, deleted: false })
     .include("locations")
     .include("contacts")
     .include("invoiceEmails")

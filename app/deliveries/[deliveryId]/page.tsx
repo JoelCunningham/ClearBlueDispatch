@@ -1,5 +1,6 @@
 import { Calendar, MapPin } from "lucide-react";
 
+import ErrorMessage from "@/components/alerts/error-message";
 import LinkButton from "@/components/buttons/link-button";
 import PhoneButtons from "@/components/buttons/phone-buttons";
 import Card from "@/components/wrappers/card";
@@ -8,7 +9,7 @@ import LineItem from "@/components/wrappers/line-item";
 import List from "@/components/wrappers/list";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
-import { dateToLongFormat } from "@/lib/utils/date-utils";
+import { dateToLongFormat, isDatePast } from "@/lib/utils/date-utils";
 import { getGoogleMapsUrl } from "@/lib/utils/maps-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
@@ -24,15 +25,22 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
   const contactSubtitle = delivery.contact ? `${delivery.contact.name} • ${delivery.contact.phoneNumber}` : "No contact.";
 
+  const isPastDelivery = isDatePast(delivery.date);
+
   return (
     <Page>
       <Heading
-        title={getCustomerName(delivery.location.customerName, delivery.location.address)}
+        title={getCustomerName(delivery.customer.name, delivery.location.address)}
         subtitle={`${dateToLongFormat(delivery.date)} • Stop #${delivery.position}`}
         subtitleIcon={Calendar}
         backFallback={`/routes/${delivery.routeId}`}
         actionLink={{ text: "Edit", href: `/deliveries/${deliveryIdNumber}/edit`, role: "MANAGER" }}
       />
+
+      <ErrorMessage assigned="delivery" assignee="user" deleted={delivery.user.deleted} past={isPastDelivery} />
+      <ErrorMessage assigned="delivery" assignee="location" deleted={delivery.location.deleted} past={isPastDelivery} />
+      <ErrorMessage assigned="delivery" assignee="contact" deleted={delivery.contact?.deleted ?? false} past={isPastDelivery} />
+      <ErrorMessage assigned="delivery" assignee="customer" deleted={delivery.customer.deleted} past={isPastDelivery} />
 
       <LinkButton text={delivery.location.address} icon={MapPin} href={getGoogleMapsUrl(delivery.location.address)} />
 
@@ -53,6 +61,7 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
       ) : (
         <LinkButton text="Create docket" href={`/dockets/new/${deliveryIdNumber}`} />
       )}
+      <LinkButton href={`/customers/${delivery.customer.id}`} text="Go to customer details" />
     </Page>
   );
 }

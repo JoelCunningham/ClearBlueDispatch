@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'9f8636c2d46008efbdbdf4124abae8cb60039ed55012ededcb2d88f5837b3721'>;
+  StorageHashBase<'8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -271,6 +271,7 @@ export type FieldOutputTypes = {
       readonly comments: CodecTypes['pg/text@1']['output'] | null;
       readonly repName: CodecTypes['pg/text@1']['output'];
       readonly repSignature: CodecTypes['pg/bytea@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly deliveryId: CodecTypes['pg/int4@1']['output'];
     };
     readonly InvoiceEmail: {
@@ -297,6 +298,7 @@ export type FieldOutputTypes = {
       readonly role: 'DRIVER' | 'MANAGER';
       readonly passwordHash: CodecTypes['pg/text@1']['output'];
       readonly deleted: CodecTypes['pg/bool@1']['output'];
+      readonly firstLogin: CodecTypes['pg/bool@1']['output'];
       readonly sessionVersion: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -335,6 +337,7 @@ export type FieldInputTypes = {
       readonly comments: CodecTypes['pg/text@1']['input'] | null;
       readonly repName: CodecTypes['pg/text@1']['input'];
       readonly repSignature: CodecTypes['pg/bytea@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly deliveryId: CodecTypes['pg/int4@1']['input'];
     };
     readonly InvoiceEmail: {
@@ -361,6 +364,7 @@ export type FieldInputTypes = {
       readonly role: 'DRIVER' | 'MANAGER';
       readonly passwordHash: CodecTypes['pg/text@1']['input'];
       readonly deleted: CodecTypes['pg/bool@1']['input'];
+      readonly firstLogin: CodecTypes['pg/bool@1']['input'];
       readonly sessionVersion: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -395,6 +399,7 @@ export type StorageColumnTypes = {
     readonly docket: {
       readonly batchNumber: CodecTypes['pg/text@1']['output'];
       readonly comments: CodecTypes['pg/text@1']['output'] | null;
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly deliveryId: CodecTypes['pg/int4@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly repName: CodecTypes['pg/text@1']['output'];
@@ -422,6 +427,7 @@ export type StorageColumnTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly deleted: CodecTypes['pg/bool@1']['output'];
       readonly email: CodecTypes['pg/text@1']['output'];
+      readonly firstLogin: CodecTypes['pg/bool@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly passwordHash: CodecTypes['pg/text@1']['output'];
@@ -459,6 +465,7 @@ export type StorageColumnInputTypes = {
     readonly docket: {
       readonly batchNumber: CodecTypes['pg/text@1']['input'];
       readonly comments: CodecTypes['pg/text@1']['input'] | null;
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly deliveryId: CodecTypes['pg/int4@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly repName: CodecTypes['pg/text@1']['input'];
@@ -486,6 +493,7 @@ export type StorageColumnInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly deleted: CodecTypes['pg/bool@1']['input'];
       readonly email: CodecTypes['pg/text@1']['input'];
+      readonly firstLogin: CodecTypes['pg/bool@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly passwordHash: CodecTypes['pg/text@1']['input'];
@@ -504,6 +512,7 @@ export namespace Models {
     role: 'DRIVER' | 'MANAGER';
     passwordHash: CodecTypes['pg/text@1']['output'];
     deleted: CodecTypes['pg/bool@1']['output'];
+    firstLogin: CodecTypes['pg/bool@1']['output'];
     sessionVersion: CodecTypes['pg/int4@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -540,6 +549,7 @@ export namespace Models {
     comments: CodecTypes['pg/text@1']['output'] | null;
     repName: CodecTypes['pg/text@1']['output'];
     repSignature: CodecTypes['pg/bytea@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
     deliveryId: CodecTypes['pg/int4@1']['output'];
     delivery: public_Delivery;
     readonly [RelationKeys]?: 'delivery';
@@ -859,6 +869,15 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/bytea@1';
                   readonly nullable: false;
                 };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
                 readonly deliveryId: {
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
@@ -1080,6 +1099,15 @@ type ContractBase = Omit<
                   readonly default: {
                     readonly kind: 'literal';
                     readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly firstLogin: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
                   };
                 };
                 readonly sessionVersion: {
@@ -1393,6 +1421,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bytea@1' };
               };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
               readonly deliveryId: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -1422,6 +1454,7 @@ type ContractBase = Omit<
                 readonly comments: { readonly column: 'comments' };
                 readonly repName: { readonly column: 'repName' };
                 readonly repSignature: { readonly column: 'repSignature' };
+                readonly deleted: { readonly column: 'deleted' };
                 readonly deliveryId: { readonly column: 'deliveryId' };
               };
             };
@@ -1601,6 +1634,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
               };
+              readonly firstLogin: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
               readonly sessionVersion: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -1643,6 +1680,7 @@ type ContractBase = Omit<
                 readonly role: { readonly column: 'role' };
                 readonly passwordHash: { readonly column: 'passwordHash' };
                 readonly deleted: { readonly column: 'deleted' };
+                readonly firstLogin: { readonly column: 'firstLogin' };
                 readonly sessionVersion: { readonly column: 'sessionVersion' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 export const passwordSchema = z
   .string()
@@ -14,6 +14,14 @@ export const resetUserPasswordSchema = z.object({
   userId: z.coerce.number().int().positive(),
   newPassword: passwordSchema
 });
+
+export const createUserSchema = z.object({
+  name: z.string().trim().min(1, "Name is required."),
+  email: z.email("Enter a valid email address."),
+  role: z.enum(["DRIVER", "MANAGER"])
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export const updateUserSchema = z.object({
   userId: z.coerce.number().int().positive(),

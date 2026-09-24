@@ -16,7 +16,7 @@ export default function Form({ title, isSaving, error, onSubmit, submitText, chi
       {title && <h2 className="mb-4 font-semibold">{title}</h2>}
       {children}
       {error && <ErrorAlert text={error} />}
-      <PrimaryButton text={isSaving ? "Saving..." : submitText || "Save changes"} disabled={isSaving} />
+      {submitText && <PrimaryButton text={isSaving ? "Saving..." : submitText || "Save changes"} disabled={isSaving} />}
     </form>
   );
 }

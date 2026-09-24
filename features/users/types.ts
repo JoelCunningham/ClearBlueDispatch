@@ -6,20 +6,20 @@ export type UserSummary = {
   email: string;
   createdAt: Temporal.Instant;
   role: UserRole;
+  deleted?: boolean;
 };
 
-export type UpdateUserInput = {
-  userId: number;
+export type UserFormInput = {
   name: string;
   email: string;
   role: UserRole;
 };
 
-export type UpdateOwnProfileInput = {
-  name: string;
-  email: string;
-  userId: number;
-};
+export type CreateUserInput = UserFormInput;
+
+export type UpdateUserInput = UserFormInput & { userId: number };
+
+export type UpdateOwnProfileInput = UserFormInput & { userId: number };
 
 export type PasswordFormInput = {
   currentPassword?: string;

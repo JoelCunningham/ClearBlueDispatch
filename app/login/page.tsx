@@ -6,9 +6,11 @@ import LoginForm from "@/components/forms/login-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { LoginFormInput } from "@/features/login/types";
+import { isFirstTimeLogin, setPassword } from "@/features/login/actions";
+import { redirect } from "next/navigation";
 
 type LoginPageProps = {
-  searchParams: Promise<{ callbackUrl?: string; error?: string }>;
+  searchParams: Promise<{ callbackUrl?: string; email?: string; firstTimeLogin?: boolean; error?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
@@ -19,7 +21,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     "use server";
 
     try {
-      await signIn("credentials", { email: input.email, password: input.password, redirectTo: callbackUrl });
+      const firstTimeLogin = await isFirstTimeLogin({ ...input });
+
+      if (firstTimeLogin && !params.firstTimeLogin) {
+        redirect(`/login?email=${encodeURIComponent(input.email)}&firstTimeLogin=true&callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      }
+      if (firstTimeLogin && params.firstTimeLogin) {
+        const result = await setPassword({ ...input });
+        if (!result.success) return result;
+      }
+
+      await signIn("credentials", { ...input, password: firstTimeLogin ? input.newPassword : input.password, redirectTo: callbackUrl });
       return { success: true };
     } catch (error) {
       if (error instanceof AuthError) {
@@ -33,7 +45,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <Page centred>
       <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
       <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
-      <LoginForm initialError={params.error} action={login} />
+      <LoginForm initialError={params.error} action={login} requiresNewPassword={params.firstTimeLogin} email={params.email} />
     </Page>
   );
 }

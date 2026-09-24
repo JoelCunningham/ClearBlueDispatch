@@ -20,7 +20,7 @@ export default async function DocketsPage({ searchParams }: DocketsPageProps) {
 
   return (
     <Page>
-      <Heading title="Dockets" subtitle="View and manage delivery dockets." />
+      <Heading title="Dockets" backFallback="/manage" subtitle="View and manage delivery dockets." />
       <SearchBar placeholder="Search dockets..." />
       <List emptyText={search ? "No dockets match your search." : "No dockets have been created yet."}>
         {dockets.map(docket => (

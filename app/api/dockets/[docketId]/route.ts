@@ -1,5 +1,5 @@
 import DocketPdf from "@/content/docket-pdf";
-import { getLogoBuffer } from "@/lib/utils/image-utils";
+import { getLogoBuffer } from "@/lib/utils/url-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { db } from "@/prisma/db";
 import { renderToBuffer } from "@react-pdf/renderer";

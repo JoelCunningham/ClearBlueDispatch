@@ -80,6 +80,7 @@ npx prisma migration status    # Show migration status
 npx prisma migration check     # Validate migration
 npx prisma migration plan      # Create migration plan
 npx prisma db migrate          # Execute migrations
+npx prisma db update           # Update db (instead of migrate)
 npx prisma db verify           # Verify migrations
 ```
 

@@ -9,6 +9,7 @@ import Form from "@/components/wrappers/form";
 import { DeliveryContactOption, DeliveryFormInput, DeliveryLocationOption } from "@/features/deliveries/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
+import { inputFormatToDate } from "@/lib/utils/date-utils";
 
 type UserOption = {
   id: number;
@@ -40,7 +41,7 @@ export default function DeliveryForm({
   tankDetails,
   notes
 }: DeliveryFormProps) {
-  const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>(locationId ? locationId.toString() : "");
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -81,7 +82,7 @@ export default function DeliveryForm({
 
   return (
     <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={userId ? "Save changes" : "Create delivery"}>
-      <BasicInput type="date" id="date" label="Date" initial={date?.toString()} required />
+      <BasicInput type="date" id="date" label="Date" initial={date} required />
       <SelectInput
         id="assignedUserId"
         label="Driver"
@@ -94,7 +95,7 @@ export default function DeliveryForm({
         id="locationId"
         label="Location"
         items={locations.map(location => ({ id: location.id, name: getCustomerName(location.customerName, location.address) }))}
-        onChange={setSelectedLocationId}
+        onChange={e => setSelectedLocationId(e.target.value)}
         placeholder="Select a location"
         initial={locationId?.toString()}
         required
@@ -104,7 +105,7 @@ export default function DeliveryForm({
         label="Contact"
         items={customerContacts.map(contact => ({ id: contact.id, name: `${contact.name} — ${contact.phoneNumber}` }))}
         required={customerContacts.length > 0}
-        disabled={!selectedLocation}
+        disabled={!selectedLocation || customerContacts.length === 0}
         placeholder={contactPlaceholder}
         initial={contactId?.toString()}
       />

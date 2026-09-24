@@ -2,16 +2,16 @@ import InputWrapper from "./input-wrapper";
 
 interface SelectInputProps {
   id: string;
-  label: string;
+  label?: string;
   items: { id: number | string; name: string }[];
   placeholder?: string;
   initial?: string;
-  onChange?: (value: string) => void;
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   required?: boolean;
   disabled?: boolean;
 }
 
-export default function SelectInput({ id, label, items, placeholder, initial, required, disabled }: SelectInputProps) {
+export default function SelectInput({ id, label, items, placeholder, initial, required, disabled, onChange }: SelectInputProps) {
   return (
     <InputWrapper id={id} label={label}>
       <select
@@ -20,6 +20,7 @@ export default function SelectInput({ id, label, items, placeholder, initial, re
         required={required}
         disabled={disabled}
         defaultValue={initial}
+        onChange={onChange}
         className="w-full rounded-md border bg-background px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">{placeholder || "Select an option"}</option>
