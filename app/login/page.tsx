@@ -3,10 +3,11 @@ import Image from "next/image";
 
 import { signIn } from "@/auth";
 import LoginForm from "@/components/forms/login-form";
+import InstallButton from "@/components/pwa/install-button";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
-import { LoginFormInput } from "@/features/login/types";
 import { isFirstTimeLogin, setPassword } from "@/features/login/actions";
+import { LoginFormInput } from "@/features/login/types";
 import { redirect } from "next/navigation";
 
 type LoginPageProps = {
@@ -46,6 +47,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
       <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
       <LoginForm initialError={params.error} action={login} requiresNewPassword={params.firstTimeLogin} email={params.email} />
+      <div className="mt-6">
+        <InstallButton />
+      </div>
     </Page>
   );
 }

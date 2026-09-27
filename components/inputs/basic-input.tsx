@@ -20,6 +20,7 @@ interface InputProps {
   prefix?: string;
   suffix?: SuffixProps;
   value?: string | number;
+  autoComplete?: "current-password" | "new-password" | "email" | "username";
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -37,6 +38,7 @@ export default function BasicInput({
   prefix,
   suffix,
   value,
+  autoComplete,
   onChange
 }: InputProps) {
   return (
@@ -55,6 +57,7 @@ export default function BasicInput({
           min={minNumber}
           minLength={minLength}
           value={value}
+          autoComplete={autoComplete ?? "off"}
           onChange={onChange}
           className="w-full px-3 py-2 focus:outline-none"
         />

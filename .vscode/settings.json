@@ -4,6 +4,7 @@
         "color",
         "Geist",
         "mydb",
+        "nosniff",
         "oklch",
         "Timestamptz",
         "Timetz",

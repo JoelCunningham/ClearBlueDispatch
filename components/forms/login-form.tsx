@@ -54,12 +54,18 @@ export default function LoginForm({ email, initialError, requiresNewPassword, ac
 
   return (
     <Form onSubmit={handleSubmit} submitText="Sign in" error={error} isSaving={isSaving}>
-      <BasicInput type="email" id="email" label="Email" initial={email} required />
-      <BasicInput type="password" id="password" label={requiresNewPassword ? "Current password" : "Password"} required />
+      <BasicInput type="email" id="email" label="Email" initial={email} autoComplete="username" required />
+      <BasicInput
+        type="password"
+        id="password"
+        label={requiresNewPassword ? "Current password" : "Password"}
+        autoComplete="current-password"
+        required
+      />
       {requiresNewPassword && (
         <>
-          <BasicInput type="password" id="newPassword" label="New password" required />
-          <BasicInput type="password" id="confirmPassword" label="Confirm new password" required />
+          <BasicInput type="password" id="newPassword" label="New password" autoComplete="new-password" required />
+          <BasicInput type="password" id="confirmPassword" label="Confirm new password" autoComplete="new-password" required />
         </>
       )}
     </Form>
