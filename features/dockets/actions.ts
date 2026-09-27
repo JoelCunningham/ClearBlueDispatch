@@ -9,28 +9,35 @@ import CustomerDocketEmail from "@/content/customer-docket-email";
 import DocketPdf from "@/content/docket-pdf";
 import InternalDocketEmail from "@/content/internal-docket-email";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { requireDeliveryAccess, requireDocketAccess, requireRole } from "@/lib/auth/authorization";
 import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { db } from "@/prisma/db";
-import { UpdateDocketInput } from "./types";
-import { CreateDocketInput, createDocketSchema, updateDocketSchema } from "./validation";
+import { CreateDocketInput, UpdateDocketInput } from "./types";
+import { createDocketSchema, updateDocketSchema } from "./validation";
+import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
 
 export async function createDocket(input: CreateDocketInput) {
   const result = createDocketSchema.safeParse(input);
   if (!result.success) return { success: false, error: "Invalid docket details." };
 
   const { deliveryId, volume, batchNumber, comments, repName, repSignature } = result.data;
+  const delivery = await requireDeliveryAccess(deliveryId);
+  if (!delivery) return { success: false, error: "Delivery not found." };
+
   let docketId: number;
 
   try {
     docketId = await db.transaction(async tx => {
-      const delivery = await tx.orm.public.Delivery.where({ id: deliveryId }).first();
+      const delivery = await tx.orm.public.Delivery.where({ id: deliveryId, deleted: false }).first();
       if (!delivery) throw new Error("Delivery not found.");
 
       const existingDocket = await tx.orm.public.Docket.where({ deliveryId }).first();
       if (existingDocket) throw new Error("This delivery already has a docket.");
 
-      const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, comments, repName, repSignature });
+      const signature = dataUrlToBuffer(repSignature);
+
+      const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, comments, repName, repSignature: signature });
       return docket.id;
     });
   } catch (error) {
@@ -48,18 +55,25 @@ export async function createDocket(input: CreateDocketInput) {
 }
 
 export async function updateDocket(input: UpdateDocketInput) {
+  await requireRole("MANAGER");
+
   const result = updateDocketSchema.safeParse(input);
   if (!result.success) return { success: false, error: "Invalid docket details." };
 
   const { docketId, volume, batchNumber, comments, repName, repSignature } = result.data;
+  const docket = await requireDocketAccess(docketId);
+  if (!docket) return { success: false, error: "Docket not found." };
+
   let deliveryId: number;
 
   try {
     deliveryId = await db.transaction(async tx => {
-      const docket = await tx.orm.public.Docket.where({ id: docketId }).first();
+      const docket = await tx.orm.public.Docket.where({ id: docketId, deleted: false }).first();
       if (!docket) throw new Error("Docket not found.");
 
-      await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, comments, repName, repSignature });
+      const signature = dataUrlToBuffer(repSignature);
+
+      await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, comments, repName, repSignature: signature });
       return docket.deliveryId;
     });
   } catch (error) {

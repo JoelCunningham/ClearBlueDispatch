@@ -1,7 +1,10 @@
 import { db } from "@/prisma/db";
+import { requireDocketAccess, requireRole } from "@/lib/auth/authorization";
 import type { DocketDetail, DocketSummary } from "./types";
 
 export async function getDockets(search?: string): Promise<DocketSummary[]> {
+  await requireRole("MANAGER");
+
   const dockets = await db.orm.public.Docket.where({ deleted: false })
     .include("delivery", delivery => delivery.include("route").include("location", location => location.include("customer")))
     .all();
@@ -34,6 +37,8 @@ export async function getDockets(search?: string): Promise<DocketSummary[]> {
 }
 
 export async function getDocket(docketId: number): Promise<DocketDetail | null> {
+  await requireDocketAccess(docketId);
+
   const docket = await db.orm.public.Docket.where({ id: docketId, deleted: false })
     .include("delivery", delivery => delivery.include("route").include("location", location => location.include("customer")))
     .first();

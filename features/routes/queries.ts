@@ -1,9 +1,6 @@
 import { db } from "@/prisma/db";
-import { requireUser } from "@/lib/auth/authorization";
-
 import type { RouteDetail, RouteSummary, UserSummary } from "./types";
-import { requireRouteAccess } from "@/lib/auth/authorization";
-import { requireRole } from "@/lib/auth/authorization";
+import { requireRole, requireRouteAccess, requireUser } from "@/lib/auth/authorization";
 
 type GetRoutesOptions = {
   fromDate?: Temporal.Instant;
@@ -40,15 +37,14 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
   const route = await requireRouteAccess(routeId);
   if (!route) return null;
 
-  const routeWithDetails = await db.orm.public.Route.where({ id: routeId }).include("assignedUser").include("deliveries").first();
+  const routeWithDetails = await db.orm.public.Route.where({ id: routeId })
+    .include("assignedUser")
+    .include("deliveries", delivery => delivery.include("location", location => location.include("customer")))
+    .first();
 
   if (!routeWithDetails) return null;
 
   const deliveries = [...routeWithDetails.deliveries].sort((a, b) => a.position - b.position);
-  const locations = await Promise.all(
-    deliveries.map(delivery => db.orm.public.Location.where({ id: delivery.locationId, deleted: false }).include("customer").first())
-  );
-
   return {
     id: routeWithDetails.id,
     date: routeWithDetails.date,
@@ -57,10 +53,12 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
       name: routeWithDetails.assignedUser.name,
       deleted: routeWithDetails.assignedUser.deleted
     },
-    deliveries: deliveries.map((delivery, index) => {
-      const location = locations[index];
+    deliveries: deliveries.map(delivery => {
+      const location = delivery.location;
 
       if (!location) throw new Error(`Location ${delivery.locationId} not found.`);
+      if (location.deleted) throw new Error(`Location ${delivery.locationId} is deleted.`);
+      if (!location.customer) throw new Error(`Customer for location ${location.id} not found.`);
 
       return {
         id: delivery.id,

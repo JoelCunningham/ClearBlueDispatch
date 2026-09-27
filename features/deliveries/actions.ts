@@ -20,12 +20,15 @@ export async function createDelivery(input: CreateDeliveryInput) {
   const temporalDate = Temporal.PlainDate.from(date).toZonedDateTime("UTC").toInstant();
 
   const resultData = await db.transaction(async tx => {
-    const location = await tx.orm.public.Location.first({ id: locationId });
+    const location = await tx.orm.public.Location.first({ id: locationId, deleted: false });
 
     if (!location) throw new Error("Location not found.");
 
+    const assignedUser = await tx.orm.public.User.first({ id: assignedUserId, deleted: false });
+    if (!assignedUser || assignedUser.role !== "DRIVER") throw new Error("Assigned user not found.");
+
     if (contactId !== undefined) {
-      const contact = await tx.orm.public.Contact.first({ id: contactId });
+      const contact = await tx.orm.public.Contact.first({ id: contactId, deleted: false });
       if (!contact) throw new Error("Contact not found.");
       if (contact.customerId !== location.customerId) throw new Error("Contact does not belong to the location's customer.");
     }
@@ -62,11 +65,14 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
       const delivery = await tx.orm.public.Delivery.where({ id: deliveryId }).first();
       if (!delivery) throw new Error("Delivery not found.");
 
-      const location = await tx.orm.public.Location.first({ id: locationId });
+      const location = await tx.orm.public.Location.first({ id: locationId, deleted: false });
       if (!location) throw new Error("Location not found.");
 
+      const assignedUser = await tx.orm.public.User.first({ id: assignedUserId, deleted: false });
+      if (!assignedUser || assignedUser.role !== "DRIVER") throw new Error("Assigned user not found.");
+
       if (contactId !== undefined) {
-        const contact = await tx.orm.public.Contact.first({ id: contactId });
+        const contact = await tx.orm.public.Contact.first({ id: contactId, deleted: false });
         if (!contact) throw new Error("Contact not found.");
         if (contact.customerId !== location.customerId) throw new Error("Contact does not belong to the location's customer.");
       }

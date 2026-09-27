@@ -49,7 +49,7 @@ export default function DocketForm({
         batchNumber: String(formData.get("batchNumber") ?? ""),
         comments: String(formData.get("comments") ?? ""),
         repName: String(formData.get("repName") ?? ""),
-        repSignature: dataUrlToBuffer(String(formData.get("repSignature") ?? ""))
+        repSignature: String(formData.get("repSignature") ?? "")
       };
 
       const result = await action(input);

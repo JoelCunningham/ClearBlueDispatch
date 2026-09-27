@@ -18,11 +18,11 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
 
   const deliveryIdNumber = idOrNotFound(deliveryId);
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
-  const customerName = getCustomerName(delivery.location.customerName, delivery.location.address);
+  const customerName = getCustomerName(delivery.customer.name, delivery.location.address);
 
   async function submitDocket(input: CreateDocketInput) {
     "use server";
-    return await createDocket({ deliveryId: deliveryIdNumber, ...input });
+    return await createDocket({ ...input });
   }
 
   return (

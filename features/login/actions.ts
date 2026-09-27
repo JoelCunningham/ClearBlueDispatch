@@ -8,10 +8,13 @@ export async function isFirstTimeLogin(input: LoginUserInput): Promise<boolean> 
   const result = loginUserSchema.safeParse(input);
   if (!result.success) return false;
 
-  const { email } = result.data;
+  const { email, password } = result.data;
 
   const user = await db.orm.public.User.where({ email, deleted: false }).first();
   if (!user) return false;
+
+  const passwordMatches = await verifyPassword(password, user.passwordHash);
+  if (!passwordMatches) return false;
 
   return user.firstLogin;
 }

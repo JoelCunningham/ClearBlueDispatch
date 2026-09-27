@@ -156,6 +156,8 @@ export async function getDeliveries(search?: string): Promise<DeliverySummary[]>
 }
 
 export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeliveryInput | null> {
+  await requireRole("MANAGER");
+
   const delivery = await db.orm.public.Delivery.where({ id: deliveryId, deleted: false })
     .include("route", route => route.include("assignedUser"))
     .include("docket")

@@ -23,7 +23,8 @@ export async function createUser(input: CreateUserInput) {
   const existingUser = await db.orm.public.User.where({ email }).first();
   if (existingUser) return { success: false, error: "That email address is already in use." };
 
-  const password = process.env.DEFAULT_USER_PASSWORD || "password";
+  const password = process.env.DEFAULT_USER_PASSWORD;
+  if (!password) return { success: false, error: "DEFAULT_USER_PASSWORD is not configured." };
   const passwordHash = await hashPassword(password);
   const newUser = await db.orm.public.User.create({ name, email, role, passwordHash });
 
@@ -81,7 +82,7 @@ export async function deleteUser(input: { userId: number }) {
     return { success: false, error: "You cannot delete your own user profile." };
   }
 
-  await db.orm.public.User.where({ id: userId }).update({ deleted: true });
+  await db.orm.public.User.where({ id: userId }).update({ deleted: true, sessionVersion: user.sessionVersion + 1 });
 
   revalidatePath("/users");
   redirect("/users");
@@ -100,7 +101,7 @@ export async function restoreUser(input: { userId: number }) {
     return { success: false, error: "You cannot restore your own user profile." };
   }
 
-  await db.orm.public.User.where({ id: userId }).update({ deleted: false });
+  await db.orm.public.User.where({ id: userId }).update({ deleted: false, sessionVersion: user.sessionVersion + 1 });
 
   revalidatePath("/users");
   redirect("/users");
@@ -130,6 +131,8 @@ export async function changeOwnPassword(input: ChangeOwnPasswordInput) {
 }
 
 export async function resetUserPassword(input: ResetUserPasswordInput) {
+  await requireRole("MANAGER");
+
   const result = resetUserPasswordSchema.safeParse(input);
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
 

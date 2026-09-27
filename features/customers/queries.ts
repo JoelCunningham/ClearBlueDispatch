@@ -19,7 +19,7 @@ export async function getCustomers(search?: string): Promise<CustomerSummary[]> 
   const query = search?.trim().toLowerCase();
   if (!query) return summaries;
 
-  return customers.filter(customer => [customer.name].some(value => value.toLowerCase().includes(query)));
+  return summaries.filter(customer => [customer.name].some(value => value.toLowerCase().includes(query)));
 }
 
 export async function getCustomer(customerId: number): Promise<CustomerDetail | null> {

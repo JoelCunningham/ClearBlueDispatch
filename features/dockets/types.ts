@@ -3,7 +3,7 @@ export type DocketFormInput = {
   batchNumber: string;
   comments: string;
   repName: string;
-  repSignature: Uint8Array;
+  repSignature: string;
 };
 
 export type CreateDocketInput = DocketFormInput;

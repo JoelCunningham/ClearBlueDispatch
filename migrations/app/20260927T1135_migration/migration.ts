@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689/contract';
-import endContract from '../../snapshots/8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/7f679c3b8ae95d93d4c2780ae4dedd7bbaa14018be29e76fa19457e1fd9bbaed/contract';
+import endContract from '../../snapshots/7f679c3b8ae95d93d4c2780ae4dedd7bbaa14018be29e76fa19457e1fd9bbaed/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -19,7 +19,7 @@ export default class M extends Migration<never, End> {
       this.createSchema({ schema: 'public' }),
       this.createTable({
         schema: 'public',
-        table: 'contact',
+        table: 'Contact',
         columns: [
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('deleted', 'bool', {
@@ -35,7 +35,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'customer',
+        table: 'Customer',
         columns: [
           col('deleted', 'bool', {
             notNull: true,
@@ -50,7 +50,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'delivery',
+        table: 'Delivery',
         columns: [
           col('contactId', 'int4', { codecRef: { codecId: 'pg/int4@1' } }),
           col('deleted', 'bool', {
@@ -69,7 +69,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'docket',
+        table: 'Docket',
         columns: [
           col('batchNumber', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('comments', 'text', { codecRef: { codecId: 'pg/text@1' } }),
@@ -88,7 +88,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'invoiceEmail',
+        table: 'InvoiceEmail',
         columns: [
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('deleted', 'bool', {
@@ -103,7 +103,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'location',
+        table: 'Location',
         columns: [
           col('address', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('customerId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
@@ -118,7 +118,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'route',
+        table: 'Route',
         columns: [
           col('assignedUserId', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
           col('date', 'timestamptz', {
@@ -131,7 +131,7 @@ export default class M extends Migration<never, End> {
       }),
       this.createTable({
         schema: 'public',
-        table: 'user',
+        table: 'User',
         columns: [
           col('createdAt', 'timestamptz', {
             notNull: true,
@@ -166,141 +166,141 @@ export default class M extends Migration<never, End> {
         ],
         constraints: [
           primaryKey(['id']),
-          checkExpression('user_role_check_0e203bb4', "\"role\" IN ('DRIVER', 'MANAGER')"),
+          checkExpression('User_role_check_0e203bb4', "\"role\" IN ('DRIVER', 'MANAGER')"),
         ],
       }),
       this.addUnique({
         schema: 'public',
-        table: 'docket',
-        constraint: 'docket_deliveryId_key',
+        table: 'Docket',
+        constraint: 'Docket_deliveryId_key',
         columns: ['deliveryId'],
       }),
       this.addUnique({
         schema: 'public',
-        table: 'route',
-        constraint: 'route_assignedUserId_date_key',
+        table: 'Route',
+        constraint: 'Route_assignedUserId_date_key',
         columns: ['assignedUserId', 'date'],
       }),
       this.addUnique({
         schema: 'public',
-        table: 'user',
-        constraint: 'user_email_key',
+        table: 'User',
+        constraint: 'User_email_key',
         columns: ['email'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'contact',
-        index: 'contact_customerId_idx_b2a8a46c',
+        table: 'Contact',
+        index: 'Contact_customerId_idx_b2a8a46c',
         columns: ['customerId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'delivery',
-        index: 'delivery_contactId_idx_ec98db2a',
+        table: 'Delivery',
+        index: 'Delivery_contactId_idx_ec98db2a',
         columns: ['contactId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'delivery',
-        index: 'delivery_locationId_idx_7aae3038',
+        table: 'Delivery',
+        index: 'Delivery_locationId_idx_7aae3038',
         columns: ['locationId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'delivery',
-        index: 'delivery_routeId_idx_91ae2fd6',
+        table: 'Delivery',
+        index: 'Delivery_routeId_idx_91ae2fd6',
         columns: ['routeId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'invoiceEmail',
-        index: 'invoiceEmail_customerId_idx_b2a8a46c',
+        table: 'InvoiceEmail',
+        index: 'InvoiceEmail_customerId_idx_b2a8a46c',
         columns: ['customerId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'location',
-        index: 'location_customerId_idx_b2a8a46c',
+        table: 'Location',
+        index: 'Location_customerId_idx_b2a8a46c',
         columns: ['customerId'],
       }),
       this.createIndex({
         schema: 'public',
-        table: 'route',
-        index: 'route_assignedUserId_idx_d0c6c9aa',
+        table: 'Route',
+        index: 'Route_assignedUserId_idx_d0c6c9aa',
         columns: ['assignedUserId'],
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'contact',
+        table: 'Contact',
         foreignKey: {
-          name: 'contact_customerId_fkey',
+          name: 'Contact_customerId_fkey',
           columns: ['customerId'],
-          references: { schema: 'public', table: 'customer', columns: ['id'] },
+          references: { schema: 'public', table: 'Customer', columns: ['id'] },
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'delivery',
+        table: 'Delivery',
         foreignKey: {
-          name: 'delivery_routeId_fkey',
+          name: 'Delivery_routeId_fkey',
           columns: ['routeId'],
-          references: { schema: 'public', table: 'route', columns: ['id'] },
+          references: { schema: 'public', table: 'Route', columns: ['id'] },
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'delivery',
+        table: 'Delivery',
         foreignKey: {
-          name: 'delivery_locationId_fkey',
+          name: 'Delivery_locationId_fkey',
           columns: ['locationId'],
-          references: { schema: 'public', table: 'location', columns: ['id'] },
+          references: { schema: 'public', table: 'Location', columns: ['id'] },
           onDelete: 'restrict',
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'delivery',
+        table: 'Delivery',
         foreignKey: {
-          name: 'delivery_contactId_fkey',
+          name: 'Delivery_contactId_fkey',
           columns: ['contactId'],
-          references: { schema: 'public', table: 'contact', columns: ['id'] },
+          references: { schema: 'public', table: 'Contact', columns: ['id'] },
           onDelete: 'restrict',
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'docket',
+        table: 'Docket',
         foreignKey: {
-          name: 'docket_deliveryId_fkey',
+          name: 'Docket_deliveryId_fkey',
           columns: ['deliveryId'],
-          references: { schema: 'public', table: 'delivery', columns: ['id'] },
+          references: { schema: 'public', table: 'Delivery', columns: ['id'] },
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'invoiceEmail',
+        table: 'InvoiceEmail',
         foreignKey: {
-          name: 'invoiceEmail_customerId_fkey',
+          name: 'InvoiceEmail_customerId_fkey',
           columns: ['customerId'],
-          references: { schema: 'public', table: 'customer', columns: ['id'] },
+          references: { schema: 'public', table: 'Customer', columns: ['id'] },
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'location',
+        table: 'Location',
         foreignKey: {
-          name: 'location_customerId_fkey',
+          name: 'Location_customerId_fkey',
           columns: ['customerId'],
-          references: { schema: 'public', table: 'customer', columns: ['id'] },
+          references: { schema: 'public', table: 'Customer', columns: ['id'] },
         },
       }),
       this.addForeignKey({
         schema: 'public',
-        table: 'route',
+        table: 'Route',
         foreignKey: {
-          name: 'route_assignedUserId_fkey',
+          name: 'Route_assignedUserId_fkey',
           columns: ['assignedUserId'],
-          references: { schema: 'public', table: 'user', columns: ['id'] },
+          references: { schema: 'public', table: 'User', columns: ['id'] },
         },
       }),
     ];

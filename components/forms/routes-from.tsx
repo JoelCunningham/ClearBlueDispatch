@@ -34,8 +34,6 @@ export default function RoutesForm({ role, users }: RoutesFormProps) {
     suppressEvent(event);
     setError(undefined);
 
-    console.log("handleSubmit called");
-
     try {
       const formData = new FormData(event.currentTarget);
 

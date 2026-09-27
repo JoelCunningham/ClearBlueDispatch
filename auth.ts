@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 
 import { authConfig } from "./auth.config";
 import { verifyPassword } from "./lib/auth/authorization";
+import { clearLoginFailures, getLoginAttemptKey, isLoginAllowed, recordLoginFailure } from "./lib/auth/login-rate-limit";
 import { db } from "./prisma/db";
 import { UserRole } from "./types/next-auth";
 
@@ -14,17 +15,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") {
           return null;
         }
 
+        const attemptKey = getLoginAttemptKey(request, credentials.email);
+        if (!isLoginAllowed(attemptKey)) return null;
+
         const user = await db.orm.public.User.first({ email: credentials.email });
-        if (!user) return null;
-        if (user.deleted) return null;
+        if (!user) {
+          recordLoginFailure(attemptKey);
+          return null;
+        }
+        if (user.deleted) {
+          recordLoginFailure(attemptKey);
+          return null;
+        }
 
         const passwordMatches = await verifyPassword(credentials.password, user.passwordHash);
-        if (!passwordMatches) return null;
+        if (!passwordMatches) {
+          recordLoginFailure(attemptKey);
+          return null;
+        }
+
+        clearLoginFailures(attemptKey);
 
         return {
           id: user.id.toString(),

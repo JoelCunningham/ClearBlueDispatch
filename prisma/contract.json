@@ -4,35 +4,35 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
-    "contact": {
+    "Contact": {
       "model": "Contact",
       "namespace": "public"
     },
-    "customer": {
+    "Customer": {
       "model": "Customer",
       "namespace": "public"
     },
-    "delivery": {
+    "Delivery": {
       "model": "Delivery",
       "namespace": "public"
     },
-    "docket": {
+    "Docket": {
       "model": "Docket",
       "namespace": "public"
     },
-    "invoiceEmail": {
+    "InvoiceEmail": {
       "model": "InvoiceEmail",
       "namespace": "public"
     },
-    "location": {
+    "Location": {
       "model": "Location",
       "namespace": "public"
     },
-    "route": {
+    "Route": {
       "model": "Route",
       "namespace": "public"
     },
-    "user": {
+    "User": {
       "model": "User",
       "namespace": "public"
     }
@@ -146,7 +146,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "contact"
+              "table": "Contact"
             }
           },
           "Customer": {
@@ -243,7 +243,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "customer"
+              "table": "Customer"
             }
           },
           "Delivery": {
@@ -399,7 +399,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "delivery"
+              "table": "Delivery"
             }
           },
           "Docket": {
@@ -507,7 +507,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "docket"
+              "table": "Docket"
             }
           },
           "InvoiceEmail": {
@@ -575,7 +575,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "invoiceEmail"
+              "table": "InvoiceEmail"
             }
           },
           "Location": {
@@ -658,7 +658,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "location"
+              "table": "Location"
             }
           },
           "Route": {
@@ -731,7 +731,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "route"
+              "table": "Route"
             }
           },
           "User": {
@@ -864,7 +864,7 @@
                 }
               },
               "namespaceId": "public",
-              "table": "user"
+              "table": "User"
             }
           }
         }
@@ -876,7 +876,7 @@
       "public": {
         "entries": {
           "table": {
-            "contact": {
+            "Contact": {
               "columns": {
                 "customerId": {
                   "codecId": "pg/int4@1",
@@ -919,14 +919,14 @@
                       "customerId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "contact"
+                    "tableName": "Contact"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "customer"
+                    "tableName": "Customer"
                   }
                 }
               ],
@@ -935,8 +935,8 @@
                   "columns": [
                     "customerId"
                   ],
-                  "name": "contact_customerId_idx_b2a8a46c",
-                  "prefix": "contact_customerId_idx",
+                  "name": "Contact_customerId_idx_b2a8a46c",
+                  "prefix": "Contact_customerId_idx",
                   "unique": false
                 }
               ],
@@ -947,7 +947,7 @@
               },
               "uniques": []
             },
-            "customer": {
+            "Customer": {
               "columns": {
                 "deleted": {
                   "codecId": "pg/bool@1",
@@ -987,7 +987,7 @@
               },
               "uniques": []
             },
-            "delivery": {
+            "Delivery": {
               "columns": {
                 "contactId": {
                   "codecId": "pg/int4@1",
@@ -1045,14 +1045,14 @@
                       "routeId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "delivery"
+                    "tableName": "Delivery"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "route"
+                    "tableName": "Route"
                   }
                 },
                 {
@@ -1062,14 +1062,14 @@
                       "locationId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "delivery"
+                    "tableName": "Delivery"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "location"
+                    "tableName": "Location"
                   }
                 },
                 {
@@ -1079,14 +1079,14 @@
                       "contactId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "delivery"
+                    "tableName": "Delivery"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "contact"
+                    "tableName": "Contact"
                   }
                 }
               ],
@@ -1095,24 +1095,24 @@
                   "columns": [
                     "contactId"
                   ],
-                  "name": "delivery_contactId_idx_ec98db2a",
-                  "prefix": "delivery_contactId_idx",
+                  "name": "Delivery_contactId_idx_ec98db2a",
+                  "prefix": "Delivery_contactId_idx",
                   "unique": false
                 },
                 {
                   "columns": [
                     "locationId"
                   ],
-                  "name": "delivery_locationId_idx_7aae3038",
-                  "prefix": "delivery_locationId_idx",
+                  "name": "Delivery_locationId_idx_7aae3038",
+                  "prefix": "Delivery_locationId_idx",
                   "unique": false
                 },
                 {
                   "columns": [
                     "routeId"
                   ],
-                  "name": "delivery_routeId_idx_91ae2fd6",
-                  "prefix": "delivery_routeId_idx",
+                  "name": "Delivery_routeId_idx_91ae2fd6",
+                  "prefix": "Delivery_routeId_idx",
                   "unique": false
                 }
               ],
@@ -1123,7 +1123,7 @@
               },
               "uniques": []
             },
-            "docket": {
+            "Docket": {
               "columns": {
                 "batchNumber": {
                   "codecId": "pg/text@1",
@@ -1181,14 +1181,14 @@
                       "deliveryId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "docket"
+                    "tableName": "Docket"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "delivery"
+                    "tableName": "Delivery"
                   }
                 }
               ],
@@ -1206,7 +1206,7 @@
                 }
               ]
             },
-            "invoiceEmail": {
+            "InvoiceEmail": {
               "columns": {
                 "customerId": {
                   "codecId": "pg/int4@1",
@@ -1244,14 +1244,14 @@
                       "customerId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "invoiceEmail"
+                    "tableName": "InvoiceEmail"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "customer"
+                    "tableName": "Customer"
                   }
                 }
               ],
@@ -1260,8 +1260,8 @@
                   "columns": [
                     "customerId"
                   ],
-                  "name": "invoiceEmail_customerId_idx_b2a8a46c",
-                  "prefix": "invoiceEmail_customerId_idx",
+                  "name": "InvoiceEmail_customerId_idx_b2a8a46c",
+                  "prefix": "InvoiceEmail_customerId_idx",
                   "unique": false
                 }
               ],
@@ -1272,7 +1272,7 @@
               },
               "uniques": []
             },
-            "location": {
+            "Location": {
               "columns": {
                 "address": {
                   "codecId": "pg/text@1",
@@ -1310,14 +1310,14 @@
                       "customerId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "location"
+                    "tableName": "Location"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "customer"
+                    "tableName": "Customer"
                   }
                 }
               ],
@@ -1326,8 +1326,8 @@
                   "columns": [
                     "customerId"
                   ],
-                  "name": "location_customerId_idx_b2a8a46c",
-                  "prefix": "location_customerId_idx",
+                  "name": "Location_customerId_idx_b2a8a46c",
+                  "prefix": "Location_customerId_idx",
                   "unique": false
                 }
               ],
@@ -1338,7 +1338,7 @@
               },
               "uniques": []
             },
-            "route": {
+            "Route": {
               "columns": {
                 "assignedUserId": {
                   "codecId": "pg/int4@1",
@@ -1367,14 +1367,14 @@
                       "assignedUserId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "route"
+                    "tableName": "Route"
                   },
                   "target": {
                     "columns": [
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "user"
+                    "tableName": "User"
                   }
                 }
               ],
@@ -1383,8 +1383,8 @@
                   "columns": [
                     "assignedUserId"
                   ],
-                  "name": "route_assignedUserId_idx_d0c6c9aa",
-                  "prefix": "route_assignedUserId_idx",
+                  "name": "Route_assignedUserId_idx_d0c6c9aa",
+                  "prefix": "Route_assignedUserId_idx",
                   "unique": false
                 }
               ],
@@ -1402,12 +1402,12 @@
                 }
               ]
             },
-            "user": {
+            "User": {
               "checks": [
                 {
                   "expression": "\"role\" IN ('DRIVER', 'MANAGER')",
-                  "name": "user_role_check_0e203bb4",
-                  "prefix": "user_role_check"
+                  "name": "User_role_check_0e203bb4",
+                  "prefix": "User_role_check"
                 }
               ],
               "columns": {
@@ -1522,7 +1522,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "8f861a98450232bf9fc7bbb1bee38e292ddc1af90d00089105ed747d0d052689"
+    "storageHash": "7f679c3b8ae95d93d4c2780ae4dedd7bbaa14018be29e76fa19457e1fd9bbaed"
   },
   "capabilities": {
     "postgres": {
@@ -1537,6 +1537,8 @@
       "checkConstraint": true,
       "defaultInInsert": true,
       "enums": true,
+      "insertOnConflictSkip": true,
+      "insertOnConflictWithoutTarget": true,
       "lateral": true,
       "returning": true,
       "scalarList": true

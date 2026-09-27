@@ -15,7 +15,7 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
-  const callbackUrl = params.callbackUrl ?? "/routes";
+  const callbackUrl = getSafeCallbackUrl(params.callbackUrl);
 
   async function login(input: LoginFormInput) {
     "use server";
@@ -48,4 +48,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <LoginForm initialError={params.error} action={login} requiresNewPassword={params.firstTimeLogin} email={params.email} />
     </Page>
   );
+}
+
+function getSafeCallbackUrl(callbackUrl?: string) {
+  if (!callbackUrl || !callbackUrl.startsWith("/") || callbackUrl.startsWith("//") || callbackUrl.includes("\\")) {
+    return "/routes";
+  }
+
+  return callbackUrl;
 }
