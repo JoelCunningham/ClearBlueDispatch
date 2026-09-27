@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Clear Blue Dispatch
 
-## Getting Started
+![Clear Blue Dispatch](public/icons/logo.png)
 
-First, run the development server:
+Delivery and docket management for Clear Blue Solutions. Clear Blue Dispatch gives managers and drivers one place to plan routes, track deliveries, manage customers, and produce delivery documentation.
+
+## What it does
+
+- Manage upcoming and historical delivery routes.
+- Assign routes to drivers and control access by role.
+- Create and update customers, deliveries, and dockets.
+- Capture delivery signatures and generate docket PDFs.
+- Send customer and internal docket emails.
+- Install as a progressive web app and monitor network status.
+
+## Tech stack
+
+- [Next.js](https://nextjs.org/) 16 with the App Router
+- React 19 and TypeScript
+- [Prisma ORM](https://www.prisma.io/) with PostgreSQL
+- [NextAuth.js](https://authjs.dev/) for authentication
+- Tailwind CSS 4
+- React PDF and React Email for generated documents and messages
+
+## Requirements
+
+- Node.js 20 or newer
+- npm
+- PostgreSQL 15 or newer
+
+## Getting started
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env` file in the project root with a PostgreSQL connection string:
+
+   ```env
+   DATABASE_URL="postgresql://user:password@localhost:5432/clear_blue_dispatch"
+   ```
+
+3. Apply the database migrations:
+
+   ```bash
+   npx prisma db migrate
+   ```
+
+4. Create the first application user. The role must be `MANAGER` or `DRIVER`:
+
+   ```bash
+   npx tsx scripts/create-user.ts "manager@example.com" "Example Manager" "change-this-password" MANAGER
+   ```
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000). The home route redirects to the routes view, and unauthenticated users are sent to the login page.
+
+## Available commands
+
+| Command                 | Purpose                          |
+| ----------------------- | -------------------------------- |
+| `npm run dev`           | Start the development server     |
+| `npm run build`         | Create a production build        |
+| `npm run start`         | Run the production build         |
+| `npm run lint`          | Run ESLint                       |
+| `npm run contract:emit` | Regenerate Prisma contract types |
+
+## Project structure
+
+| Directory     | Purpose                                                 |
+| ------------- | ------------------------------------------------------- |
+| `app/`        | Next.js routes, pages, and API handlers                 |
+| `components/` | Shared UI, navigation, form, and input components       |
+| `features/`   | Domain-specific actions, queries, types, and validation |
+| `content/`    | PDF and email templates                                 |
+| `prisma/`     | Database contract, client, and generated contract files |
+| `public/`     | PWA assets, logos, and screenshots                      |
+
+## Database workflow
+
+The database contract lives in [`prisma/contract.prisma`](prisma/contract.prisma). After changing it, regenerate the checked-in contract files:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run contract:emit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Use the Prisma migration commands for schema changes and keep migrations in [`migrations/`](migrations/).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build the application with `npm run build`, then serve it with `npm run start`. Configure `DATABASE_URL` in the deployment environment and ensure the target PostgreSQL instance is running PostgreSQL 15 or newer.
