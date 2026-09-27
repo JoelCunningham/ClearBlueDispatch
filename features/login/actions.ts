@@ -24,10 +24,13 @@ export async function setPassword(input: SetPasswordInput): Promise<{ success: b
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
 
   const { email, password, newPassword } = result.data;
+  const trimmedEmail = email.trim().toLowerCase();
+
   if (password === newPassword) return { success: false, error: "Your new password must be different from your current password." };
 
-  const user = await db.orm.public.User.where({ email, deleted: false }).first();
+  const user = await db.orm.public.User.where({ email: trimmedEmail, deleted: false }).first();
   if (!user) return { success: false, error: "User not found." };
+  if (!user.firstLogin) return { success: false, error: "First-time password setup is no longer available." };
 
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) return { success: false, error: "Current password is incorrect." };

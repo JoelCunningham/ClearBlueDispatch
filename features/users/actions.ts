@@ -5,7 +5,13 @@ import { redirect } from "next/navigation";
 import { render } from "react-email";
 
 import NewUserEmail from "@/content/new-user-email";
-import { changeOwnPasswordSchema, createUserSchema, resetUserPasswordSchema, updateUserSchema } from "@/features/users/validation";
+import {
+  changeOwnPasswordSchema,
+  createUserSchema,
+  resetUserPasswordSchema,
+  updateOwnProfileSchema,
+  updateUserSchema
+} from "@/features/users/validation";
 import { hashPassword, requireRole, requireUser, verifyPassword } from "@/lib/auth/authorization";
 import { sendEmail } from "@/lib/email/sendEmail";
 import { getLoginUrl, getLogoUrl } from "@/lib/utils/url-utils";
@@ -19,16 +25,20 @@ export async function createUser(input: CreateUserInput) {
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
 
   const { name, email, role } = result.data;
+  const trimmedEmail = email.trim().toLowerCase();
 
-  const existingUser = await db.orm.public.User.where({ email }).first();
+  const existingUser = await db.orm.public.User.where({ email: trimmedEmail }).first();
   if (existingUser) return { success: false, error: "That email address is already in use." };
 
-  const password = process.env.DEFAULT_USER_PASSWORD;
-  if (!password) return { success: false, error: "DEFAULT_USER_PASSWORD is not configured." };
+  const password = await generateRandomPassword(12);
   const passwordHash = await hashPassword(password);
-  const newUser = await db.orm.public.User.create({ name, email, role, passwordHash });
+  const newUser = await db.orm.public.User.create({ name, email: trimmedEmail, role, passwordHash });
 
-  await sendNewUserEmail(newUser.name, newUser.email, password);
+  try {
+    await sendNewUserEmail(newUser.name, newUser.email, password);
+  } catch (error) {
+    console.error("Failed to send new user email:", error);
+  }
 
   revalidatePath("/users");
   redirect(`/users/${newUser.id}`);
@@ -41,12 +51,13 @@ export async function updateUser(input: UpdateUserInput) {
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
 
   const { userId, name, email, role } = result.data;
+  const trimmedEmail = email.trim().toLowerCase();
 
   const existingUser = await db.orm.public.User.where({ id: userId }).first();
   if (!existingUser) return { success: false, error: "User not found." };
   if (existingUser.deleted) return { success: false, error: "User deleted." };
 
-  const emailUser = await db.orm.public.User.where({ email }).first();
+  const emailUser = await db.orm.public.User.where({ email: trimmedEmail }).first();
   if (emailUser && emailUser.id !== userId) {
     return { success: false, error: "That email address is already in use." };
   }
@@ -59,7 +70,7 @@ export async function updateUser(input: UpdateUserInput) {
 
   await db.orm.public.User.where({ id: userId }).update({
     name,
-    email,
+    email: trimmedEmail,
     role,
     ...(roleChanged ? { sessionVersion: existingUser.sessionVersion + 1 } : {})
   });
@@ -153,17 +164,18 @@ export async function resetUserPassword(input: ResetUserPasswordInput) {
 export async function updateOwnProfile(input: UpdateOwnProfileInput) {
   const user = await requireUser();
 
-  const result = updateUserSchema.safeParse(input);
+  const result = updateOwnProfileSchema.safeParse(input);
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
 
   const { name, email } = result.data;
+  const trimmedEmail = email.trim().toLowerCase();
 
-  const existingUser = await db.orm.public.User.where({ email }).first();
   const currentUserId = Number(user.id);
+  const existingUser = await db.orm.public.User.where({ email: trimmedEmail }).first();
 
   if (existingUser && existingUser.id !== currentUserId) return { success: false, error: "That email address is already in use." };
 
-  await db.orm.public.User.where({ id: user.id }).update({ name, email });
+  await db.orm.public.User.where({ id: currentUserId }).update({ name, email: trimmedEmail });
 
   revalidatePath("/profile");
   redirect(`/profile`);
@@ -177,4 +189,15 @@ async function sendNewUserEmail(userName: string, userEmail: string, userPasswor
     NewUserEmail({ userName: userName, userEmail: userEmail, userPassword: userPassword, loginUrl: loginUrl, logoUrl: logoUrl })
   );
   await sendEmail({ to: userEmail, subject: "Welcome to ClearBlue Solutions", html: emailContent });
+}
+
+async function generateRandomPassword(length: number): Promise<string> {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+  let password = "";
+  const randomValues = new Uint32Array(length);
+  crypto.getRandomValues(randomValues);
+  for (let i = 0; i < length; i++) {
+    password += charset[randomValues[i] % charset.length];
+  }
+  return password;
 }

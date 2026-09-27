@@ -6,7 +6,7 @@ export default auth(request => {
     request.nextUrl.pathname.startsWith("/manage") ||
     request.nextUrl.pathname.startsWith("/profile") ||
     request.nextUrl.pathname.startsWith("/dockets") ||
-    request.nextUrl.pathname.startsWith("/profile") ||
+    request.nextUrl.pathname.startsWith("/deliveries") ||
     request.nextUrl.pathname.startsWith("/customers") ||
     request.nextUrl.pathname.startsWith("/users");
 

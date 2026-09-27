@@ -9,7 +9,6 @@ import { UserRole } from "./types/next-auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  trustHost: true,
   providers: [
     Credentials({
       credentials: {
@@ -17,14 +16,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials, request) {
-        if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") {
-          return null;
-        }
+        if (typeof credentials?.email !== "string" || typeof credentials?.password !== "string") return null;
 
-        const attemptKey = getLoginAttemptKey(request, credentials.email);
+        const email = credentials.email.trim().toLowerCase();
+        const attemptKey = getLoginAttemptKey(request, email);
+
         if (!isLoginAllowed(attemptKey)) return null;
 
-        const user = await db.orm.public.User.first({ email: credentials.email });
+        const user = await db.orm.public.User.first({ email });
         if (!user) {
           recordLoginFailure(attemptKey);
           return null;

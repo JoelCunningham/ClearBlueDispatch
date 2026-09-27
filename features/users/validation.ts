@@ -1,4 +1,4 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 export const passwordSchema = z
   .string()
@@ -8,6 +8,11 @@ export const passwordSchema = z
 export const changeOwnPasswordSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required."),
   newPassword: passwordSchema
+});
+
+export const updateOwnProfileSchema = z.object({
+  name: z.string().trim().min(1, "Name is required."),
+  email: z.email("Enter a valid email address.")
 });
 
 export const resetUserPasswordSchema = z.object({
