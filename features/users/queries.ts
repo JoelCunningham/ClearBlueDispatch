@@ -1,6 +1,5 @@
+import { requireRole, requireUser } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
-import { requireRole } from "@/lib/auth/authorization";
-
 import { UserSummary } from "./types";
 
 export async function getUsers(): Promise<UserSummary[]> {
@@ -19,7 +18,7 @@ export async function getUsers(): Promise<UserSummary[]> {
 }
 
 export async function getUser(userId: number): Promise<UserSummary | null> {
-  await requireRole("MANAGER");
+  await requireUser();
 
   const user = await db.orm.public.User.where({ id: userId }).first();
   if (!user) return null;
