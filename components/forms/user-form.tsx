@@ -14,10 +14,11 @@ type UserFormProps = {
   email?: string;
   role?: UserRole;
   canEditRole: boolean;
+  hideTitle?: boolean;
   action: (input: UserFormInput) => Promise<{ success: boolean; error?: string }>;
 };
 
-export default function UserForm({ name, email, role, canEditRole, action }: UserFormProps) {
+export default function UserForm({ name, email, role, canEditRole, hideTitle, action }: UserFormProps) {
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -50,7 +51,13 @@ export default function UserForm({ name, email, role, canEditRole, action }: Use
   }
 
   return (
-    <Form title="Account details" onSubmit={handleSubmit} isSaving={isSaving} error={error}>
+    <Form
+      title={hideTitle ? undefined : "Account details"}
+      onSubmit={handleSubmit}
+      submitText={email ? "Save changes" : "Create user"}
+      isSaving={isSaving}
+      error={error}
+    >
       <BasicInput type="text" id="name" label="Name" initial={name} required />
       <BasicInput type="email" id="email" label="Email" initial={email} required />
       <SelectInput
