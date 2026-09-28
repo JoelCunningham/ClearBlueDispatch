@@ -1,5 +1,6 @@
 import { AuthError } from "next-auth";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
 import { signIn } from "@/auth";
 import LoginForm from "@/components/forms/login-form";
@@ -8,7 +9,6 @@ import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { isFirstTimeLogin, setPassword } from "@/features/login/actions";
 import { LoginFormInput } from "@/features/login/types";
-import { redirect } from "next/navigation";
 
 type LoginPageProps = {
   searchParams: Promise<{ callbackUrl?: string; email?: string; firstTimeLogin?: boolean; error?: string }>;
@@ -26,6 +26,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       if (firstTimeLogin && !params.firstTimeLogin) {
         redirect(`/login?email=${encodeURIComponent(input.email)}&firstTimeLogin=true&callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      }
+      if (!firstTimeLogin && params.firstTimeLogin) {
+        redirect(`/login?email=${encodeURIComponent(input.email)}&callbackUrl=${encodeURIComponent(callbackUrl)}`);
       }
       if (firstTimeLogin && params.firstTimeLogin) {
         const result = await setPassword({ ...input });

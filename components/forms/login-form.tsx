@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
+import InfoAlert from "@/components/alerts/info-alert";
+import BasicInput from "@/components/inputs/basic-input";
+import Form from "@/components/wrappers/form";
 import { LoginFormInput } from "@/features/login/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
-import BasicInput from "../inputs/basic-input";
-import Form from "../wrappers/form";
 
 type LoginFormProps = {
   email?: string;
@@ -17,12 +18,6 @@ type LoginFormProps = {
 export default function LoginForm({ email, initialError, requiresNewPassword, action }: LoginFormProps) {
   const [error, setError] = useState<string | undefined>(initialError);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (requiresNewPassword) {
-      setError("You are required to set a new password for your account.");
-    }
-  }, [requiresNewPassword]);
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     suppressEvent(event);
@@ -54,6 +49,7 @@ export default function LoginForm({ email, initialError, requiresNewPassword, ac
 
   return (
     <Form onSubmit={handleSubmit} submitText="Sign in" error={error} isSaving={isSaving}>
+      {requiresNewPassword && <InfoAlert text="You are required to set a new password." />}
       <BasicInput type="email" id="email" label="Email" initial={email} autoComplete="username" required />
       <BasicInput
         type="password"
