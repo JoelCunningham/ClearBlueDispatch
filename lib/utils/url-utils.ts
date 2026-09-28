@@ -11,5 +11,5 @@ export function getLogoUrl(): string {
 }
 
 export function getLoginUrl(): string {
-  return `${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_APP_URL : "http://localhost:3000"}/login`;
+  return `${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_APP_URL : "http://localhost:3000"}/login?firstTimeLogin=true`;
 }
