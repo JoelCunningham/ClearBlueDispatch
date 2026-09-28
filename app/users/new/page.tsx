@@ -15,8 +15,8 @@ export default async function CreateUserPage() {
 
   return (
     <Page>
-      <Heading title="Create delivery" subtitle="Add a delivery to a driver's route." backFallback="/deliveries" />
-      <UserForm canEditRole={true} action={submitUser} />
+      <Heading title="Create user" subtitle="Add a user to the system." backFallback="/users" />
+      <UserForm canEditRole={true} action={submitUser} hideTitle={true} />
     </Page>
   );
 }
