@@ -1,5 +1,6 @@
 "use server";
 
+import { createHash, randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { render } from "react-email";
@@ -14,6 +15,7 @@ import {
 } from "@/features/users/validation";
 import { hashPassword, requireRole, requireUser, verifyPassword } from "@/lib/auth/authorization";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { getFuture } from "@/lib/utils/date-utils";
 import { getLoginUrl, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
 import { ChangeOwnPasswordInput, CreateUserInput, ResetUserPasswordInput, UpdateOwnProfileInput, UpdateUserInput } from "./types";
@@ -30,12 +32,14 @@ export async function createUser(input: CreateUserInput) {
   const existingUser = await db.orm.public.User.where({ email: trimmedEmail }).first();
   if (existingUser) return { success: false, error: "That email address is already in use." };
 
-  const password = await generateRandomPassword(12);
-  const passwordHash = await hashPassword(password);
-  const newUser = await db.orm.public.User.create({ name, email: trimmedEmail, role, passwordHash });
+  const token = randomBytes(32).toString("hex");
+  const loginTokenHash = createHash("sha256").update(token).digest("hex");
+  const loginTokenExpiry = getFuture(2);
+
+  const newUser = await db.orm.public.User.create({ name, email: trimmedEmail, role, loginTokenHash, loginTokenExpiry, sessionVersion: 1 });
 
   try {
-    await sendNewUserEmail(newUser.name, newUser.email, password);
+    await sendNewUserEmail(newUser.name, newUser.email, token);
   } catch (error) {
     console.error("Failed to send new user email:", error);
   }
@@ -130,6 +134,7 @@ export async function changeOwnPassword(input: ChangeOwnPasswordInput) {
   const user = await db.orm.public.User.where({ id: sessionUser.id }).first();
   if (!user) return { success: false, error: "User not found." };
   if (user.deleted) return { success: false, error: "User deleted." };
+  if (!user.passwordHash) return { success: false, error: "User does not have a password set." };
 
   const valid = await verifyPassword(currentPassword, user.passwordHash);
   if (!valid) return { success: false, error: "Current password is incorrect." };
@@ -181,23 +186,10 @@ export async function updateOwnProfile(input: UpdateOwnProfileInput) {
   redirect(`/profile`);
 }
 
-async function sendNewUserEmail(userName: string, userEmail: string, userPassword: string) {
+async function sendNewUserEmail(userName: string, userEmail: string, token: string) {
   const logoUrl = getLogoUrl();
-  const loginUrl = getLoginUrl();
+  const loginUrl = getLoginUrl(token);
 
-  const emailContent = await render(
-    NewUserEmail({ userName: userName, userEmail: userEmail, userPassword: userPassword, loginUrl: loginUrl, logoUrl: logoUrl })
-  );
+  const emailContent = await render(NewUserEmail({ userName: userName, userEmail: userEmail, loginUrl: loginUrl, logoUrl: logoUrl }));
   await sendEmail({ to: userEmail, subject: "Welcome to ClearBlue Solutions", html: emailContent });
-}
-
-async function generateRandomPassword(length: number): Promise<string> {
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
-  let password = "";
-  const randomValues = new Uint32Array(length);
-  crypto.getRandomValues(randomValues);
-  for (let i = 0; i < length; i++) {
-    password += charset[randomValues[i] % charset.length];
-  }
-  return password;
 }

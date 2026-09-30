@@ -9,7 +9,6 @@ import Form from "@/components/wrappers/form";
 import { DeliveryContactOption, DeliveryFormInput, DeliveryLocationOption } from "@/features/deliveries/types";
 import { suppressEvent } from "@/lib/utils/event-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
-import { inputFormatToDate } from "@/lib/utils/date-utils";
 
 type UserOption = {
   id: number;

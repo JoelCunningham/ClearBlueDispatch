@@ -1,6 +1,7 @@
 import { requireRole, requireUser } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 import { UserSummary } from "./types";
+import { dateToLongFormat } from "@/lib/utils/date-utils";
 
 export async function getUsers(): Promise<UserSummary[]> {
   await requireRole("MANAGER");
@@ -12,7 +13,7 @@ export async function getUsers(): Promise<UserSummary[]> {
     name: user.name,
     email: user.email,
     role: user.role,
-    createdAt: user.createdAt,
+    createdAt: dateToLongFormat(user.createdAt),
     deleted: user.deleted
   }));
 }
@@ -28,7 +29,7 @@ export async function getUser(userId: number): Promise<UserSummary | null> {
     name: user.name,
     email: user.email,
     role: user.role,
-    createdAt: user.createdAt,
+    createdAt: dateToLongFormat(user.createdAt),
     deleted: user.deleted
   };
 }

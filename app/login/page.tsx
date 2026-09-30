@@ -7,8 +7,9 @@ import LoginForm from "@/components/forms/login-form";
 import InstallButton from "@/components/pwa/install-button";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
-import { isFirstTimeLogin, setPassword } from "@/features/login/actions";
-import { LoginFormInput } from "@/features/login/types";
+import { LoginUserInput } from "@/features/login/types";
+import { checkUser } from "@/lib/auth/authorization";
+import { getSafeCallbackUrl } from "@/lib/utils/url-utils";
 
 type LoginPageProps = {
   searchParams: Promise<{ callbackUrl?: string; email?: string; firstTimeLogin?: boolean; error?: string }>;
@@ -16,26 +17,15 @@ type LoginPageProps = {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
-  const callbackUrl = getSafeCallbackUrl(params.callbackUrl);
+  const callbackUrl = getSafeCallbackUrl("/routes", params.callbackUrl);
 
-  async function login(input: LoginFormInput) {
+  if (await checkUser()) redirect(callbackUrl);
+
+  async function login(input: LoginUserInput) {
     "use server";
 
     try {
-      const firstTimeLogin = await isFirstTimeLogin({ ...input });
-
-      if (firstTimeLogin && !params.firstTimeLogin) {
-        redirect(`/login?email=${encodeURIComponent(input.email)}&firstTimeLogin=true&callbackUrl=${encodeURIComponent(callbackUrl)}`);
-      }
-      if (!firstTimeLogin && params.firstTimeLogin) {
-        redirect(`/login?email=${encodeURIComponent(input.email)}&callbackUrl=${encodeURIComponent(callbackUrl)}`);
-      }
-      if (firstTimeLogin && params.firstTimeLogin) {
-        const result = await setPassword({ ...input });
-        if (!result.success) return result;
-      }
-
-      await signIn("credentials", { ...input, password: firstTimeLogin ? input.newPassword : input.password, redirectTo: callbackUrl });
+      await signIn("credentials", { ...input, password: input.password, redirectTo: callbackUrl });
       return { success: true };
     } catch (error) {
       if (error instanceof AuthError) {
@@ -49,18 +39,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <Page centred>
       <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
       <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
-      <LoginForm initialError={params.error} action={login} requiresNewPassword={params.firstTimeLogin} email={params.email} />
+      <LoginForm initialError={params.error} action={login} />
       <div className="mt-6">
         <InstallButton />
       </div>
     </Page>
   );
-}
-
-function getSafeCallbackUrl(callbackUrl?: string) {
-  if (!callbackUrl || !callbackUrl.startsWith("/") || callbackUrl.startsWith("//") || callbackUrl.includes("\\")) {
-    return "/routes";
-  }
-
-  return callbackUrl;
 }

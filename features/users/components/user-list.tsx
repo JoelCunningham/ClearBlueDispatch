@@ -13,12 +13,11 @@ interface UserListProps {
     name: string;
     email: string;
     role: string;
-    createdAt: string;
     deleted?: boolean;
   }[];
 }
 
-export function UserList({ users }: UserListProps) {
+export default function UserList({ users }: UserListProps) {
   const [showDeleted, setShowDeleted] = useState(false);
 
   const cardSubtitle = (user: { role: string; deleted?: boolean }) => {

@@ -4,7 +4,7 @@ export type UserSummary = {
   id: number;
   name: string;
   email: string;
-  createdAt: Temporal.Instant;
+  createdAt: string;
   role: UserRole;
   deleted?: boolean;
 };

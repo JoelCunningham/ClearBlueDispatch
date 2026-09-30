@@ -757,17 +757,24 @@
                   "kind": "scalar"
                 }
               },
-              "firstLogin": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/bool@1",
-                  "kind": "scalar"
-                }
-              },
               "id": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "loginTokenExpiry": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "loginTokenHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -779,7 +786,7 @@
                 }
               },
               "passwordHash": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -841,11 +848,14 @@
                 "email": {
                   "column": "email"
                 },
-                "firstLogin": {
-                  "column": "firstLogin"
-                },
                 "id": {
                   "column": "id"
+                },
+                "loginTokenExpiry": {
+                  "column": "loginTokenExpiry"
+                },
+                "loginTokenHash": {
+                  "column": "loginTokenHash"
                 },
                 "name": {
                   "column": "name"
@@ -1434,15 +1444,6 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "firstLogin": {
-                  "codecId": "pg/bool@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": true
-                  },
-                  "nativeType": "bool",
-                  "nullable": false
-                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -1450,6 +1451,16 @@
                     "kind": "function"
                   },
                   "nativeType": "int4",
+                  "nullable": false
+                },
+                "loginTokenExpiry": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "loginTokenHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
                   "nullable": false
                 },
                 "name": {
@@ -1460,7 +1471,7 @@
                 "passwordHash": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": false
+                  "nullable": true
                 },
                 "role": {
                   "codecId": "pg/text@1",
@@ -1522,7 +1533,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7f679c3b8ae95d93d4c2780ae4dedd7bbaa14018be29e76fa19457e1fd9bbaed"
+    "storageHash": "147df13b297e6b7dfc28b5de2d33ae5cae8d1bcd01a4707c31270f6567574152"
   },
   "capabilities": {
     "postgres": {

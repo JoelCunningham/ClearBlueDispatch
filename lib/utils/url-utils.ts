@@ -7,9 +7,20 @@ export async function getLogoBuffer(): Promise<Uint8Array> {
 }
 
 export function getLogoUrl(): string {
-  return `${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_APP_URL : "http://localhost:3000"}/icons/logo.png`;
+  return `${getHostname()}/icons/logo.png`;
 }
 
-export function getLoginUrl(): string {
-  return `${process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_APP_URL : "http://localhost:3000"}/login?firstTimeLogin=true`;
+export function getLoginUrl(token: string): string {
+  return `${getHostname()}/setup?token=${encodeURIComponent(token)}`;
+}
+
+export function getSafeCallbackUrl(fallback: string, callbackUrl?: string): string {
+  if (!callbackUrl || !callbackUrl.startsWith("/") || callbackUrl.startsWith("//") || callbackUrl.includes("\\")) {
+    return fallback;
+  }
+  return callbackUrl;
+}
+
+function getHostname(): string {
+  return process.env.NODE_ENV === "production" ? (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000") : "http://localhost:3000";
 }
