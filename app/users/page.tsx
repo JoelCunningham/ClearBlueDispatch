@@ -1,6 +1,6 @@
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
-import { UserList } from "@/features/users/components/user-list";
+import UserList from "@/features/users/components/user-list";
 import { getUsers } from "@/features/users/queries";
 
 export default async function ManageUsersPage() {
@@ -11,7 +11,6 @@ export default async function ManageUsersPage() {
     name: user.name,
     email: user.email,
     role: user.role,
-    createdAt: user.createdAt.toString(),
     deleted: user.deleted
   }));
 

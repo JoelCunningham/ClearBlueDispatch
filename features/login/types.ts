@@ -1,9 +1,11 @@
-export type LoginFormInput = {
+export type LoginUserInput = {
   email: string;
   password: string;
-  newPassword?: string;
 };
 
-export type LoginUserInput = LoginFormInput;
-
-export type SetPasswordInput = LoginFormInput;
+export type SetupPasswordInput = {
+  userId?: number;
+  password: string;
+  confirmPassword: string;
+  callbackUrl?: string;
+};

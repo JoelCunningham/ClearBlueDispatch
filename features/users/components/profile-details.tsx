@@ -9,7 +9,7 @@ type ProfileDetailsProps = {
   name?: string;
   email: string;
   role: UserRole;
-  dateCreated: Temporal.Instant;
+  dateCreated: string;
 };
 
 export default function ProfileDetails({ name, email, role, dateCreated }: ProfileDetailsProps) {
@@ -20,7 +20,7 @@ export default function ProfileDetails({ name, email, role, dateCreated }: Profi
         <LineItem name="Role" value={capitalise(role)} vertical />
         <LineItem name="Email" value={email} vertical />
         <LineItem name="Password" value="************" vertical />
-        <LineItem name="Date created" value={dateToLongYearFormat(dateCreated)} vertical />
+        <LineItem name="Date created" value={dateCreated} vertical />
       </List>
     </Card>
   );

@@ -1,47 +1,28 @@
-import { hashPassword, verifyPassword } from "@/lib/auth/authorization";
+import { signIn } from "@/auth";
+import { hashPassword } from "@/lib/auth/authorization";
+import { getToday } from "@/lib/utils/date-utils";
 import { db } from "@/prisma/db";
-import { revalidatePath } from "next/cache";
-import { LoginUserInput, SetPasswordInput } from "./types";
-import { loginUserSchema, setPasswordSchema } from "./validation";
+import { SetupPasswordInput } from "./types";
+import { setupPasswordSchema } from "./validation";
 
-export async function isFirstTimeLogin(input: LoginUserInput): Promise<boolean> {
-  const result = loginUserSchema.safeParse(input);
-  if (!result.success) return false;
-
-  const { email, password } = result.data;
-
-  const user = await db.orm.public.User.where({ email, deleted: false }).first();
-  if (!user) return false;
-
-  const passwordMatches = await verifyPassword(password, user.passwordHash);
-  if (!passwordMatches) return false;
-
-  return user.firstLogin;
-}
-
-export async function setPassword(input: SetPasswordInput): Promise<{ success: boolean; error?: string }> {
-  const result = setPasswordSchema.safeParse(input);
+export async function setupPassword(input: SetupPasswordInput) {
+  const result = setupPasswordSchema.safeParse(input);
   if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
 
-  const { email, password, newPassword } = result.data;
-  const trimmedEmail = email.trim().toLowerCase();
+  const { userId, password, confirmPassword, callbackUrl } = result.data;
 
-  if (password === newPassword) return { success: false, error: "Your new password must be different from your current password." };
+  const user = await db.orm.public.User.where({ id: userId }).first();
+  if (!user) return { success: false, error: "This invitation link is invalid." };
 
-  const user = await db.orm.public.User.where({ email: trimmedEmail, deleted: false }).first();
-  if (!user) return { success: false, error: "User not found." };
-  if (!user.firstLogin) return { success: false, error: "First-time password setup is no longer available." };
+  if (Temporal.Instant.compare(user.loginTokenExpiry, getToday()) < 0) {
+    return { success: false, error: "This invitation link has expired." };
+  }
+  if (user.passwordHash) return { success: false, error: "This invitation link has already been used." };
+  if (password !== confirmPassword) return { success: false, error: "Passwords do not match." };
 
-  const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) return { success: false, error: "Current password is incorrect." };
+  const passwordHash = await hashPassword(password);
+  await db.orm.public.User.where({ id: user.id }).update({ passwordHash });
 
-  const passwordHash = await hashPassword(newPassword);
-  await db.orm.public.User.where({ id: user.id, deleted: false }).update({
-    passwordHash,
-    sessionVersion: user.sessionVersion + 1,
-    firstLogin: false
-  });
-
-  revalidatePath("/login");
+  await signIn("credentials", { email: user.email, password: input.password, redirectTo: callbackUrl });
   return { success: true };
 }

@@ -1,5 +1,9 @@
 export function getToday(): Temporal.Instant {
-  return Temporal.Now.instant().toZonedDateTimeISO("Australia/Melbourne").toPlainDate().toZonedDateTime("Australia/Melbourne").toInstant();
+  return getTodayPlain().toZonedDateTime("Australia/Melbourne").toInstant();
+}
+
+export function getFuture(days: number): Temporal.Instant {
+  return getTodayPlain().add({ days }).toZonedDateTime("Australia/Melbourne").toInstant();
 }
 
 export function getWeekOfYear(date: Temporal.Instant): number {
@@ -37,4 +41,8 @@ export function inputFormatToDate(input: string): Temporal.Instant {
 
 export function isDatePast(date: Temporal.Instant): boolean {
   return Temporal.Instant.compare(date, getToday()) < 0;
+}
+
+function getTodayPlain(): Temporal.PlainDate {
+  return Temporal.Now.instant().toZonedDateTimeISO("Australia/Melbourne").toPlainDate();
 }

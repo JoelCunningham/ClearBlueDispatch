@@ -1,14 +1,14 @@
 import DocketPdf from "@/content/docket-pdf";
-import { getLogoBuffer } from "@/lib/utils/url-utils";
+import { checkUser } from "@/lib/auth/authorization";
 import { getDocketNumber } from "@/lib/utils/string-utils";
-import { getAuthenticatedUser } from "@/lib/auth/authorization";
+import { getLogoBuffer } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
 import path from "path";
 
 export async function GET(req: Request, { params }: { params: Promise<{ docketId: string }> }) {
-  const user = await getAuthenticatedUser();
+  const user = await checkUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
   const { docketId } = await params;

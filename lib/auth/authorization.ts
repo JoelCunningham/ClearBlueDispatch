@@ -5,13 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/prisma/db";
 import { UserRole } from "@/types/next-auth";
 
-export async function requireUser() {
-  const user = await getAuthenticatedUser();
-  if (!user) redirect("/login");
-  return user;
-}
-
-export async function getAuthenticatedUser() {
+export async function checkUser() {
   const session = await auth();
   if (!session?.user) return null;
 
@@ -24,20 +18,22 @@ export async function getAuthenticatedUser() {
   return session.user;
 }
 
-export async function requireRole(role: UserRole) {
-  const user = await requireUser();
-  if (user.role !== role) redirect("/routes");
-  return user;
-}
-
-export async function checkUser() {
-  return getAuthenticatedUser();
-}
-
 export async function checkUserRole() {
   const user = await checkUser();
   if (!user) return null;
   return user.role;
+}
+
+export async function requireUser() {
+  const user = await checkUser();
+  if (!user) redirect("/login");
+  return user;
+}
+
+export async function requireRole(role: UserRole) {
+  const user = await requireUser();
+  if (user.role !== role) redirect("/routes");
+  return user;
 }
 
 export async function requireRouteAccess(routeId: number) {
@@ -75,6 +71,7 @@ export async function hashPassword(password: string) {
   return await bcrypt.hash(password, 12);
 }
 
-export async function verifyPassword(password: string, passwordHash: string) {
+export async function verifyPassword(password: string, passwordHash: string | null) {
+  if (!passwordHash) return false;
   return await bcrypt.compare(password, passwordHash);
 }

@@ -5,21 +5,22 @@ enum UserRole {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
 
-  email          String   @unique
-  name           String
-  role           UserRole
-  passwordHash   String
+  email            String   @unique
+  name             String
+  role             UserRole
+  passwordHash     String?
+  deleted          Boolean  @default(false)
 
-  deleted        Boolean  @default(false)
-  firstLogin     Boolean  @default(true)
-  sessionVersion Int      @default(0)
+  sessionVersion   Int      @default(0)
+  loginTokenHash   String
+  loginTokenExpiry DateTime
 
-  routes         Route[]
+  routes           Route[]
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
 }
 
 model Route {

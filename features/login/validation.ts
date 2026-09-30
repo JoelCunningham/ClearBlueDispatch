@@ -7,10 +7,16 @@ export const loginUserSchema = z.object({
 
 export type LoginUserInput = z.infer<typeof loginUserSchema>;
 
-export const setPasswordSchema = z.object({
-  email: z.email("Enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-  newPassword: z.string().min(12, "New password must be at least 12 characters.")
-});
+export const setupPasswordSchema = z
+  .object({
+    userId: z.number().optional(),
+    password: z.string().min(12, "Password must be at least 12 characters."),
+    confirmPassword: z.string(),
+    callbackUrl: z.string().optional()
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"]
+  });
 
-export type SetPasswordInput = z.infer<typeof setPasswordSchema>;
+export type SetupPasswordInput = z.infer<typeof setupPasswordSchema>;
