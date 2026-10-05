@@ -190,6 +190,6 @@ async function sendNewUserEmail(userName: string, userEmail: string, token: stri
   const logoUrl = getLogoUrl();
   const loginUrl = getLoginUrl(token);
 
-  const emailContent = await render(NewUserEmail({ userName: userName, userEmail: userEmail, loginUrl: loginUrl, logoUrl: logoUrl }));
+  const emailContent = await render(NewUserEmail({ userName: userName, loginUrl: loginUrl, logoUrl: logoUrl }));
   await sendEmail({ to: userEmail, subject: "Welcome to ClearBlue Solutions", html: emailContent });
 }

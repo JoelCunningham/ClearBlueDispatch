@@ -1,5 +1,6 @@
 import { AuthError } from "next-auth";
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { signIn } from "@/auth";
@@ -12,7 +13,7 @@ import { checkUser } from "@/lib/auth/authorization";
 import { getSafeCallbackUrl } from "@/lib/utils/url-utils";
 
 type LoginPageProps = {
-  searchParams: Promise<{ callbackUrl?: string; email?: string; firstTimeLogin?: boolean; error?: string }>;
+  searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
@@ -40,6 +41,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
       <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
       <LoginForm initialError={params.error} action={login} />
+      <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+        Forgot your password?
+      </Link>
       <div className="mt-6">
         <InstallButton />
       </div>

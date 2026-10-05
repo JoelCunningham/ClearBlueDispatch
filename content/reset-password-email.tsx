@@ -1,16 +1,16 @@
 import { Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Tailwind, Text, pixelBasedPreset } from "react-email";
 
-interface NewUserEmailProps {
+interface ResetPasswordEmailProps {
   userName: string;
   loginUrl: string;
   logoUrl: string;
 }
 
-export default function NewUserEmail({ userName, loginUrl, logoUrl }: NewUserEmailProps) {
+export default function ResetPasswordEmail({ userName, loginUrl, logoUrl }: ResetPasswordEmailProps) {
   return (
     <Html>
       <Head />
-      <Preview>Welcome to ClearBlue Solutions - Set up your account</Preview>
+      <Preview>ClearBlue Solutions - Reset your password</Preview>
 
       <Tailwind
         config={{
@@ -40,7 +40,7 @@ export default function NewUserEmail({ userName, loginUrl, logoUrl }: NewUserEma
                       <td align="left">
                         <Heading className="text-primary text-xl font-bold p-0 m-0">ClearBlue Solutions</Heading>
                         <Text className="inline-block bg-secondary text-primary px-2.5 py-1 rounded text-xs font-semibold mt-2 mb-0">
-                          Account Created
+                          Reset Password
                         </Text>
                       </td>
                       <td align="right" className="w-25">
@@ -54,8 +54,7 @@ export default function NewUserEmail({ userName, loginUrl, logoUrl }: NewUserEma
 
             <Text className="text-foreground text-sm leading-relaxed my-2">Hello {userName},</Text>
             <Text className="text-foreground text-sm leading-relaxed my-2">
-              An account has been created for you with ClearBlue Solutions. Before you can sign in, you'll need to set a password for your
-              account.
+              You have requested to reset your password for your ClearBlue Solutions account.
             </Text>
 
             <Section className="text-center my-6">
@@ -63,13 +62,11 @@ export default function NewUserEmail({ userName, loginUrl, logoUrl }: NewUserEma
                 href={loginUrl}
                 className="bg-primary text-white font-semibold text-sm px-6 py-3 rounded-md inline-block no-underline"
               >
-                Set Up Your Account
+                Reset Your Password
               </Button>
             </Section>
 
-            <Text className="text-xs text-muted italic my-4">
-              This invitation link can only be used once and will expire after 48 hours.
-            </Text>
+            <Text className="text-xs text-muted italic my-4">This reset link can only be used once and will expire after 48 hours.</Text>
 
             <Text className="text-xs text-muted italic my-4">
               If the button above doesn't work, copy and paste this link into your browser:

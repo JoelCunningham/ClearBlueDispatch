@@ -9,3 +9,7 @@ export type SetupPasswordInput = {
   confirmPassword: string;
   callbackUrl?: string;
 };
+
+export type ResetPasswordInput = {
+  email: string;
+};

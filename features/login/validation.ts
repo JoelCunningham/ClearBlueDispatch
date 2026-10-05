@@ -20,3 +20,9 @@ export const setupPasswordSchema = z
   });
 
 export type SetupPasswordInput = z.infer<typeof setupPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  email: z.email("Enter a valid email address.")
+});
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
