@@ -1,4 +1,4 @@
-import RoutesForm from "@/components/forms/routes-from";
+import RoutesForm from "@/components/forms/routes-form";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import List from "@/components/wrappers/list";

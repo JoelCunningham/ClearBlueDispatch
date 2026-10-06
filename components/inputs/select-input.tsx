@@ -1,4 +1,4 @@
-import InputWrapper from "./input-wrapper";
+import Input from "@/components/wrappers/input";
 
 interface SelectInputProps {
   id: string;
@@ -13,7 +13,7 @@ interface SelectInputProps {
 
 export default function SelectInput({ id, label, items, placeholder, initial, required, disabled, onChange }: SelectInputProps) {
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <select
         id={id}
         name={id}
@@ -30,6 +30,6 @@ export default function SelectInput({ id, label, items, placeholder, initial, re
           </option>
         ))}
       </select>
-    </InputWrapper>
+    </Input>
   );
 }

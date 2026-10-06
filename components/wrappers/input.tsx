@@ -1,10 +1,10 @@
-interface InputWrapperProps {
+interface InputProps {
   id: string;
   label?: string;
   children?: React.ReactNode;
 }
 
-export default function InputWrapper({ id, label, children }: InputWrapperProps) {
+export default function Input({ id, label, children }: InputProps) {
   return (
     <div className="space-y-2">
       {label && (

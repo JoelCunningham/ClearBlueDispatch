@@ -1,4 +1,4 @@
-import InputWrapper from "./input-wrapper";
+import Input from "@/components/wrappers/input";
 
 interface TextAreaInputProps {
   id: string;
@@ -8,8 +8,8 @@ interface TextAreaInputProps {
 
 export default function TextAreaInput({ id, label, initial }: TextAreaInputProps) {
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <textarea id={id} name={id} rows={4} className="w-full rounded-md border bg-background px-3 py-2" defaultValue={initial} />
-    </InputWrapper>
+    </Input>
   );
 }

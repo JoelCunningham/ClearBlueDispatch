@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 
+import BaseForm from "@/components/forms/base-form";
 import BasicInput from "@/components/inputs/basic-input";
 import SelectInput from "@/components/inputs/select-input";
 import TextAreaInput from "@/components/inputs/textarea-input";
-import Form from "@/components/wrappers/form";
 import { DeliveryContactOption, DeliveryFormInput, DeliveryLocationOption } from "@/features/deliveries/types";
-import { suppressEvent } from "@/lib/utils/event-utils";
+import { ActionResult } from "@/lib/utils/action-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 
 type UserOption = {
@@ -19,7 +19,7 @@ type DeliveryFormProps = {
   users: UserOption[];
   locations: DeliveryLocationOption[];
   contacts: DeliveryContactOption[];
-  action: (input: DeliveryFormInput) => Promise<{ success: boolean; error?: string }>;
+  action: (input: DeliveryFormInput) => Promise<ActionResult>;
   date?: string;
   userId?: number;
   locationId?: number;
@@ -41,9 +41,6 @@ export default function DeliveryForm({
   notes
 }: DeliveryFormProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string>(locationId ? locationId.toString() : "");
-  const [error, setError] = useState<string>();
-  const [isSaving, setIsSaving] = useState(false);
-
   const selectedLocation = locations.find(location => location.id === Number(selectedLocationId));
   const customerContacts = selectedLocation ? contacts.filter(contact => contact.customerId === selectedLocation.customerId) : [];
   const contactPlaceholder = selectedLocation
@@ -52,35 +49,23 @@ export default function DeliveryForm({
       : "No contacts available"
     : "Select a location first";
 
-  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
-    suppressEvent(event);
-    setError(undefined);
-    setIsSaving(true);
+  async function handleAction(formData: FormData) {
+    const contactIdVal = formData.get("contactId");
 
-    try {
-      const formData = new FormData(event.currentTarget);
-      const contactIdVal = formData.get("contactId");
+    const input: DeliveryFormInput = {
+      assignedUserId: Number(formData.get("assignedUserId") ?? 0),
+      date: String(formData.get("date") ?? ""),
+      locationId: Number(formData.get("locationId") ?? 0),
+      contactId: contactIdVal ? Number(contactIdVal) : undefined,
+      notes: String(formData.get("notes") ?? ""),
+      tankDetails: String(formData.get("tankDetails") ?? "")
+    };
 
-      const input: DeliveryFormInput = {
-        assignedUserId: Number(formData.get("assignedUserId") ?? 0),
-        date: String(formData.get("date") ?? ""),
-        locationId: Number(formData.get("locationId") ?? 0),
-        contactId: contactIdVal ? Number(contactIdVal) : undefined,
-        notes: String(formData.get("notes") ?? ""),
-        tankDetails: String(formData.get("tankDetails") ?? "")
-      };
-
-      const result = await action(input);
-      if (!result.success) setError(result.error ?? "Unable to create delivery.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to create delivery.");
-    } finally {
-      setIsSaving(false);
-    }
+    return action(input);
   }
 
   return (
-    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={userId ? "Save changes" : "Create delivery"}>
+    <BaseForm action={handleAction} errorMessage="Unable to create delivery." submitText={userId ? "Save changes" : "Create delivery"}>
       <BasicInput type="date" id="date" label="Date" initial={date} required />
       <SelectInput
         id="assignedUserId"
@@ -110,6 +95,6 @@ export default function DeliveryForm({
       />
       <TextAreaInput id="tankDetails" label="Tank details" initial={tankDetails} />
       <TextAreaInput id="notes" label="Notes" initial={notes} />
-    </Form>
+    </BaseForm>
   );
 }

@@ -1,29 +1,30 @@
-import { Button, Section, Text } from "react-email";
+import { Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Tailwind, Text, pixelBasedPreset } from "react-email";
+import EmailWrapper from "./wrappers/email-wrapper";
 
-import EmailWrapper from "@/content/wrappers/email-wrapper";
-
-interface NewUserEmailProps {
+interface ResetPasswordEmailProps {
   userName: string;
   loginUrl: string;
   logoUrl: string;
 }
 
-export default function NewUserEmail({ userName, loginUrl, logoUrl }: NewUserEmailProps) {
+export default function ResetPasswordEmail({ userName, loginUrl, logoUrl }: ResetPasswordEmailProps) {
+  var title = "Reset Your Password";
+  var previewText = "Your reset link is ready";
+
   return (
-    <EmailWrapper title="Welcome to ClearBlue Solutions" preview="Set up your account" logoUrl={logoUrl}>
+    <EmailWrapper title={title} preview={previewText} logoUrl={logoUrl}>
       <Text className="text-foreground text-sm leading-relaxed my-2">Hello {userName},</Text>
       <Text className="text-foreground text-sm leading-relaxed my-2">
-        An account has been created for you with ClearBlue Solutions. Before you can sign in, you'll need to set a password for your
-        account.
+        You have requested to reset your password for your ClearBlue Solutions account.
       </Text>
 
       <Section className="text-center my-6">
         <Button href={loginUrl} className="bg-primary text-white font-semibold text-sm px-6 py-3 rounded-md inline-block no-underline">
-          Set Up Your Account
+          Reset Your Password
         </Button>
       </Section>
 
-      <Text className="text-xs text-muted italic my-4">This invitation link can only be used once and will expire after 48 hours.</Text>
+      <Text className="text-xs text-muted italic my-4">This reset link can only be used once and will expire after 48 hours.</Text>
 
       <Text className="text-xs text-muted italic my-4">If the button above doesn't work, copy and paste this link into your browser:</Text>
 

@@ -1,4 +1,4 @@
-import { Document, Font, Image, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Image, Page, Text, View } from "@react-pdf/renderer";
 import { createTw } from "@react-pdf/tailwind";
 
 import { configs } from "@/lib/config/configs";

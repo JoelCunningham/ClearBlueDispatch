@@ -8,14 +8,15 @@ import { render } from "react-email";
 import CustomerDocketEmail from "@/content/customer-docket-email";
 import DocketPdf from "@/content/docket-pdf";
 import InternalDocketEmail from "@/content/internal-docket-email";
-import { sendEmail } from "@/lib/email/sendEmail";
 import { requireDeliveryAccess, requireDocketAccess, requireRole } from "@/lib/auth/authorization";
-import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
+import { sendEmail } from "@/lib/email/sendEmail";
+import { getErrorMessage } from "@/lib/utils/action-utils";
+import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
+import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
 import { CreateDocketInput, UpdateDocketInput } from "./types";
 import { createDocketSchema, updateDocketSchema } from "./validation";
-import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
 
 export async function createDocket(input: CreateDocketInput) {
   const result = createDocketSchema.safeParse(input);
@@ -41,7 +42,7 @@ export async function createDocket(input: CreateDocketInput) {
       return docket.id;
     });
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to create docket." };
+    return { success: false, error: getErrorMessage(error, "Unable to create docket.") };
   }
 
   try {
@@ -77,7 +78,7 @@ export async function updateDocket(input: UpdateDocketInput) {
       return docket.deliveryId;
     });
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to update docket." };
+    return { success: false, error: getErrorMessage(error, "Unable to update docket.") };
   }
 
   try {

@@ -1,12 +1,13 @@
 import React from "react";
-import InputWrapper from "./input-wrapper";
+
+import Input from "@/components/wrappers/input";
 
 interface SuffixProps {
   icon: React.ReactNode;
   onClick?: () => void;
 }
 
-interface InputProps {
+interface BasicInputProps {
   type: "text" | "email" | "password" | "date" | "tel" | "number" | "search";
   id: string;
   label?: string;
@@ -24,7 +25,7 @@ interface InputProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function BasicInput({
+export default function BaseInput({
   type,
   id,
   label,
@@ -40,9 +41,9 @@ export default function BasicInput({
   value,
   autoComplete,
   onChange
-}: InputProps) {
+}: BasicInputProps) {
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <div className="flex rounded-md border bg-background disabled:bg-muted focus-within:ring-2 focus-within:ring-ring">
         {prefix && <span className="justify-center p-2">{prefix}</span>}
         <input
@@ -67,6 +68,6 @@ export default function BasicInput({
           </span>
         )}
       </div>
-    </InputWrapper>
+    </Input>
   );
 }

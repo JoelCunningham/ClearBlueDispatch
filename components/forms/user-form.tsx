@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
-
+import BaseForm from "@/components/forms/base-form";
 import BasicInput from "@/components/inputs/basic-input";
 import SelectInput from "@/components/inputs/select-input";
-import Form from "@/components/wrappers/form";
 import { UserFormInput } from "@/features/users/types";
-import { suppressEvent } from "@/lib/utils/event-utils";
+import { ActionResult } from "@/lib/utils/action-utils";
 import { UserRole } from "@/types/next-auth";
 
 type UserFormProps = {
@@ -15,48 +13,26 @@ type UserFormProps = {
   role?: UserRole;
   canEditRole: boolean;
   hideTitle?: boolean;
-  action: (input: UserFormInput) => Promise<{ success: boolean; error?: string }>;
+  action: (input: UserFormInput) => Promise<ActionResult>;
 };
 
 export default function UserForm({ name, email, role, canEditRole, hideTitle, action }: UserFormProps) {
-  const [error, setError] = useState<string>();
-  const [isSaving, setIsSaving] = useState(false);
+  async function handleAction(formData: FormData) {
+    const input: UserFormInput = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      role: (formData.get("role") as UserRole) ?? role
+    };
 
-  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
-    suppressEvent(event);
-    setError(undefined);
-    setIsSaving(true);
-
-    try {
-      const formData = new FormData(event.currentTarget);
-
-      const input = {
-        userId: Number(formData.get("userId") ?? 0),
-        name: String(formData.get("name") ?? ""),
-        email: String(formData.get("email") ?? ""),
-        role: (formData.get("role") as UserRole) ?? role
-      };
-
-      const result = await action(input);
-
-      if (!result.success && result.success !== undefined) {
-        setError(result.error ?? "Unable to save changes.");
-        return;
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unable to save changes.");
-    } finally {
-      setIsSaving(false);
-    }
+    return action(input);
   }
 
   return (
-    <Form
+    <BaseForm
       title={hideTitle ? undefined : "Account details"}
-      onSubmit={handleSubmit}
+      action={handleAction}
       submitText={email ? "Save changes" : "Create user"}
-      isSaving={isSaving}
-      error={error}
+      errorMessage="Unable to save changes."
     >
       <BasicInput type="text" id="name" label="Name" initial={name} required />
       <BasicInput type="email" id="email" label="Email" initial={email} required />
@@ -71,6 +47,6 @@ export default function UserForm({ name, email, role, canEditRole, hideTitle, ac
         initial={role?.toString()}
         required
       />
-    </Form>
+    </BaseForm>
   );
 }

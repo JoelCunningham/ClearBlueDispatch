@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import InputWrapper from "./input-wrapper";
+
+import Input from "@/components/wrappers/input";
 
 type Point = { x: number; y: number };
 type Stroke = Point[];
@@ -168,7 +169,7 @@ export default function SignatureInput({ id, label, initial, disabled = false }:
   const hasContent = Boolean(signature || strokes.length > 0 || (initial && !isCleared));
 
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <div ref={containerRef} className="relative overflow-hidden rounded-md border bg-white">
         <canvas
           ref={canvasRef}
@@ -199,6 +200,6 @@ export default function SignatureInput({ id, label, initial, disabled = false }:
           Clear
         </button>
       </div>
-    </InputWrapper>
+    </Input>
   );
 }
