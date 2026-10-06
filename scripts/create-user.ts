@@ -1,7 +1,8 @@
 // npx tsx scripts/create-user.ts "joelcunningham1016@gmail.com" "Joel F" "admin" MANAGER
 
 import { hashPassword } from "@/lib/auth/authorization";
-import { db } from "../prisma/db";
+import { getFuture } from "@/lib/utils/date-utils";
+import { db } from "@/prisma/db";
 
 const email = process.argv[2];
 const name = process.argv[3];
@@ -27,6 +28,6 @@ if (existingUser) {
   process.exit(1);
 }
 
-const user = await db.orm.public.User.create({ email, name, role, passwordHash });
+const user = await db.orm.public.User.create({ email, name, role, passwordHash, loginTokenHash: "", loginTokenExpiry: getFuture(1) });
 
 console.log(`Created ${user.role} user: ${user.email}`);

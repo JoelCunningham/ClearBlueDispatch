@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
-import InputWrapper from "./input-wrapper";
+
+import Input from "@/components/wrappers/input";
 
 interface MinimalSelectInputProps {
   id: string;
@@ -11,7 +12,7 @@ interface MinimalSelectInputProps {
 
 export default function MinimalSelectInput({ id, label, items, initial, onChange }: MinimalSelectInputProps) {
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <div className="relative w-fit flex -mt-1">
         <ChevronDown />
         <select
@@ -28,6 +29,6 @@ export default function MinimalSelectInput({ id, label, items, initial, onChange
           ))}
         </select>
       </div>
-    </InputWrapper>
+    </Input>
   );
 }

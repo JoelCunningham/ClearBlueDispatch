@@ -5,9 +5,8 @@ import { useState } from "react";
 import DeleteButton from "@/components/buttons/delete-button";
 import MiniForm from "@/components/forms/mini-form";
 import BasicInput from "@/components/inputs/basic-input";
-import Form from "@/components/wrappers/form";
+import BaseForm from "@/components/forms/base-form";
 import type { ContactItem, CustomerDetail, CustomerFormInput, InvoiceEmailItem, LocationItem } from "@/features/customers/types";
-import { suppressEvent } from "@/lib/utils/event-utils";
 
 type CustomerFormProps = {
   customer?: CustomerDetail;
@@ -19,45 +18,29 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
   const [contacts, setContacts] = useState<ContactItem[]>(customer?.contacts ?? []);
   const [emails, setEmails] = useState<InvoiceEmailItem[]>(customer?.invoiceEmails ?? []);
 
-  const [error, setError] = useState<string>();
-  const [isSaving, setIsSaving] = useState(false);
+  async function handleAction(formData: FormData) {
+    const input: CustomerFormInput = {
+      name: String(formData.get("name") ?? ""),
+      rate: Number(formData.get("rate") ?? 0),
 
-  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
-    suppressEvent(event);
-    setError(undefined);
-    setIsSaving(true);
+      locations: locations.map((location, index) => ({
+        ...(location.id !== undefined && { id: location.id }),
+        address: location.id !== undefined ? location.address : String(formData.get(`locations.${index}.address`) ?? "")
+      })),
 
-    try {
-      const formData = new FormData(event.currentTarget);
+      contacts: contacts.map((contact, index) => ({
+        ...(contact.id !== undefined && { id: contact.id }),
+        name: contact.id !== undefined ? contact.name : String(formData.get(`contacts.${index}.name`) ?? ""),
+        phoneNumber: contact.id !== undefined ? contact.phoneNumber : String(formData.get(`contacts.${index}.phoneNumber`) ?? "")
+      })),
 
-      const input: CustomerFormInput = {
-        name: String(formData.get("name") ?? ""),
-        rate: Number(formData.get("rate") ?? 0),
+      emails: emails.map((email, index) => ({
+        ...(email.id !== undefined && { id: email.id }),
+        emailAddress: email.id !== undefined ? email.emailAddress : String(formData.get(`invoiceEmails.${index}.emailAddress`) ?? "")
+      }))
+    };
 
-        locations: locations.map((location, index) => ({
-          ...(location.id !== undefined && { id: location.id }),
-          address: location.id !== undefined ? location.address : String(formData.get(`locations.${index}.address`) ?? "")
-        })),
-
-        contacts: contacts.map((contact, index) => ({
-          ...(contact.id !== undefined && { id: contact.id }),
-          name: contact.id !== undefined ? contact.name : String(formData.get(`contacts.${index}.name`) ?? ""),
-          phoneNumber: contact.id !== undefined ? contact.phoneNumber : String(formData.get(`contacts.${index}.phoneNumber`) ?? "")
-        })),
-
-        emails: emails.map((email, index) => ({
-          ...(email.id !== undefined && { id: email.id }),
-          emailAddress: email.id !== undefined ? email.emailAddress : String(formData.get(`invoiceEmails.${index}.emailAddress`) ?? "")
-        }))
-      };
-
-      const result = await action(input);
-      if (!result.success) setError(result.error ?? "Unable to save customer.");
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unable to save customer.");
-    } finally {
-      setIsSaving(false);
-    }
+    return action(input);
   }
 
   function addLocation() {
@@ -85,7 +68,7 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
   }
 
   return (
-    <Form onSubmit={handleSubmit} isSaving={isSaving} error={error} submitText={customer ? "Save changes" : "Create customer"}>
+    <BaseForm action={handleAction} errorMessage="Unable to save customer." submitText={customer ? "Save changes" : "Create customer"}>
       <BasicInput type="text" id="name" label="Customer name" initial={customer?.name ?? ""} required />
       <BasicInput
         type="number"
@@ -171,6 +154,6 @@ export default function CustomerForm({ customer, action }: CustomerFormProps) {
           </div>
         )}
       </MiniForm>
-    </Form>
+    </BaseForm>
   );
 }

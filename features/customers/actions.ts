@@ -8,6 +8,7 @@ import { db } from "@/prisma/db";
 import { redirect } from "next/navigation";
 import type { CreateCustomerInput, UpdateCustomerInput } from "./types";
 import { createCustomerSchema, updateCustomerSchema } from "./validation";
+import { getErrorMessage } from "@/lib/utils/action-utils";
 
 export async function createCustomer(input: CreateCustomerInput) {
   await requireRole("MANAGER");
@@ -147,7 +148,7 @@ export async function updateCustomer(input: UpdateCustomerInput) {
       }
     });
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to save customer." };
+    return { success: false, error: getErrorMessage(error, "Unable to save customer.") };
   }
 
   revalidatePath("/customers");

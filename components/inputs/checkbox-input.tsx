@@ -1,4 +1,4 @@
-import InputWrapper from "./input-wrapper";
+import Input from "@/components/wrappers/input";
 
 interface CheckboxInputProps {
   id: string;
@@ -11,7 +11,7 @@ interface CheckboxInputProps {
 
 export default function CheckboxInput({ id, label, initial, required, disabled, onChange }: CheckboxInputProps) {
   return (
-    <InputWrapper id={id} label={label}>
+    <Input id={id} label={label}>
       <input
         type="checkbox"
         id={id}
@@ -22,6 +22,6 @@ export default function CheckboxInput({ id, label, initial, required, disabled, 
         className="h-4 w-4 rounded border text-primary focus:ring-primary ml-2"
         onChange={onChange}
       />
-    </InputWrapper>
+    </Input>
   );
 }

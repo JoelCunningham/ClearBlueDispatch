@@ -9,6 +9,7 @@ import { db } from "@/prisma/db";
 import type { CreateDeliveryInput, UpdateDeliveryInput } from "./types";
 import { createDeliverySchema, updateDeliverySchema } from "./validation";
 import { inputFormatToDate } from "@/lib/utils/date-utils";
+import { getErrorMessage } from "@/lib/utils/action-utils";
 
 export async function createDelivery(input: CreateDeliveryInput) {
   await requireRole("MANAGER");
@@ -118,7 +119,7 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
       return targetRoute.id;
     });
   } catch (error) {
-    return { success: false, error: error instanceof Error ? error.message : "Unable to update delivery." };
+    return { success: false, error: getErrorMessage(error, "Unable to update delivery.") };
   }
 
   revalidatePath("/routes");
@@ -166,4 +167,6 @@ export async function deleteDelivery(input: { deliveryId: number }) {
   revalidatePath("/routes");
   revalidatePath(`/routes/${routeId}`);
   revalidatePath("/deliveries");
+
+  redirect(`/deliveries`);
 }
