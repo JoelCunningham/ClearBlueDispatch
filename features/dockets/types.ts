@@ -6,7 +6,7 @@ export type DocketFormInput = {
   repSignature: string;
 };
 
-export type CreateDocketInput = DocketFormInput;
+export type CreateDocketInput = DocketFormInput & { deliveryId: number };
 
 export type UpdateDocketInput = DocketFormInput & { docketId: number };
 

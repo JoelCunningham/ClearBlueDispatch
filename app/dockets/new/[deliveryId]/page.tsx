@@ -3,8 +3,7 @@ import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { getDelivery } from "@/features/deliveries/queries";
 import { createDocket } from "@/features/dockets/actions";
-import { CreateDocketInput } from "@/features/dockets/types";
-import { requireRole } from "@/lib/auth/authorization";
+import { DocketFormInput } from "@/features/dockets/types";
 import { dateToLongYearFormat } from "@/lib/utils/date-utils";
 import { getCustomerName } from "@/lib/utils/string-utils";
 import { idOrNotFound, valueOrNotFound } from "@/lib/utils/validation-utils";
@@ -20,9 +19,9 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
   const customerName = getCustomerName(delivery.customer.name, delivery.location.address);
 
-  async function submitDocket(input: CreateDocketInput) {
+  async function submitDocket(input: DocketFormInput) {
     "use server";
-    return await createDocket({ ...input });
+    return await createDocket({ ...input, deliveryId: deliveryIdNumber });
   }
 
   return (
