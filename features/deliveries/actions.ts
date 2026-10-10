@@ -26,7 +26,7 @@ export async function createDelivery(input: CreateDeliveryInput) {
     if (!location) throw new Error("Location not found.");
 
     const assignedUser = await tx.orm.public.User.first({ id: assignedUserId, deleted: false });
-    if (!assignedUser || assignedUser.role !== "DRIVER") throw new Error("Assigned user not found.");
+    if (!assignedUser) throw new Error("Assigned user not found.");
 
     if (contactId !== undefined) {
       const contact = await tx.orm.public.Contact.first({ id: contactId, deleted: false });
@@ -70,7 +70,7 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
       if (!location) throw new Error("Location not found.");
 
       const assignedUser = await tx.orm.public.User.first({ id: assignedUserId, deleted: false });
-      if (!assignedUser || assignedUser.role !== "DRIVER") throw new Error("Assigned user not found.");
+      if (!assignedUser) throw new Error("Assigned user not found.");
 
       if (contactId !== undefined) {
         const contact = await tx.orm.public.Contact.first({ id: contactId, deleted: false });
@@ -150,14 +150,10 @@ export async function deleteDelivery(input: { deliveryId: number }) {
       .orderBy(delivery => delivery.position.asc())
       .all();
 
-    if (remainingDeliveries.length === 0) {
-      await tx.orm.public.Route.where({ id: routeId }).delete();
-    } else {
-      for (let i = 0; i < remainingDeliveries.length; i++) {
-        const item = remainingDeliveries[i];
-        if (item.position !== i + 1) {
-          await tx.orm.public.Delivery.where({ id: item.id }).update({ position: i + 1 });
-        }
+    for (let i = 0; i < remainingDeliveries.length; i++) {
+      const item = remainingDeliveries[i];
+      if (item.position !== i + 1) {
+        await tx.orm.public.Delivery.where({ id: item.id }).update({ position: i + 1 });
       }
     }
 

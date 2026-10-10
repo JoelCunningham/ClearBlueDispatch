@@ -10,6 +10,7 @@ type GetRoutesOptions = {
 export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary[]> {
   const user = await requireUser();
   let query = db.orm.public.Route.include("assignedUser")
+    .include("deliveries")
     .orderBy(route => route.date.desc())
     .orderBy(route => route.assignedUserId.desc());
 
@@ -24,13 +25,15 @@ export async function getRoutes(options: GetRoutesOptions): Promise<RouteSummary
   }
 
   const routes = await query.all();
-  return routes.map(route => ({
-    id: route.id,
-    assignedUserId: route.assignedUserId,
-    assignedUserName: route.assignedUser?.name,
-    assignedUserDeleted: route.assignedUser?.deleted,
-    date: route.date
-  }));
+  return routes
+    .filter(route => route.deliveries.some(delivery => !delivery.deleted))
+    .map(route => ({
+      id: route.id,
+      assignedUserId: route.assignedUserId,
+      assignedUserName: route.assignedUser?.name,
+      assignedUserDeleted: route.assignedUser?.deleted,
+      date: route.date
+    }));
 }
 
 export async function getRoute(routeId: number): Promise<RouteDetail | null> {
@@ -39,7 +42,7 @@ export async function getRoute(routeId: number): Promise<RouteDetail | null> {
 
   const routeWithDetails = await db.orm.public.Route.where({ id: routeId })
     .include("assignedUser")
-    .include("deliveries", delivery => delivery.include("location", location => location.include("customer")))
+    .include("deliveries", delivery => delivery.where({ deleted: false }).include("location", location => location.include("customer")))
     .first();
 
   if (!routeWithDetails) return null;

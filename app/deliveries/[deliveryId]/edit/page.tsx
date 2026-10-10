@@ -38,7 +38,7 @@ export default async function EditDeliveryPage({ params }: EditDeliveryPageProps
   return (
     <Page>
       <Heading title="Edit Delivery" backFallback={`/deliveries/${delivery.deliveryId}`} />
-      <ErrorMessage assigned="delivery" assignee="user" deleted={delivery.hasUser} past={isDatePast(inputFormatToDate(delivery.date))} />
+      <ErrorMessage assigned="delivery" assignee="user" deleted={!delivery.hasUser} past={isDatePast(inputFormatToDate(delivery.date))} />
       <DeliveryForm
         users={users}
         locations={locations}
