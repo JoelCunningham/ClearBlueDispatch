@@ -23,6 +23,7 @@ export default async function DocketPdfPage({ params }: DocketPdfPageProps) {
         height={600}
         className="max-w-full h-auto shadow-md rounded border bg-background"
         loading="eager"
+        unoptimized
       />
     </Page>
   );
