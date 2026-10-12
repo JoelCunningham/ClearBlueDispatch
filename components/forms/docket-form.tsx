@@ -49,7 +49,7 @@ export default function DocketForm({
         <LineItem name="Date" value={date} />
       </section>
       <BasicInput type="number" id="volume" label="Volume" minNumber={1} step={1} initial={volume} />
-      <BasicInput type="number" id="batchNumber" label="Batch number" minNumber={1} step={1} initial={batchNumber} />
+      <BasicInput type="text" id="batchNumber" label="Batch number" initial={batchNumber} />
       <BasicInput type="text" id="comments" label="Comments" initial={comments} />
       <BasicInput type="text" id="repName" label="Name" initial={repName} />
       <SignatureInput id="repSignature" label="Signature" initial={repSignature} />

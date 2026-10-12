@@ -1,5 +1,6 @@
 import ErrorMessage from "@/components/alerts/error-message";
 import InfoAlert from "@/components/alerts/info-alert";
+import LinkButton from "@/components/buttons/link-button";
 import PrimaryButton from "@/components/buttons/primary-button";
 import DeliveryForm from "@/components/forms/delivery-form";
 import Heading from "@/components/wrappers/heading";
@@ -27,12 +28,22 @@ export default async function EditDeliveryPage({ params }: EditDeliveryPageProps
 
   async function submitDelivery(input: DeliveryFormInput) {
     "use server";
-    return updateDelivery({ ...input, deliveryId: delivery.deliveryId, hasDocket: delivery.hasDocket, hasUser: delivery.hasUser });
+    return updateDelivery({ ...input, deliveryId: delivery.deliveryId });
   }
 
   async function removeDelivery() {
     "use server";
     return deleteDelivery({ deliveryId: delivery.deliveryId });
+  }
+
+  if (delivery.deleted) {
+    return (
+      <Page>
+        <Heading title="Delivery Not Found" />
+        <InfoAlert text="The requested delivery has been deleted." />
+        <LinkButton text="Back to deliveries" href="/deliveries" />
+      </Page>
+    );
   }
 
   return (

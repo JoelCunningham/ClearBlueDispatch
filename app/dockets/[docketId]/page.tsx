@@ -46,7 +46,7 @@ export default async function DocketPage({ params }: DocketPageProps) {
           </LineItem>
         </List>
       </Card>
-      <LinkButton href={`/dockets/${docket.id}/pdf`} text="View PDF" />
+      <LinkButton href={`/api/dockets/${docket.id}`} text="Download PDF" download />
       <LinkButton href={`/deliveries/${docket.deliveryId}`} text="Go to delivery details" />
     </Page>
   );
