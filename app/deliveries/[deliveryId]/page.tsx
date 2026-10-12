@@ -1,6 +1,7 @@
 import { Calendar, MapPin } from "lucide-react";
 
 import ErrorMessage from "@/components/alerts/error-message";
+import InfoAlert from "@/components/alerts/info-alert";
 import LinkButton from "@/components/buttons/link-button";
 import PhoneButtons from "@/components/buttons/phone-buttons";
 import Card from "@/components/wrappers/card";
@@ -23,9 +24,19 @@ export default async function DeliveryPage({ params }: DeliveryPageProps) {
 
   const deliveryIdNumber = idOrNotFound(deliveryId);
   const delivery = valueOrNotFound(await getDelivery(deliveryIdNumber));
-  const contactSubtitle = delivery.contact ? `${delivery.contact.name} • ${delivery.contact.phoneNumber}` : "No contact.";
 
+  const contactSubtitle = delivery.contact ? `${delivery.contact.name} • ${delivery.contact.phoneNumber}` : "No contact.";
   const isPastDelivery = isDatePast(delivery.date);
+
+  if (delivery.deleted) {
+    return (
+      <Page>
+        <Heading title="Delivery Not Found" />
+        <InfoAlert text="The requested delivery has been deleted." />
+        <LinkButton text="Back to deliveries" href="/deliveries" />
+      </Page>
+    );
+  }
 
   return (
     <Page>

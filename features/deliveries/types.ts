@@ -9,7 +9,7 @@ export type DeliveryFormInput = {
 
 export type CreateDeliveryInput = DeliveryFormInput;
 
-export type UpdateDeliveryInput = DeliveryFormInput & { deliveryId: number; hasDocket: boolean; hasUser: boolean };
+export type UpdateDeliveryInput = DeliveryFormInput & { deliveryId: number };
 
 export type DeliveryLocationOption = {
   id: number;
@@ -32,6 +32,7 @@ export type DeliveryDetail = {
   tankDetails: string;
   date: Temporal.Instant;
   routeId: number;
+  deleted: boolean;
 
   location: {
     address: string;
@@ -73,4 +74,17 @@ export type DeliverySummary = {
   assignedUserDeleted: boolean;
   locationDeleted: boolean;
   contactDeleted: boolean;
+};
+
+export type DeliveryEditSummary = {
+  assignedUserId: number;
+  date: string;
+  locationId: number;
+  contactId?: number;
+  notes: string;
+  tankDetails: string;
+  deliveryId: number;
+  hasDocket: boolean;
+  hasUser: boolean;
+  deleted: boolean;
 };

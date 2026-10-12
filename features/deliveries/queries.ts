@@ -1,7 +1,7 @@
 import { requireRole, requireRouteAccess } from "@/lib/auth/authorization";
 import { dateToInputFormat } from "@/lib/utils/date-utils";
 import { db } from "@/prisma/db";
-import { DeliveryDetail, DeliverySummary, UpdateDeliveryInput } from "./types";
+import { DeliveryDetail, DeliveryEditSummary, DeliverySummary } from "./types";
 
 export async function getAssignableUsers() {
   await requireRole("MANAGER");
@@ -48,7 +48,7 @@ export async function getDeliveryContacts(customerId?: number) {
 }
 
 export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | null> {
-  const delivery = await db.orm.public.Delivery.where({ id: deliveryId, deleted: false })
+  const delivery = await db.orm.public.Delivery.where({ id: deliveryId })
     .include("location", location => location.include("customer"))
     .include("contact")
     .include("route", route => route.include("assignedUser"))
@@ -68,6 +68,7 @@ export async function getDelivery(deliveryId: number): Promise<DeliveryDetail | 
     tankDetails: delivery.tankDetails,
     date: delivery.route.date,
     routeId: delivery.routeId,
+    deleted: delivery.deleted,
 
     location: {
       address: delivery.location.address,
@@ -155,10 +156,10 @@ export async function getDeliveries(search?: string): Promise<DeliverySummary[]>
   );
 }
 
-export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeliveryInput | null> {
+export async function getDeliveryForEdit(deliveryId: number): Promise<DeliveryEditSummary | null> {
   await requireRole("MANAGER");
 
-  const delivery = await db.orm.public.Delivery.where({ id: deliveryId, deleted: false })
+  const delivery = await db.orm.public.Delivery.where({ id: deliveryId })
     .include("route", route => route.include("assignedUser"))
     .include("docket")
     .first();
@@ -175,6 +176,7 @@ export async function getDeliveryForEdit(deliveryId: number): Promise<UpdateDeli
     notes: delivery.notes,
     tankDetails: delivery.tankDetails,
     hasDocket: delivery.docket !== null,
-    hasUser: !delivery.route.assignedUser.deleted
+    hasUser: !delivery.route.assignedUser.deleted,
+    deleted: delivery.deleted
   };
 }
