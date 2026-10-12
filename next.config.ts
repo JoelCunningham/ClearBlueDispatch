@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     browserToTerminal: true
   },
   allowedDevOrigins: ["192.168.0.15"],
-  serverExternalPackages: ["pdf-to-img", "pdf-lib"],
   async headers() {
     const securityHeaders = [
       {

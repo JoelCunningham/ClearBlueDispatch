@@ -5,7 +5,6 @@ import { getLogoBuffer } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { NextResponse } from "next/server";
-import path from "path";
 
 export async function GET(req: Request, { params }: { params: Promise<{ docketId: string }> }) {
   const user = await checkUser();
@@ -48,13 +47,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ docketId
     })
   );
 
-  const { pdf } = await import("pdf-to-img");
-  process.env.PDFJS_STANDARD_FONTS = path.join(process.cwd(), "node_modules/pdfjs-dist/standard_fonts/");
-
-  const document = await pdf(docketPdf, { scale: 2 });
-  const pageBuffer = await document.getPage(1);
-
-  return new NextResponse(new Uint8Array(pageBuffer), {
-    headers: { "Content-Type": "image/png", "Cache-Control": "private, no-store" }
+  return new NextResponse(Buffer.from(docketPdf), {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="ClearBlue Solutions Docket ${getDocketNumber(docket.id)}.pdf"`,
+      "Cache-Control": "private, no-store"
+    }
   });
 }
