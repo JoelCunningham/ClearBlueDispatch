@@ -1,13 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import ResetPasswordForm from "@/components/forms/reset-password-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
+import { resetPassword } from "@/features/login/actions";
 import { ResetPasswordInput } from "@/features/login/types";
 import { checkUser } from "@/lib/auth/authorization";
-import { resetPassword } from "@/features/login/actions";
 
 type ResetPasswordPageProps = {
   searchParams: Promise<{ error?: string }>;
