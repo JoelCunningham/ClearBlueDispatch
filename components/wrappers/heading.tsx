@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import BackButton from "@/components/buttons/back-button";
@@ -12,6 +13,7 @@ interface HeadingProps {
   backFallback?: string;
   actionLink?: LinkProps;
   children?: React.ReactNode;
+  logo?: boolean;
 }
 
 interface LinkProps {
@@ -20,11 +22,24 @@ interface LinkProps {
   role?: UserRole;
 }
 
-export default async function Heading({ title, subtitle, subtitleIcon: SubtitleIcon, backFallback, actionLink, children }: HeadingProps) {
+export default async function Heading({
+  title,
+  subtitle,
+  subtitleIcon: SubtitleIcon,
+  backFallback,
+  actionLink,
+  children,
+  logo
+}: HeadingProps) {
   const role = await checkUserRole();
 
   return (
     <div className="mb-6 space-y-2 w-full">
+      {logo && (
+        <div className="flex justify-center">
+          <Image src="/icons/logo.png" alt="Clear Blue Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
+        </div>
+      )}
       {backFallback && <BackButton fallbackHref={backFallback} />}
       <div className="flex items-start justify-between gap-4 w-full">
         <div>

@@ -31,8 +31,7 @@ export default async function SetupPage({ searchParams }: SetupPageProps) {
 
   return (
     <Page centred>
-      <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
-      <Heading title="Set your password" subtitle={`Create a password for your account`} />
+      <Heading title="Set your password" subtitle={`Create a password for your account`} logo />
       {user === null ? (
         <ErrorAlert text="This invitation has already been used. If you need a new invitation, please contact your manager." />
       ) : Temporal.Instant.compare(user.loginTokenExpiry, getToday()) < 0 ? (
