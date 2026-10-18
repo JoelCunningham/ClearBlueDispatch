@@ -1,5 +1,4 @@
 import { AuthError } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -38,8 +37,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <Page centred>
-      <Image src="/icons/logo.png" alt="Clear Blue Dispatch Logo" width={394} height={344} className="mb-4 -mt-16 w-36" loading="eager" />
-      <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" />
+      <Heading title="Sign in" subtitle="Sign in to your Clear Blue Dispatch account" logo />
       <LoginForm initialError={params.error} action={login} />
       <Link href="/forgot-password" className="text-sm text-primary hover:underline">
         Forgot your password?
