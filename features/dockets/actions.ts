@@ -10,7 +10,7 @@ import DocketPdf from "@/content/docket-pdf";
 import InternalDocketEmail from "@/content/internal-docket-email";
 import { requireDeliveryAccess, requireDocketAccess, requireRole } from "@/lib/auth/authorization";
 import { sendEmail } from "@/lib/email/sendEmail";
-import { getErrorMessage } from "@/lib/utils/action-utils";
+import { getErrorMessage, getValidationResult } from "@/lib/utils/action-utils";
 import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
 import { getPhotoExtension } from "@/lib/utils/photo-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
@@ -21,7 +21,7 @@ import { createDocketSchema, updateDocketSchema } from "./validation";
 
 export async function createDocket(input: CreateDocketInput) {
   const result = createDocketSchema.safeParse(input);
-  if (!result.success) return { success: false, error: "Invalid docket details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid docket details.");
 
   const { deliveryId, volume, batchNumber, comments, repName, repSignature } = result.data;
   const delivery = await requireDeliveryAccess(deliveryId);
@@ -60,7 +60,7 @@ export async function updateDocket(input: UpdateDocketInput) {
   await requireRole("MANAGER");
 
   const result = updateDocketSchema.safeParse(input);
-  if (!result.success) return { success: false, error: "Invalid docket details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid docket details.");
 
   const { docketId, volume, batchNumber, comments, repName, repSignature } = result.data;
   const docket = await requireDocketAccess(docketId);

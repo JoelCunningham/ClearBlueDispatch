@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import ErrorAlert from "@/components/alerts/error-alert";
 import PrimaryButton from "@/components/buttons/primary-button";
+import { useFormFieldErrors } from "@/components/forms/base-form";
 import Input from "@/components/wrappers/input";
 
 type PhotoInputProps = {
@@ -15,6 +16,8 @@ type PhotoInputProps = {
 };
 
 export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false }: PhotoInputProps) {
+  const fieldErrors = useFormFieldErrors(id);
+  const errorId = `${id}-error`;
   const [photos, setPhotos] = useState<File[]>([]);
   const [error, setError] = useState("");
 
@@ -80,6 +83,8 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
           multiple
           disabled={disabled}
           onChange={handleChange}
+          aria-invalid={fieldErrors.length > 0}
+          aria-describedby={fieldErrors.length > 0 ? errorId : undefined}
           className="sr-only"
         />
 

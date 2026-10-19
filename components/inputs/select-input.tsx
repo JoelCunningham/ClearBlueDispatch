@@ -1,3 +1,4 @@
+import { useFormFieldErrors } from "@/components/forms/base-form";
 import Input from "@/components/wrappers/input";
 
 interface SelectInputProps {
@@ -12,6 +13,9 @@ interface SelectInputProps {
 }
 
 export default function SelectInput({ id, label, items, placeholder, initial, required, disabled, onChange }: SelectInputProps) {
+  const errors = useFormFieldErrors(id);
+  const errorId = `${id}-error`;
+
   return (
     <Input id={id} label={label}>
       <select
@@ -21,6 +25,8 @@ export default function SelectInput({ id, label, items, placeholder, initial, re
         disabled={disabled}
         defaultValue={initial}
         onChange={onChange}
+        aria-invalid={errors.length > 0}
+        aria-describedby={errors.length > 0 ? errorId : undefined}
         className="w-full rounded-md border bg-background px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">{placeholder || "Select an option"}</option>

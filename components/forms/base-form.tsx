@@ -1,17 +1,25 @@
 "use client";
 
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import Form from "@/components/wrappers/form";
+import { FieldErrors } from "@/lib/utils/action-utils";
 import { suppressEvent } from "@/lib/utils/event-utils";
 
 export type BaseFormResult = {
   success: boolean;
   error?: string;
+  fieldErrors?: FieldErrors;
 };
 
 export type BaseFormAction = (formData: FormData, form: HTMLFormElement) => BaseFormResult | void | Promise<BaseFormResult | void>;
+
+const FormErrorsContext = createContext<FieldErrors | undefined>(undefined);
+
+export function useFormFieldErrors(id: string): string[] {
+  return useContext(FormErrorsContext)?.[id] ?? [];
+}
 
 type BaseFormProps = {
   title?: string;
@@ -35,11 +43,13 @@ export default function BaseForm({
   children
 }: BaseFormProps) {
   const [error, setError] = useState<string | undefined>(initialError);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     suppressEvent(event);
     setError(undefined);
+    setFieldErrors(undefined);
     setIsSubmitting(true);
 
     try {
@@ -47,7 +57,8 @@ export default function BaseForm({
       const result = await action(new FormData(form), form);
 
       if (result && !result.success) {
-        setError(result.error ?? errorMessage);
+        setError(result.error ?? (result.fieldErrors ? undefined : errorMessage));
+        setFieldErrors(result.fieldErrors);
         return;
       }
 
@@ -61,8 +72,10 @@ export default function BaseForm({
   }
 
   return (
-    <Form title={title} onSubmit={handleSubmit} isSaving={isSubmitting || externalIsSaving} error={error} submitText={submitText}>
-      {children}
-    </Form>
+    <FormErrorsContext.Provider value={fieldErrors}>
+      <Form title={title} onSubmit={handleSubmit} isSaving={isSubmitting || externalIsSaving} error={error} submitText={submitText}>
+        {children}
+      </Form>
+    </FormErrorsContext.Provider>
   );
 }

@@ -15,7 +15,7 @@ export default function SetupPasswordForm({ action }: SetupPasswordFormProps) {
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (password !== confirmPassword) {
-      return { success: false, error: "Passwords do not match." };
+      return { success: false, fieldErrors: { confirmPassword: ["Passwords do not match."] } };
     }
 
     const input: SetupPasswordInput = { password, confirmPassword };

@@ -5,17 +5,17 @@ import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 
+import { getErrorMessage, getValidationResult } from "@/lib/utils/action-utils";
 import { redirect } from "next/navigation";
 import type { CreateCustomerInput, UpdateCustomerInput } from "./types";
 import { createCustomerSchema, updateCustomerSchema } from "./validation";
-import { getErrorMessage } from "@/lib/utils/action-utils";
 
 export async function createCustomer(input: CreateCustomerInput) {
   await requireRole("MANAGER");
 
   const result = createCustomerSchema.safeParse(input);
   if (!result.success) {
-    return { success: false, error: "Invalid customer details." };
+    return getValidationResult(result.error, "Invalid customer details.");
   }
 
   const customer = await db.transaction(async tx => {
@@ -64,7 +64,7 @@ export async function updateCustomer(input: UpdateCustomerInput) {
 
   const result = updateCustomerSchema.safeParse(input);
   if (!result.success) {
-    return { success: false, error: "Invalid customer details." };
+    return getValidationResult(result.error, "Invalid customer details.");
   }
 
   const { customerId, name, rate, locations, contacts, emails: invoiceEmails } = result.data;
