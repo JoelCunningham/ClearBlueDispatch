@@ -17,7 +17,7 @@ export default function PasswordForm({ requireCurrentPassword, action }: Passwor
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (newPassword !== confirmPassword) {
-      return { success: false, error: "New passwords do not match." };
+      return { success: false, fieldErrors: { confirmPassword: ["New passwords do not match."] } };
     }
 
     const input: PasswordFormInput = { currentPassword: requireCurrentPassword ? currentPassword : undefined, newPassword };

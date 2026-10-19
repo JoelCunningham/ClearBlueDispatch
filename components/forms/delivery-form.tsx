@@ -47,7 +47,7 @@ export default function DeliveryForm({
     ? customerContacts.length > 0
       ? "Select a contact"
       : "No contacts available"
-    : "Select a location first";
+    : "Select a customer first";
 
   async function handleAction(formData: FormData) {
     const contactIdVal = formData.get("contactId");
@@ -77,10 +77,10 @@ export default function DeliveryForm({
       />
       <SelectInput
         id="locationId"
-        label="Location"
+        label="Customer"
         items={locations.map(location => ({ id: location.id, name: getCustomerName(location.customerName, location.address) }))}
         onChange={e => setSelectedLocationId(e.target.value)}
-        placeholder="Select a location"
+        placeholder="Select a customer"
         initial={locationId?.toString()}
         required
       />

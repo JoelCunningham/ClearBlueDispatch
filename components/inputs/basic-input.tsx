@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useFormFieldErrors } from "@/components/forms/base-form";
 import Input from "@/components/wrappers/input";
 
 interface SuffixProps {
@@ -42,6 +43,9 @@ export default function BaseInput({
   autoComplete,
   onChange
 }: BasicInputProps) {
+  const errors = useFormFieldErrors(id);
+  const errorId = `${id}-error`;
+
   return (
     <Input id={id} label={label}>
       <div className="flex rounded-md border bg-background disabled:bg-muted focus-within:ring-2 focus-within:ring-ring">
@@ -58,6 +62,8 @@ export default function BaseInput({
           min={minNumber}
           minLength={minLength}
           value={value}
+          aria-invalid={errors.length > 0}
+          aria-describedby={errors.length > 0 ? errorId : undefined}
           autoComplete={autoComplete ?? "off"}
           onChange={onChange}
           className="w-full px-3 py-2 focus:outline-none"

@@ -6,16 +6,16 @@ import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/authorization";
 import { db } from "@/prisma/db";
 
+import { getErrorMessage, getValidationResult } from "@/lib/utils/action-utils";
+import { inputFormatToDate } from "@/lib/utils/date-utils";
 import type { CreateDeliveryInput, UpdateDeliveryInput } from "./types";
 import { createDeliverySchema, updateDeliverySchema } from "./validation";
-import { inputFormatToDate } from "@/lib/utils/date-utils";
-import { getErrorMessage } from "@/lib/utils/action-utils";
 
 export async function createDelivery(input: CreateDeliveryInput) {
   await requireRole("MANAGER");
 
   const result = createDeliverySchema.safeParse(input);
-  if (!result.success) return { success: false, error: "Invalid delivery details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid delivery details.");
 
   const { assignedUserId, date, locationId, contactId, notes, tankDetails } = result.data;
   const temporalDate = Temporal.PlainDate.from(date).toZonedDateTime("UTC").toInstant();
@@ -55,7 +55,7 @@ export async function updateDelivery(input: UpdateDeliveryInput) {
   await requireRole("MANAGER");
 
   const result = updateDeliverySchema.safeParse(input);
-  if (!result.success) return { success: false, error: "Invalid delivery details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid delivery details.");
 
   const { deliveryId, assignedUserId, date, locationId, contactId, notes, tankDetails } = result.data;
   const temporalDate = inputFormatToDate(date);

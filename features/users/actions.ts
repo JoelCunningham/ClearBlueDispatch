@@ -15,6 +15,7 @@ import {
 } from "@/features/users/validation";
 import { hashPassword, requireRole, requireUser, verifyPassword } from "@/lib/auth/authorization";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { getValidationResult } from "@/lib/utils/action-utils";
 import { getFuture } from "@/lib/utils/date-utils";
 import { getLoginUrl, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
@@ -24,7 +25,7 @@ export async function createUser(input: CreateUserInput) {
   await requireRole("MANAGER");
 
   const result = createUserSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid user details.");
 
   const { name, email, role } = result.data;
   const trimmedEmail = email.trim().toLowerCase();
@@ -52,7 +53,7 @@ export async function updateUser(input: UpdateUserInput) {
   const manager = await requireRole("MANAGER");
 
   const result = updateUserSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid user details.");
 
   const { userId, name, email, role } = result.data;
   const trimmedEmail = email.trim().toLowerCase();
@@ -126,7 +127,7 @@ export async function changeOwnPassword(input: ChangeOwnPasswordInput) {
   const sessionUser = await requireUser();
 
   const result = changeOwnPasswordSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
+  if (!result.success) return getValidationResult(result.error, "Invalid password.");
 
   const { currentPassword, newPassword } = result.data;
   if (currentPassword === newPassword) return { success: false, error: "Your new password must be different from your current password." };
@@ -150,7 +151,7 @@ export async function resetUserPassword(input: ResetUserPasswordInput) {
   await requireRole("MANAGER");
 
   const result = resetUserPasswordSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
+  if (!result.success) return getValidationResult(result.error, "Invalid password.");
 
   const { userId, newPassword } = result.data;
 
@@ -170,7 +171,7 @@ export async function updateOwnProfile(input: UpdateOwnProfileInput) {
   const user = await requireUser();
 
   const result = updateOwnProfileSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid user details." };
+  if (!result.success) return getValidationResult(result.error, "Invalid user details.");
 
   const { name, email } = result.data;
   const trimmedEmail = email.trim().toLowerCase();

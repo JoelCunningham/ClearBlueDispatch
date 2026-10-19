@@ -5,6 +5,7 @@ import { signIn } from "@/auth";
 import ResetPasswordEmail from "@/content/reset-password-email";
 import { hashPassword } from "@/lib/auth/authorization";
 import { sendEmail } from "@/lib/email/sendEmail";
+import { getValidationResult } from "@/lib/utils/action-utils";
 import { getFuture, getToday } from "@/lib/utils/date-utils";
 import { getLoginUrl, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
@@ -13,7 +14,7 @@ import { resetPasswordSchema, setupPasswordSchema } from "./validation";
 
 export async function setupPassword(input: SetupPasswordInput) {
   const result = setupPasswordSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid password." };
+  if (!result.success) return getValidationResult(result.error, "Invalid password.");
 
   const { userId, password, confirmPassword, callbackUrl } = result.data;
 
@@ -34,7 +35,7 @@ export async function setupPassword(input: SetupPasswordInput) {
 
 export async function resetPassword(input: ResetPasswordInput) {
   const result = resetPasswordSchema.safeParse(input);
-  if (!result.success) return { success: false, error: result.error.issues[0]?.message ?? "Invalid email." };
+  if (!result.success) return getValidationResult(result.error, "Invalid email.");
 
   const user = await db.orm.public.User.where({ email: input.email }).first();
   if (!user) return { success: false, error: "No account found with that email address." };

@@ -1,3 +1,7 @@
+"use client";
+
+import { useFormFieldErrors } from "@/components/forms/base-form";
+
 interface InputProps {
   id: string;
   label?: string;
@@ -5,6 +9,9 @@ interface InputProps {
 }
 
 export default function Input({ id, label, children }: InputProps) {
+  const errors = useFormFieldErrors(id);
+  const errorId = `${id}-error`;
+
   return (
     <div className="space-y-2">
       {label && (
@@ -13,6 +20,13 @@ export default function Input({ id, label, children }: InputProps) {
         </label>
       )}
       {children}
+      {errors.length > 0 && (
+        <div id={errorId} className="space-y-1 text-sm text-destructive" role="alert">
+          {errors.map(error => (
+            <p key={error}>{error}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

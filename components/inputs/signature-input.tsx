@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useFormFieldErrors } from "@/components/forms/base-form";
 import Input from "@/components/wrappers/input";
 
 type Point = { x: number; y: number };
@@ -15,6 +16,8 @@ type SignatureInputProps = {
 };
 
 export default function SignatureInput({ id, label, initial, disabled = false }: SignatureInputProps) {
+  const fieldErrors = useFormFieldErrors(id);
+  const errorId = `${id}-error`;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -170,7 +173,12 @@ export default function SignatureInput({ id, label, initial, disabled = false }:
 
   return (
     <Input id={id} label={label}>
-      <div ref={containerRef} className="relative overflow-hidden rounded-md border bg-white">
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden rounded-md border bg-white"
+        aria-invalid={fieldErrors.length > 0}
+        aria-describedby={fieldErrors.length > 0 ? errorId : undefined}
+      >
         <canvas
           ref={canvasRef}
           className="block w-full touch-none"
@@ -188,7 +196,7 @@ export default function SignatureInput({ id, label, initial, disabled = false }:
         )}
       </div>
 
-      <input type="hidden" id={id} name={id} value={signature} readOnly />
+      <input type="hidden" id={id} name={id} value={signature} readOnly aria-invalid={fieldErrors.length > 0} />
 
       <div className="flex justify-end">
         <button
