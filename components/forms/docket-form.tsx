@@ -2,6 +2,7 @@
 
 import BaseForm from "@/components/forms/base-form";
 import BasicInput from "@/components/inputs/basic-input";
+import PhotoInput from "@/components/inputs/photo-input";
 import SignatureInput from "@/components/inputs/signature-input";
 import LineItem from "@/components/wrappers/line-item";
 import { DocketFormInput } from "@/features/dockets/types";
@@ -36,7 +37,8 @@ export default function DocketForm({
       batchNumber: String(formData.get("batchNumber") ?? ""),
       comments: String(formData.get("comments") ?? ""),
       repName: String(formData.get("repName") ?? ""),
-      repSignature: String(formData.get("repSignature") ?? "")
+      repSignature: String(formData.get("repSignature") ?? ""),
+      photos: formData.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0)
     };
 
     return action(input);
@@ -53,6 +55,7 @@ export default function DocketForm({
       <BasicInput type="text" id="comments" label="Comments" initial={comments} />
       <BasicInput type="text" id="repName" label="Name" initial={repName} />
       <SignatureInput id="repSignature" label="Signature" initial={repSignature} />
+      <PhotoInput id="photos" maxPhotos={5} maxSizeMb={5} />
     </BaseForm>
   );
 }

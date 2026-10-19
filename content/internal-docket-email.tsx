@@ -6,6 +6,7 @@ import { dateToShortFormat } from "@/lib/utils/date-utils";
 interface InternalDocketEmailProps {
   number: string;
   customerName: string;
+  customerRate: number;
   address: string;
   date: Temporal.Instant;
   volume: number | string;
@@ -18,6 +19,7 @@ interface InternalDocketEmailProps {
 export default function InternalDocketEmail({
   number,
   customerName,
+  customerRate,
   address,
   date,
   volume,
@@ -44,6 +46,9 @@ export default function InternalDocketEmail({
         </Text>
         <Text className="text-sm text-foreground my-1">
           <strong className="text-muted">Customer Name:</strong> {customerName}
+        </Text>
+        <Text className="text-sm text-foreground my-1">
+          <strong className="text-muted">Customer Rate:</strong> ${customerRate.toFixed(2)} per L
         </Text>
         <Text className="text-sm text-foreground my-1">
           <strong className="text-muted">Delivery Address:</strong> {address}
