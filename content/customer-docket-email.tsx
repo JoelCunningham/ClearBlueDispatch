@@ -51,6 +51,9 @@ export default function CustomerDocketEmail({
 
       <Text className="text-xs text-muted italic my-4">
         A PDF copy containing full delivery site details, driver signature, and certification numbers is attached to this email.
+        {isUpdate
+          ? " Please see the original email for any photos taken during the delivery."
+          : " Additionally, photos taken during the delivery are included for your reference. Please keep this email for your records."}
       </Text>
 
       <Hr className="border-border my-6" />

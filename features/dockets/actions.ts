@@ -12,6 +12,7 @@ import { requireDeliveryAccess, requireDocketAccess, requireRole } from "@/lib/a
 import { sendEmail } from "@/lib/email/sendEmail";
 import { getErrorMessage } from "@/lib/utils/action-utils";
 import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
+import { getPhotoExtension } from "@/lib/utils/photo-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
@@ -46,7 +47,7 @@ export async function createDocket(input: CreateDocketInput) {
   }
 
   try {
-    await sendDocketEmail(docketId);
+    await sendDocketEmail(docketId, result.data.photos);
   } catch (error) {
     console.error("Failed to send docket email", error);
   }
@@ -82,7 +83,7 @@ export async function updateDocket(input: UpdateDocketInput) {
   }
 
   try {
-    await sendDocketEmail(docketId, true);
+    await sendDocketEmail(docketId, result.data.photos, true);
   } catch (error) {
     console.error("Failed to send docket email", error);
   }
@@ -94,7 +95,7 @@ export async function updateDocket(input: UpdateDocketInput) {
   redirect(`/dockets/${docketId}`);
 }
 
-async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
+async function sendDocketEmail(docketId: number, photos: File[], isUpdate: boolean = false) {
   const docket = await db.orm.public.Docket.where({ id: docketId, deleted: false }).first();
   if (!docket) throw new Error(`Docket ${docketId} not found.`);
 
@@ -153,6 +154,7 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
       number: docketNumber,
       date: delivery.route.date,
       customerName: delivery.location.customer.name,
+      customerRate: delivery.location.customer.rate,
       address: delivery.location.address,
       volume: docket.volume,
       batchNumber: docket.batchNumber,
@@ -162,11 +164,19 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
     })
   );
 
-  const attachment = {
+  const docketAttachment = {
     filename: `ClearBlue Solutions Docket-${docketNumber}.pdf`,
     content: docketPdf,
     contentType: "application/pdf"
   };
+
+  const photoAttachments = await Promise.all(
+    photos.map(async (photo, index) => ({
+      filename: `Docket-${docketNumber}-Photo-${index + 1}.${getPhotoExtension(photo.type)}`,
+      content: Buffer.from(await photo.arrayBuffer()),
+      contentType: photo.type
+    }))
+  );
 
   const emailPromises: Promise<void>[] = [];
 
@@ -176,7 +186,7 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
         to: customerRecipients,
         subject: `${isUpdate ? "Updated: " : ""}Delivery Docket ${docketNumber} - ClearBlue Solutions`,
         html: customerEmailHtml,
-        attachments: [attachment]
+        attachments: [...photoAttachments, docketAttachment]
       })
     );
   }
@@ -187,7 +197,7 @@ async function sendDocketEmail(docketId: number, isUpdate: boolean = false) {
         to: managerRecipients,
         subject: `[Internal] ${isUpdate ? "Updated Docket" : "New Docket"} ${docketNumber} - ${delivery.location.customer.name}`,
         html: internalEmailHtml,
-        attachments: [attachment]
+        attachments: [...photoAttachments, docketAttachment]
       })
     );
   }

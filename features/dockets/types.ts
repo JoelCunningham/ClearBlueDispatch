@@ -4,6 +4,7 @@ export type DocketFormInput = {
   comments: string;
   repName: string;
   repSignature: string;
+  photos: File[];
 };
 
 export type CreateDocketInput = DocketFormInput & { deliveryId: number };

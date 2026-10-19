@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
     },
     browserToTerminal: true
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "25mb"
+    }
+  },
   allowedDevOrigins: ["192.168.0.15"],
   async headers() {
     const securityHeaders = [
