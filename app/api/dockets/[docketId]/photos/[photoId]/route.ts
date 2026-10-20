@@ -1,7 +1,7 @@
-import { issueSignedToken, presignUrl } from "@vercel/blob";
 import { NextResponse } from "next/server";
 
 import { requireDocketAccess } from "@/lib/auth/authorization";
+import { getPrivatePhotoUrl } from "@/lib/utils/docket-photo-utils";
 import { db } from "@/prisma/db";
 
 export async function GET(_: Request, { params }: { params: Promise<{ docketId: string; photoId: string }> }) {
@@ -23,12 +23,5 @@ export async function GET(_: Request, { params }: { params: Promise<{ docketId: 
   }).first();
   if (!photo) return NextResponse.json({ error: "Photo not found." }, { status: 404 });
 
-  const token = await issueSignedToken({ pathname: "*", operations: ["get"] });
-  const { presignedUrl } = await presignUrl(token, {
-    access: "private",
-    operation: "get",
-    pathname: new URL(photo.blobId).pathname.slice(1)
-  });
-
-  return NextResponse.json({ url: presignedUrl });
+  return NextResponse.json({ url: await getPrivatePhotoUrl(photo.blobId) });
 }

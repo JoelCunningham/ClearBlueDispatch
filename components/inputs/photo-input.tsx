@@ -165,7 +165,7 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, initialPhotos = [
           );
         })}
 
-        <PrimaryButton text="Add photos" onClick={() => inputRef.current?.click()} />
+        <PrimaryButton text="Add photos" onClick={() => inputRef.current?.click()} secondary />
 
         {error && <ErrorAlert text={error} />}
       </div>

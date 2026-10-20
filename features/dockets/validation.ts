@@ -6,8 +6,7 @@ const uploadedPhotoSchema = z.object({
   size: z.number().int().positive("Photo size must be positive.")
 });
 
-export const createDocketSchema = z.object({
-  deliveryId: z.coerce.number().int().positive("Delivery ID must be positive."),
+const docketFieldsSchema = z.object({
   volume: z.coerce.number().int().positive("Volume must be a whole number greater than zero."),
   batchNumber: z.string().trim().min(1, "Enter a batch number.").max(128, "Batch number must be 128 characters or fewer."),
   comments: z.string().trim().max(2000, "Comments must be 2,000 characters or fewer.").optional(),
@@ -16,9 +15,13 @@ export const createDocketSchema = z.object({
   photos: z.array(uploadedPhotoSchema).max(5, "You can upload a maximum of 5 photos.")
 });
 
+export const createDocketSchema = docketFieldsSchema.extend({
+  deliveryId: z.coerce.number().int().positive("Delivery ID must be positive.")
+});
+
 export type CreateDocketInput = z.infer<typeof createDocketSchema>;
 
-export const updateDocketSchema = z.object({
+export const updateDocketSchema = docketFieldsSchema.extend({
   docketId: z.coerce.number().int().positive("Docket ID must be positive."),
   volume: z.coerce.number().int().positive("Volume must be a whole number greater than zero."),
   batchNumber: z.string().trim().min(1, "Enter a batch number.").max(128, "Batch number must be 128 characters or fewer."),

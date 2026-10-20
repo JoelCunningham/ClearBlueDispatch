@@ -36,12 +36,35 @@ export default function DocketForm({
   initialPhotos = []
 }: DocketFormProps) {
   async function handleAction(formData: FormData) {
+    const input: DocketFormInput = {
+      volume: Number(formData.get("volume") ?? 0),
+      batchNumber: String(formData.get("batchNumber") ?? ""),
+      comments: String(formData.get("comments") ?? ""),
+      repName: String(formData.get("repName") ?? ""),
+      repSignature: String(formData.get("repSignature") ?? ""),
+      photos: []
+    };
+
     const files = formData.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0);
-    const existingPhotos = formData
-      .getAll("photos-existing")
-      .map(value => JSON.parse(String(value)) as UploadedPhoto);
-    const newPhotos: UploadedPhoto[] = await Promise.all(
-      files.map(async file => {
+    const existingPhotos = formData.getAll("photos-existing").map(value => JSON.parse(String(value)) as UploadedPhoto);
+    const uploadedBlobIds: string[] = [];
+
+    async function cleanupUploadedPhotos() {
+      if (uploadedBlobIds.length === 0) return;
+      const response = await fetch("/api/photos/upload/cleanup", {
+        method: "DELETE",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...uploadTarget, blobIds: uploadedBlobIds })
+      });
+      if (!response.ok) {
+        console.error("Unable to clean up uploaded photos.", await response.text());
+      }
+    }
+
+    let newPhotos: UploadedPhoto[];
+    try {
+      newPhotos = [];
+      for (const file of files) {
         const response = await fetch("/api/photos/upload", {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -64,20 +87,20 @@ export default function DocketForm({
         if (!uploadResponse.ok) throw new Error(`Photo upload failed (${uploadResponse.status}).`);
         const blob = (await uploadResponse.json()) as { url: string };
 
-        return { blobId: blob.url, contentType: file.type, size: file.size };
-      })
-    );
+        uploadedBlobIds.push(blob.url);
+        newPhotos.push({ blobId: blob.url, contentType: file.type, size: file.size });
+      }
+    } catch (error) {
+      await cleanupUploadedPhotos();
+      throw error;
+    }
 
-    const input: DocketFormInput = {
-      volume: Number(formData.get("volume") ?? 0),
-      batchNumber: String(formData.get("batchNumber") ?? ""),
-      comments: String(formData.get("comments") ?? ""),
-      repName: String(formData.get("repName") ?? ""),
-      repSignature: String(formData.get("repSignature") ?? ""),
-      photos: [...existingPhotos, ...newPhotos]
-    };
+    input.photos = [...existingPhotos, ...newPhotos];
 
-    return action(input);
+    const result = await action(input);
+    if (!result.success) await cleanupUploadedPhotos();
+
+    return result;
   }
 
   return (

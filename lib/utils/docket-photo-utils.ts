@@ -1,4 +1,4 @@
-import { del, head, list } from "@vercel/blob";
+import { del, head, issueSignedToken, list, presignUrl } from "@vercel/blob";
 
 import { db } from "@/prisma/db";
 import { UploadedPhoto } from "@/features/dockets/types";
@@ -13,6 +13,17 @@ export function getPhotoPathPrefix(target: { deliveryId?: number; docketId?: num
   throw new Error("A photo upload target is required.");
 }
 
+async function getPhotoBlobUsage(): Promise<number> {
+  let cursor: string | undefined;
+  let usedBytes = 0;
+  do {
+    const result = await list({ prefix: photoPathRoot, limit: 1000, cursor });
+    usedBytes += result.blobs.reduce((total, blob) => total + blob.size, 0);
+    cursor = result.hasMore ? result.cursor : undefined;
+  } while (cursor);
+  return usedBytes;
+}
+
 export async function ensurePhotoUploadCapacity(requiredBytes: number): Promise<void> {
   const blobCapacity = Number(process.env["BLOB_CAPACITY"] ?? 1_000_000_000);
   if (!Number.isSafeInteger(blobCapacity) || blobCapacity <= 0) {
@@ -22,14 +33,7 @@ export async function ensurePhotoUploadCapacity(requiredBytes: number): Promise<
     throw new Error("Photo size is invalid or exceeds the 5 MB limit.");
   }
 
-  let cursor: string | undefined;
-  let usedBytes = 0;
-  do {
-    const result = await list({ prefix: photoPathRoot, limit: 1000, cursor });
-    usedBytes += result.blobs.reduce((total, blob) => total + blob.size, 0);
-    cursor = result.hasMore ? result.cursor : undefined;
-  } while (cursor);
-
+  const usedBytes = await getPhotoBlobUsage();
   if (usedBytes + requiredBytes > blobCapacity * cleanupThreshold) {
     throw new Error("There is not enough photo storage available. Please try again later.");
   }
@@ -66,10 +70,7 @@ export async function verifyDocketPhotos(
           ]
         : [];
       if (expectedHostnames.length > 0 && !expectedHostnames.includes(hostname)) {
-        console.warn("Blob photo hostname differs from PHOTO_BLOB_STORE_ID; validating with BLOB_READ_WRITE_TOKEN.", {
-          actualHostname: hostname,
-          expectedHostnames
-        });
+        throw new Error("Photo does not belong to the configured Blob store.");
       }
 
       let blob;
@@ -96,6 +97,16 @@ export async function removeDocketPhotos(photos: UploadedPhoto[]): Promise<void>
   await Promise.all(photos.map(photo => del(photo.blobId)));
 }
 
+export async function getPrivatePhotoUrl(blobId: string): Promise<string> {
+  const token = await issueSignedToken({ pathname: "*", operations: ["get"] });
+  const { presignedUrl } = await presignUrl(token, {
+    access: "private",
+    operation: "get",
+    pathname: new URL(blobId).pathname.slice(1)
+  });
+  return presignedUrl;
+}
+
 export async function makeRoomForPhotos(requiredBytes: number, protectedBlobIds: string[]): Promise<void> {
   const blobCapacity = Number(process.env["BLOB_CAPACITY"] ?? 1_000_000_000);
   if (!Number.isSafeInteger(blobCapacity) || blobCapacity <= 0) {
@@ -103,7 +114,7 @@ export async function makeRoomForPhotos(requiredBytes: number, protectedBlobIds:
   }
 
   const photos = await db.orm.public.DocketPhoto.where({ deleted: false }).orderBy(photo => photo.createdAt.asc()).all();
-  let usedBytes = photos.reduce((total, photo) => total + photo.size, 0);
+  let usedBytes = await getPhotoBlobUsage();
   const targetBytes = blobCapacity * cleanupThreshold;
 
   if (usedBytes + requiredBytes <= targetBytes) return;
@@ -112,9 +123,16 @@ export async function makeRoomForPhotos(requiredBytes: number, protectedBlobIds:
     if (usedBytes + requiredBytes <= targetBytes) break;
     if (protectedBlobIds.includes(photo.blobId)) continue;
 
-    await del(photo.blobId);
-    await db.orm.public.DocketPhoto.where({ id: photo.id }).update({ deleted: true });
-    usedBytes -= photo.size;
+    await db.orm.public.DocketPhoto.where({ id: photo.id, deleted: false }).update({ deleted: true });
+    try {
+      await del(photo.blobId);
+      usedBytes -= photo.size;
+    } catch (error) {
+      console.error("Failed to remove photo Blob after marking it deleted.", {
+        blobId: photo.blobId,
+        error: error instanceof Error ? error.message : "Unknown Blob error"
+      });
+    }
   }
 
   if (usedBytes + requiredBytes > targetBytes) {

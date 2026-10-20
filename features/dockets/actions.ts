@@ -39,6 +39,11 @@ export async function createDocket(input: CreateDocketInput) {
   let docketId: number;
 
   try {
+    await makeRoomForPhotos(
+      photos.reduce((total, photo) => total + photo.size, 0),
+      photos.map(photo => photo.blobId)
+    );
+
     docketId = await db.transaction(async tx => {
       const delivery = await tx.orm.public.Delivery.where({ id: deliveryId, deleted: false }).first();
       if (!delivery) throw new Error("Delivery not found.");
@@ -49,18 +54,16 @@ export async function createDocket(input: CreateDocketInput) {
       const signature = dataUrlToBuffer(repSignature);
 
       const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, comments, repName, repSignature: signature });
+      await createDocketPhotos(tx, docket.id, photos);
       return docket.id;
     });
   } catch (error) {
+    try {
+      await removeDocketPhotos(photos);
+    } catch (cleanupError) {
+      console.error("Failed to clean up docket photo Blobs after creation failed.", cleanupError);
+    }
     return { success: false, error: getErrorMessage(error, "Unable to create docket.") };
-  }
-
-  try {
-    await saveDocketPhotos(docketId, photos);
-  } catch (error) {
-    await removeDocketPhotos(photos);
-    console.error("Failed to save docket photos", error);
-    return { success: false, error: getErrorMessage(error, "Unable to save docket photos.") };
   }
 
   try {
@@ -92,28 +95,50 @@ export async function updateDocket(input: UpdateDocketInput) {
     return { success: false, error: getErrorMessage(error, "Invalid docket photos.") };
   }
 
-  let deliveryId: number;
+  const deliveryId = docket.deliveryId;
 
   try {
-    deliveryId = await db.transaction(async tx => {
-      const docket = await tx.orm.public.Docket.where({ id: docketId, deleted: false }).first();
-      if (!docket) throw new Error("Docket not found.");
+    const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
+    const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
+    const newPhotos = photos.filter(photo => !existingBlobIds.has(photo.blobId));
+    const removedPhotos = existingPhotos.filter(existing => !photos.some(photo => photo.blobId === existing.blobId));
 
+    await makeRoomForPhotos(
+      newPhotos.reduce((total, photo) => total + photo.size, 0),
+      photos.map(photo => photo.blobId)
+    );
+
+    await db.transaction(async tx => {
       const signature = dataUrlToBuffer(repSignature);
+      const currentDocket = await tx.orm.public.Docket.where({ id: docketId, deleted: false }).first();
+      if (!currentDocket) throw new Error("Docket not found.");
 
-      await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, comments, repName, repSignature: signature });
-      return docket.deliveryId;
+      await tx.orm.public.Docket.where({ id: docketId, deleted: false }).update({
+        volume,
+        batchNumber,
+        comments,
+        repName,
+        repSignature: signature
+      });
+      await Promise.all(
+        removedPhotos.map(photo => tx.orm.public.DocketPhoto.where({ id: photo.id, deleted: false }).update({ deleted: true }))
+      );
+      await createDocketPhotos(tx, docketId, newPhotos);
     });
-  } catch (error) {
-    return { success: false, error: getErrorMessage(error, "Unable to update docket.") };
-  }
 
-  try {
-    await updateDocketPhotos(docketId, photos);
+    try {
+      await removeDocketPhotos(removedPhotos);
+    } catch (error) {
+      console.error("Failed to remove deleted docket photo Blobs.", error);
+    }
   } catch (error) {
     const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
     const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
-    await removeDocketPhotos(photos.filter(photo => !existingBlobIds.has(photo.blobId)));
+    try {
+      await removeDocketPhotos(photos.filter(photo => !existingBlobIds.has(photo.blobId)));
+    } catch (cleanupError) {
+      console.error("Failed to clean up new docket photo Blobs after update failed.", cleanupError);
+    }
     console.error("Failed to save docket photos", error);
     return { success: false, error: getErrorMessage(error, "Unable to save docket photos.") };
   }
@@ -131,17 +156,10 @@ export async function updateDocket(input: UpdateDocketInput) {
   redirect(`/dockets/${docketId}`);
 }
 
-async function saveDocketPhotos(docketId: number, photos: UploadedPhoto[]) {
-  if (photos.length === 0) return;
-
-  await makeRoomForPhotos(
-    photos.reduce((total, photo) => total + photo.size, 0),
-    photos.map(photo => photo.blobId)
-  );
-
-  await Promise.all(
+function createDocketPhotos(tx: Parameters<Parameters<typeof db.transaction>[0]>[0], docketId: number, photos: UploadedPhoto[]) {
+  return Promise.all(
     photos.map(photo =>
-      db.orm.public.DocketPhoto.create({
+      tx.orm.public.DocketPhoto.create({
         docketId,
         blobId: photo.blobId,
         contentType: photo.contentType,
@@ -149,38 +167,6 @@ async function saveDocketPhotos(docketId: number, photos: UploadedPhoto[]) {
       })
     )
   );
-}
-
-async function updateDocketPhotos(docketId: number, photos: UploadedPhoto[]) {
-  const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
-  const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
-  const newPhotos = photos.filter(photo => !existingBlobIds.has(photo.blobId));
-  const removedPhotos = existingPhotos.filter(existing => !photos.some(photo => photo.blobId === existing.blobId));
-
-  if (newPhotos.length > 0) {
-    await makeRoomForPhotos(
-      newPhotos.reduce((total, photo) => total + photo.size, 0),
-      photos.map(photo => photo.blobId)
-    );
-  }
-
-  for (const photo of removedPhotos) {
-    await removeDocketPhotos([photo]);
-    await db.orm.public.DocketPhoto.where({ id: photo.id, deleted: false }).update({ deleted: true });
-  }
-
-  await db.transaction(async tx => {
-    await Promise.all(
-      newPhotos.map(photo =>
-        tx.orm.public.DocketPhoto.create({
-          docketId,
-          blobId: photo.blobId,
-          contentType: photo.contentType,
-          size: photo.size
-        })
-      )
-    );
-  });
 }
 
 async function sendDocketEmail(docketId: number, photos: UploadedPhoto[], isUpdate: boolean = false) {

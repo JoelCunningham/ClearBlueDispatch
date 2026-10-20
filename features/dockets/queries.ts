@@ -1,6 +1,6 @@
-import { issueSignedToken, presignUrl } from "@vercel/blob";
 import { db } from "@/prisma/db";
 import { requireDocketAccess, requireRole } from "@/lib/auth/authorization";
+import { getPrivatePhotoUrl } from "@/lib/utils/docket-photo-utils";
 import type { DocketDetail, DocketPhotoPreview, DocketPhotoReference, DocketSummary } from "./types";
 
 export async function getDockets(search?: string): Promise<DocketSummary[]> {
@@ -75,21 +75,14 @@ export async function getDocket(docketId: number): Promise<DocketDetail | null> 
 
 export async function getDocketPhotoPreviews(docketId: number): Promise<DocketPhotoPreview[]> {
   const storedPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
-  const token = await issueSignedToken({ pathname: "*", operations: ["get"] });
-
   return Promise.all(
     storedPhotos.map(async photo => {
-      const { presignedUrl } = await presignUrl(token, {
-        access: "private",
-        operation: "get",
-        pathname: new URL(photo.blobId).pathname.slice(1)
-      });
       return {
         id: photo.id,
         blobId: photo.blobId,
         contentType: photo.contentType,
         size: photo.size,
-        previewUrl: presignedUrl
+        previewUrl: await getPrivatePhotoUrl(photo.blobId)
       };
     })
   );
