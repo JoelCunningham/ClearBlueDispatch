@@ -10,7 +10,8 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: "25mb"
-    }
+    },
+    proxyClientMaxBodySize: "25mb"
   },
   allowedDevOrigins: ["192.168.0.15"],
   async headers() {
