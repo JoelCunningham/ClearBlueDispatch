@@ -7,19 +7,13 @@ const nextConfig: NextConfig = {
     },
     browserToTerminal: true
   },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "25mb"
-    },
-    proxyClientMaxBodySize: "25mb"
-  },
   allowedDevOrigins: ["192.168.0.15"],
   async headers() {
     const securityHeaders = [
       {
         key: "Content-Security-Policy",
         value:
-          "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+          "default-src 'self'; img-src 'self' data: blob: https://*.blob.vercel-storage.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self' data:; connect-src 'self' https://vercel.com https://*.blob.vercel-storage.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
       },
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "DENY" },

@@ -4,7 +4,22 @@ export type DocketFormInput = {
   comments: string;
   repName: string;
   repSignature: string;
-  photos: File[];
+  photos: UploadedPhoto[];
+};
+
+export type UploadedPhoto = {
+  blobId: string;
+  contentType: string;
+  size: number;
+};
+
+export type DocketPhotoPreview = UploadedPhoto & {
+  id: number;
+  previewUrl: string;
+};
+
+export type DocketPhotoReference = UploadedPhoto & {
+  id: number;
 };
 
 export type CreateDocketInput = DocketFormInput & { deliveryId: number };
@@ -30,4 +45,5 @@ export type DocketDetail = {
   comments?: string;
   repName: string;
   repSignature: Uint8Array;
+  photos: DocketPhotoReference[];
 };

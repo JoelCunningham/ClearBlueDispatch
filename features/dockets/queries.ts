@@ -1,6 +1,7 @@
+import { issueSignedToken, presignUrl } from "@vercel/blob";
 import { db } from "@/prisma/db";
 import { requireDocketAccess, requireRole } from "@/lib/auth/authorization";
-import type { DocketDetail, DocketSummary } from "./types";
+import type { DocketDetail, DocketPhotoPreview, DocketPhotoReference, DocketSummary } from "./types";
 
 export async function getDockets(search?: string): Promise<DocketSummary[]> {
   await requireRole("MANAGER");
@@ -49,6 +50,14 @@ export async function getDocket(docketId: number): Promise<DocketDetail | null> 
   if (!docket.delivery.location) throw new Error(`Location not found for delivery ${docket.delivery.id}.`);
   if (!docket.delivery.location.customer) throw new Error(`Customer not found for location ${docket.delivery.location.id}.`);
 
+  const storedPhotos = await db.orm.public.DocketPhoto.where({ docketId: docket.id, deleted: false }).all();
+  const photos: DocketPhotoReference[] = storedPhotos.map(photo => ({
+      id: photo.id,
+      blobId: photo.blobId,
+      contentType: photo.contentType,
+      size: photo.size
+    }));
+
   return {
     id: docket.id,
     deliveryId: docket.deliveryId,
@@ -59,6 +68,29 @@ export async function getDocket(docketId: number): Promise<DocketDetail | null> 
     batchNumber: docket.batchNumber,
     comments: docket.comments ?? undefined,
     repName: docket.repName,
-    repSignature: docket.repSignature
+    repSignature: docket.repSignature,
+    photos
   };
+}
+
+export async function getDocketPhotoPreviews(docketId: number): Promise<DocketPhotoPreview[]> {
+  const storedPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
+  const token = await issueSignedToken({ pathname: "*", operations: ["get"] });
+
+  return Promise.all(
+    storedPhotos.map(async photo => {
+      const { presignedUrl } = await presignUrl(token, {
+        access: "private",
+        operation: "get",
+        pathname: new URL(photo.blobId).pathname.slice(1)
+      });
+      return {
+        id: photo.id,
+        blobId: photo.blobId,
+        contentType: photo.contentType,
+        size: photo.size,
+        previewUrl: presignedUrl
+      };
+    })
+  );
 }

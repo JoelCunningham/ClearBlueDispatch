@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import LinkButton from "@/components/buttons/link-button";
+import DocketPhotoViewer from "@/components/photos/docket-photo-viewer";
 import Card from "@/components/wrappers/card";
 import Heading from "@/components/wrappers/heading";
 import LineItem from "@/components/wrappers/line-item";
@@ -46,7 +47,8 @@ export default async function DocketPage({ params }: DocketPageProps) {
           </LineItem>
         </List>
       </Card>
-      <LinkButton href={`/api/dockets/${docket.id}`} text="Download PDF" download />
+      <DocketPhotoViewer docketId={docket.id} photos={docket.photos} />
+      <LinkButton href={`/api/dockets/${docket.id}`} text="Download PDF" download secondary />
       <LinkButton href={`/deliveries/${docket.deliveryId}`} text="Go to delivery details" />
     </Page>
   );

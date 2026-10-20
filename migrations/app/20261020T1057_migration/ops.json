@@ -1,0 +1,122 @@
+[
+  {
+    "id": "table.DocketPhoto",
+    "label": "Create table \"DocketPhoto\"",
+    "summary": "Creates table \"DocketPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "DocketPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"DocketPhoto\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"DocketPhoto\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"DocketPhoto\"",
+        "sql": "CREATE TABLE \"public\".\"DocketPhoto\" (\n  \"blobId\" text NOT NULL,\n  \"contentType\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deleted\" bool DEFAULT false NOT NULL,\n  \"docketId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"size\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"DocketPhoto\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"DocketPhoto\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.DocketPhoto.DocketPhoto_docketId_idx_087b8b64",
+    "label": "Create index \"DocketPhoto_docketId_idx_087b8b64\" on \"DocketPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "DocketPhoto_docketId_idx_087b8b64",
+        "table": "DocketPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"DocketPhoto_docketId_idx_087b8b64\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"DocketPhoto_docketId_idx_087b8b64\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"DocketPhoto_docketId_idx_087b8b64\"",
+        "sql": "CREATE INDEX \"DocketPhoto_docketId_idx_087b8b64\" ON \"public\".\"DocketPhoto\" (\"docketId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"DocketPhoto_docketId_idx_087b8b64\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"DocketPhoto_docketId_idx_087b8b64\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.DocketPhoto.DocketPhoto_docketId_fkey",
+    "label": "Add foreign key \"DocketPhoto_docketId_fkey\" on \"DocketPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "DocketPhoto_docketId_fkey",
+        "table": "DocketPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"DocketPhoto_docketId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "DocketPhoto_docketId_fkey",
+          "public",
+          "\"public\".\"DocketPhoto\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"DocketPhoto_docketId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"DocketPhoto\"\nADD CONSTRAINT \"DocketPhoto_docketId_fkey\"\nFOREIGN KEY (\"docketId\")\nREFERENCES \"public\".\"Docket\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"DocketPhoto_docketId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "DocketPhoto_docketId_fkey",
+          "public",
+          "\"public\".\"DocketPhoto\""
+        ]
+      }
+    ]
+  }
+]

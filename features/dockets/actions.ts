@@ -1,6 +1,7 @@
 "use server";
 
 import { renderToBuffer } from "@react-pdf/renderer";
+import { get } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { render } from "react-email";
@@ -12,11 +13,12 @@ import { requireDeliveryAccess, requireDocketAccess, requireRole } from "@/lib/a
 import { sendEmail } from "@/lib/email/sendEmail";
 import { getErrorMessage, getValidationResult } from "@/lib/utils/action-utils";
 import { dataUrlToBuffer } from "@/lib/utils/buffer-utils";
+import { getPhotoPathPrefix, makeRoomForPhotos, removeDocketPhotos, verifyDocketPhotos } from "@/lib/utils/docket-photo-utils";
 import { getPhotoExtension } from "@/lib/utils/photo-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
-import { CreateDocketInput, UpdateDocketInput } from "./types";
+import { CreateDocketInput, UpdateDocketInput, UploadedPhoto } from "./types";
 import { createDocketSchema, updateDocketSchema } from "./validation";
 
 export async function createDocket(input: CreateDocketInput) {
@@ -26,6 +28,13 @@ export async function createDocket(input: CreateDocketInput) {
   const { deliveryId, volume, batchNumber, comments, repName, repSignature } = result.data;
   const delivery = await requireDeliveryAccess(deliveryId);
   if (!delivery) return { success: false, error: "Delivery not found." };
+
+  let photos: UploadedPhoto[];
+  try {
+    photos = await verifyDocketPhotos(result.data.photos, getPhotoPathPrefix({ deliveryId }));
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error, "Invalid docket photos.") };
+  }
 
   let docketId: number;
 
@@ -47,7 +56,15 @@ export async function createDocket(input: CreateDocketInput) {
   }
 
   try {
-    await sendDocketEmail(docketId, result.data.photos);
+    await saveDocketPhotos(docketId, photos);
+  } catch (error) {
+    await removeDocketPhotos(photos);
+    console.error("Failed to save docket photos", error);
+    return { success: false, error: getErrorMessage(error, "Unable to save docket photos.") };
+  }
+
+  try {
+    await sendDocketEmail(docketId, photos);
   } catch (error) {
     console.error("Failed to send docket email", error);
   }
@@ -66,6 +83,15 @@ export async function updateDocket(input: UpdateDocketInput) {
   const docket = await requireDocketAccess(docketId);
   if (!docket) return { success: false, error: "Docket not found." };
 
+  let photos: UploadedPhoto[];
+  try {
+    const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
+    const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
+    photos = await verifyDocketPhotos(result.data.photos, getPhotoPathPrefix({ docketId }), existingBlobIds);
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error, "Invalid docket photos.") };
+  }
+
   let deliveryId: number;
 
   try {
@@ -83,7 +109,17 @@ export async function updateDocket(input: UpdateDocketInput) {
   }
 
   try {
-    await sendDocketEmail(docketId, result.data.photos, true);
+    await updateDocketPhotos(docketId, photos);
+  } catch (error) {
+    const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
+    const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
+    await removeDocketPhotos(photos.filter(photo => !existingBlobIds.has(photo.blobId)));
+    console.error("Failed to save docket photos", error);
+    return { success: false, error: getErrorMessage(error, "Unable to save docket photos.") };
+  }
+
+  try {
+    await sendDocketEmail(docketId, photos, true);
   } catch (error) {
     console.error("Failed to send docket email", error);
   }
@@ -95,7 +131,59 @@ export async function updateDocket(input: UpdateDocketInput) {
   redirect(`/dockets/${docketId}`);
 }
 
-async function sendDocketEmail(docketId: number, photos: File[], isUpdate: boolean = false) {
+async function saveDocketPhotos(docketId: number, photos: UploadedPhoto[]) {
+  if (photos.length === 0) return;
+
+  await makeRoomForPhotos(
+    photos.reduce((total, photo) => total + photo.size, 0),
+    photos.map(photo => photo.blobId)
+  );
+
+  await Promise.all(
+    photos.map(photo =>
+      db.orm.public.DocketPhoto.create({
+        docketId,
+        blobId: photo.blobId,
+        contentType: photo.contentType,
+        size: photo.size
+      })
+    )
+  );
+}
+
+async function updateDocketPhotos(docketId: number, photos: UploadedPhoto[]) {
+  const existingPhotos = await db.orm.public.DocketPhoto.where({ docketId, deleted: false }).all();
+  const existingBlobIds = new Set(existingPhotos.map(photo => photo.blobId));
+  const newPhotos = photos.filter(photo => !existingBlobIds.has(photo.blobId));
+  const removedPhotos = existingPhotos.filter(existing => !photos.some(photo => photo.blobId === existing.blobId));
+
+  if (newPhotos.length > 0) {
+    await makeRoomForPhotos(
+      newPhotos.reduce((total, photo) => total + photo.size, 0),
+      photos.map(photo => photo.blobId)
+    );
+  }
+
+  for (const photo of removedPhotos) {
+    await removeDocketPhotos([photo]);
+    await db.orm.public.DocketPhoto.where({ id: photo.id, deleted: false }).update({ deleted: true });
+  }
+
+  await db.transaction(async tx => {
+    await Promise.all(
+      newPhotos.map(photo =>
+        tx.orm.public.DocketPhoto.create({
+          docketId,
+          blobId: photo.blobId,
+          contentType: photo.contentType,
+          size: photo.size
+        })
+      )
+    );
+  });
+}
+
+async function sendDocketEmail(docketId: number, photos: UploadedPhoto[], isUpdate: boolean = false) {
   const docket = await db.orm.public.Docket.where({ id: docketId, deleted: false }).first();
   if (!docket) throw new Error(`Docket ${docketId} not found.`);
 
@@ -172,9 +260,9 @@ async function sendDocketEmail(docketId: number, photos: File[], isUpdate: boole
 
   const photoAttachments = await Promise.all(
     photos.map(async (photo, index) => ({
-      filename: `Docket-${docketNumber}-Photo-${index + 1}.${getPhotoExtension(photo.type)}`,
-      content: Buffer.from(await photo.arrayBuffer()),
-      contentType: photo.type
+      filename: `Docket-${docketNumber}-Photo-${index + 1}.${getPhotoExtension(photo.contentType)}`,
+      content: Buffer.from(await getPhotoBuffer(photo.blobId)),
+      contentType: photo.contentType
     }))
   );
 
@@ -203,4 +291,10 @@ async function sendDocketEmail(docketId: number, photos: File[], isUpdate: boole
   }
 
   await Promise.all(emailPromises);
+}
+
+async function getPhotoBuffer(blobId: string): Promise<ArrayBuffer> {
+  const blob = await get(blobId, { access: "private" });
+  if (!blob) throw new Error("Unable to retrieve photo (not found).");
+  return new Response(blob.stream).arrayBuffer();
 }

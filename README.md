@@ -96,3 +96,5 @@ Use the Prisma migration commands for schema changes and keep migrations in [`mi
 ## Deployment
 
 Build the application with `npm run build`, then serve it with `npm run start`. Configure `DATABASE_URL` in the deployment environment and ensure the target PostgreSQL instance is running PostgreSQL 15 or newer.
+
+Photo uploads use Vercel Blob. Configure `PHOTO_BLOB_STORE_ID`, `BLOB_READ_WRITE_TOKEN`, and `BLOB_CAPACITY` in the deployment environment. Images upload directly from the browser to Blob, so they do not pass through Vercel's Server Action request-size limit. When tracked photo usage reaches 90% of `BLOB_CAPACITY`, the oldest active photos are removed to make room.

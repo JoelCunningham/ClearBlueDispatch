@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'147df13b297e6b7dfc28b5de2d33ae5cae8d1bcd01a4707c31270f6567574152'>;
+  StorageHashBase<'96882ed6980909f83dd3cb3ac6e031798f0e432283c504bae3d8bf129e7bc127'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -282,6 +282,15 @@ export type FieldOutputTypes = {
       readonly repSignature: CodecTypes['pg/bytea@1']['output'];
       readonly volume: CodecTypes['pg/int4@1']['output'];
     };
+    readonly DocketPhoto: {
+      readonly blobId: CodecTypes['pg/text@1']['output'];
+      readonly contentType: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
+      readonly docketId: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly size: CodecTypes['pg/int4@1']['output'];
+    };
     readonly InvoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['output'];
       readonly deleted: CodecTypes['pg/bool@1']['output'];
@@ -348,6 +357,15 @@ export type FieldInputTypes = {
       readonly repName: CodecTypes['pg/text@1']['input'];
       readonly repSignature: CodecTypes['pg/bytea@1']['input'];
       readonly volume: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly DocketPhoto: {
+      readonly blobId: CodecTypes['pg/text@1']['input'];
+      readonly contentType: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
+      readonly docketId: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly size: CodecTypes['pg/int4@1']['input'];
     };
     readonly InvoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['input'];
@@ -416,6 +434,15 @@ export type StorageColumnTypes = {
       readonly repSignature: CodecTypes['pg/bytea@1']['output'];
       readonly volume: CodecTypes['pg/int4@1']['output'];
     };
+    readonly DocketPhoto: {
+      readonly blobId: CodecTypes['pg/text@1']['output'];
+      readonly contentType: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly deleted: CodecTypes['pg/bool@1']['output'];
+      readonly docketId: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly size: CodecTypes['pg/int4@1']['output'];
+    };
     readonly InvoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['output'];
       readonly deleted: CodecTypes['pg/bool@1']['output'];
@@ -482,6 +509,15 @@ export type StorageColumnInputTypes = {
       readonly repName: CodecTypes['pg/text@1']['input'];
       readonly repSignature: CodecTypes['pg/bytea@1']['input'];
       readonly volume: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly DocketPhoto: {
+      readonly blobId: CodecTypes['pg/text@1']['input'];
+      readonly contentType: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly deleted: CodecTypes['pg/bool@1']['input'];
+      readonly docketId: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly size: CodecTypes['pg/int4@1']['input'];
     };
     readonly InvoiceEmail: {
       readonly customerId: CodecTypes['pg/int4@1']['input'];
@@ -564,6 +600,17 @@ export namespace Models {
     delivery: public_Delivery;
     readonly [RelationKeys]?: 'delivery';
   };
+  export type public_DocketPhoto = {
+    blobId: CodecTypes['pg/text@1']['output'];
+    contentType: CodecTypes['pg/text@1']['output'];
+    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    deleted: CodecTypes['pg/bool@1']['output'];
+    docketId: CodecTypes['pg/int4@1']['output'];
+    id: CodecTypes['pg/int4@1']['output'];
+    size: CodecTypes['pg/int4@1']['output'];
+    docket: public_Docket;
+    readonly [RelationKeys]?: 'docket';
+  };
   export type public_InvoiceEmail = {
     customerId: CodecTypes['pg/int4@1']['output'];
     deleted: CodecTypes['pg/bool@1']['output'];
@@ -612,6 +659,7 @@ export declare const models: {
     Customer: Models.public_Customer;
     Delivery: Models.public_Delivery;
     Docket: Models.public_Docket;
+    DocketPhoto: Models.public_DocketPhoto;
     InvoiceEmail: Models.public_InvoiceEmail;
     Location: Models.public_Location;
     Route: Models.public_Route;
@@ -915,6 +963,78 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly DocketPhoto: {
+              columns: {
+                readonly blobId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly contentType: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly deleted: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly docketId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly id: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                };
+                readonly size: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'DocketPhoto_docketId_idx_087b8b64';
+                  readonly prefix: 'DocketPhoto_docketId_idx';
+                  readonly columns: readonly ['docketId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'DocketPhoto';
+                    readonly columns: readonly ['docketId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Docket';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly InvoiceEmail: {
               columns: {
                 readonly customerId: {
@@ -1172,6 +1292,10 @@ type ContractBase = Omit<
     readonly Customer: { readonly namespace: 'public' & NamespaceId; readonly model: 'Customer' };
     readonly Delivery: { readonly namespace: 'public' & NamespaceId; readonly model: 'Delivery' };
     readonly Docket: { readonly namespace: 'public' & NamespaceId; readonly model: 'Docket' };
+    readonly DocketPhoto: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'DocketPhoto';
+    };
     readonly InvoiceEmail: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'InvoiceEmail';
@@ -1470,6 +1594,68 @@ type ContractBase = Omit<
                 readonly repName: { readonly column: 'repName' };
                 readonly repSignature: { readonly column: 'repSignature' };
                 readonly volume: { readonly column: 'volume' };
+              };
+            };
+          };
+          readonly DocketPhoto: {
+            readonly fields: {
+              readonly blobId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly contentType: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly deleted: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly docketId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly size: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly docket: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Docket';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['docketId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'DocketPhoto';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly blobId: { readonly column: 'blobId' };
+                readonly contentType: { readonly column: 'contentType' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly deleted: { readonly column: 'deleted' };
+                readonly docketId: { readonly column: 'docketId' };
+                readonly id: { readonly column: 'id' };
+                readonly size: { readonly column: 'size' };
               };
             };
           };

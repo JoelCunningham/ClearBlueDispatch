@@ -114,3 +114,16 @@ model InvoiceEmail {
   emailAddress String
   deleted      Boolean  @default(false)
 }
+
+model DocketPhoto {
+  id          Int      @id @default(autoincrement())
+
+  docket      Docket   @relation(fields:[docketId], references:[id])
+  docketId    Int
+
+  blobId      String
+  contentType String
+  size        Int
+  deleted     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}

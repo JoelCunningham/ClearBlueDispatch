@@ -27,7 +27,12 @@ export default async function CreateDocketPage({ params }: DocketPageProps) {
   return (
     <Page>
       <Heading title="Create docket" backFallback={`/deliveries/${deliveryIdNumber}`} />
-      <DocketForm date={dateToLongYearFormat(delivery.date)} customerName={customerName} action={submitDocket} />
+      <DocketForm
+        uploadTarget={{ deliveryId: deliveryIdNumber }}
+        date={dateToLongYearFormat(delivery.date)}
+        customerName={customerName}
+        action={submitDocket}
+      />
     </Page>
   );
 }

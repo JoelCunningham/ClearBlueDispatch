@@ -2,7 +2,7 @@ import DocketForm from "@/components/forms/docket-form";
 import Heading from "@/components/wrappers/heading";
 import Page from "@/components/wrappers/page";
 import { updateDocket } from "@/features/dockets/actions";
-import { getDocket } from "@/features/dockets/queries";
+import { getDocket, getDocketPhotoPreviews } from "@/features/dockets/queries";
 import { DocketFormInput } from "@/features/dockets/types";
 import { requireRole } from "@/lib/auth/authorization";
 import { dateToLongYearFormat } from "@/lib/utils/date-utils";
@@ -19,6 +19,7 @@ export default async function EditDocketPage({ params }: EditDocketPageProps) {
 
   const docketIdNumber = idOrNotFound(docketId);
   const docket = valueOrNotFound(await getDocket(docketIdNumber));
+  const photoPreviews = await getDocketPhotoPreviews(docket.id);
 
   async function submitDocket(input: DocketFormInput) {
     "use server";
@@ -29,6 +30,7 @@ export default async function EditDocketPage({ params }: EditDocketPageProps) {
     <Page>
       <Heading title={`Edit Docket #${docket.id}`} backFallback={`/dockets/${docket.id}`} />
       <DocketForm
+        uploadTarget={{ docketId: docket.id }}
         number={docket.id}
         date={dateToLongYearFormat(docket.date)}
         customerName={docket.customerName}
@@ -36,6 +38,7 @@ export default async function EditDocketPage({ params }: EditDocketPageProps) {
         batchNumber={docket.batchNumber}
         repName={docket.repName}
         repSignature={undefined}
+        initialPhotos={photoPreviews}
         action={submitDocket}
       />
     </Page>

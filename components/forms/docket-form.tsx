@@ -5,10 +5,11 @@ import BasicInput from "@/components/inputs/basic-input";
 import PhotoInput from "@/components/inputs/photo-input";
 import SignatureInput from "@/components/inputs/signature-input";
 import LineItem from "@/components/wrappers/line-item";
-import { DocketFormInput } from "@/features/dockets/types";
+import { DocketFormInput, DocketPhotoPreview, UploadedPhoto } from "@/features/dockets/types";
 import { ActionResult } from "@/lib/utils/action-utils";
 
 type DocketFormProps = {
+  uploadTarget: { deliveryId?: number; docketId?: number };
   number?: number;
   date: string;
   customerName: string;
@@ -17,10 +18,12 @@ type DocketFormProps = {
   comments?: string;
   repName?: string;
   repSignature?: string;
+  initialPhotos?: DocketPhotoPreview[];
   action: (input: DocketFormInput) => Promise<ActionResult>;
 };
 
 export default function DocketForm({
+  uploadTarget,
   number,
   date,
   customerName,
@@ -29,16 +32,49 @@ export default function DocketForm({
   batchNumber,
   comments,
   repName,
-  repSignature
+  repSignature,
+  initialPhotos = []
 }: DocketFormProps) {
   async function handleAction(formData: FormData) {
+    const files = formData.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0);
+    const existingPhotos = formData
+      .getAll("photos-existing")
+      .map(value => JSON.parse(String(value)) as UploadedPhoto);
+    const newPhotos: UploadedPhoto[] = await Promise.all(
+      files.map(async file => {
+        const response = await fetch("/api/photos/upload", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ ...uploadTarget, contentType: file.type, size: file.size })
+        });
+        const uploadAuthorization = (await response.json()) as { url?: string; error?: string };
+        if (!response.ok || !uploadAuthorization.url) {
+          throw new Error(uploadAuthorization.error ?? "Unable to authorize photo upload.");
+        }
+
+        const { url } = uploadAuthorization;
+        const uploadResponse = await fetch(url, {
+          method: "PUT",
+          headers: {
+            "content-type": file.type,
+            "x-vercel-blob-access": "private"
+          },
+          body: file
+        });
+        if (!uploadResponse.ok) throw new Error(`Photo upload failed (${uploadResponse.status}).`);
+        const blob = (await uploadResponse.json()) as { url: string };
+
+        return { blobId: blob.url, contentType: file.type, size: file.size };
+      })
+    );
+
     const input: DocketFormInput = {
       volume: Number(formData.get("volume") ?? 0),
       batchNumber: String(formData.get("batchNumber") ?? ""),
       comments: String(formData.get("comments") ?? ""),
       repName: String(formData.get("repName") ?? ""),
       repSignature: String(formData.get("repSignature") ?? ""),
-      photos: formData.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0)
+      photos: [...existingPhotos, ...newPhotos]
     };
 
     return action(input);
@@ -55,7 +91,7 @@ export default function DocketForm({
       <BasicInput type="text" id="comments" label="Comments" initial={comments} />
       <BasicInput type="text" id="repName" label="Name" initial={repName} />
       <SignatureInput id="repSignature" label="Signature" initial={repSignature} />
-      <PhotoInput id="photos" maxPhotos={5} maxSizeMb={5} />
+      <PhotoInput id="photos" maxPhotos={5} maxSizeMb={5} initialPhotos={initialPhotos} />
     </BaseForm>
   );
 }
