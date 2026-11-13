@@ -1,12 +1,13 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import ErrorAlert from "@/components/alerts/error-alert";
 import PrimaryButton from "@/components/buttons/primary-button";
 import { useFormFieldErrors } from "@/components/forms/base-form";
 import Input from "@/components/wrappers/input";
+import { compressPhoto } from "@/lib/utils/compression-utils";
 
 type PhotoInputProps = {
   id: string;
@@ -20,16 +21,20 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
   const errorId = `${id}-error`;
   const [photos, setPhotos] = useState<File[]>([]);
   const [error, setError] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    return () => {
-      photos.forEach(photo => URL.revokeObjectURL(URL.createObjectURL(photo)));
-    };
-  }, [photos]);
+  function syncInputFiles(files: File[]) {
+    const input = inputRef.current;
+    if (!input) return;
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const transfer = new DataTransfer();
+    files.forEach(file => transfer.items.add(file));
+    input.files = transfer.files;
+  }
+
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget;
     const selected = Array.from(input.files ?? []);
 
@@ -38,6 +43,7 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
     const next = [...photos, ...selected];
     if (next.length > maxPhotos) {
       setError(`You can attach up to ${maxPhotos} photos.`);
+      syncInputFiles(photos);
       return;
     }
 
@@ -46,27 +52,29 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
 
     if (invalid) {
       setError(`Each photo must be an image no larger than ${maxSizeMb} MB.`);
+      syncInputFiles(photos);
       return;
     }
 
-    setPhotos(next);
+    setIsProcessing(true);
     setError("");
 
-    const transfer = new DataTransfer();
-    next.forEach(photo => transfer.items.add(photo));
-    input.files = transfer.files;
+    try {
+      const compressed = await Promise.all(selected.map(compressPhoto));
+      const updatedPhotos = [...photos, ...compressed];
+      setPhotos(updatedPhotos);
+      syncInputFiles(updatedPhotos);
+    } catch (compressionError) {
+      setError(compressionError instanceof Error ? compressionError.message : "Unable to prepare the photos for upload.");
+      syncInputFiles(photos);
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   function removePhoto(index: number) {
     const remaining = photos.filter((_, i) => i !== index);
-    const input = inputRef.current;
-
-    if (input) {
-      const transfer = new DataTransfer();
-      remaining.forEach(photo => transfer.items.add(photo));
-      input.files = transfer.files;
-    }
-
+    syncInputFiles(remaining);
     setPhotos(remaining);
     setError("");
   }
@@ -81,7 +89,7 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
           type="file"
           accept="image/*;capture=camera"
           multiple
-          disabled={disabled}
+          disabled={disabled || isProcessing}
           onChange={handleChange}
           aria-invalid={fieldErrors.length > 0}
           aria-describedby={fieldErrors.length > 0 ? errorId : undefined}
@@ -114,7 +122,11 @@ export default function PhotoInput({ id, maxPhotos, maxSizeMb, disabled = false 
           );
         })}
 
-        <PrimaryButton text="Add photos" onClick={() => inputRef.current?.click()} />
+        <PrimaryButton
+          text={isProcessing ? "Processing photos..." : "Add photos"}
+          onClick={() => inputRef.current?.click()}
+          disabled={disabled || isProcessing}
+        />
 
         {error && <ErrorAlert text={error} />}
       </div>
