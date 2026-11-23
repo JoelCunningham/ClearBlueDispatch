@@ -10,6 +10,7 @@ import Page from "@/components/wrappers/page";
 import { LoginUserInput } from "@/features/login/types";
 import { checkUser } from "@/lib/auth/authorization";
 import { getSafeCallbackUrl } from "@/lib/utils/url-utils";
+import { logError, logServerEvent } from "@/lib/utils/logger";
 
 type LoginPageProps = {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
@@ -29,8 +30,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       return { success: true };
     } catch (error) {
       if (error instanceof AuthError) {
+        logServerEvent("warn", "auth.login_action_rejected", { reason: "auth_error", authErrorType: error.type });
         return { success: false, error: "Invalid email or password." };
       }
+      logError("auth.login_action_failed", error);
       throw error;
     }
   }
