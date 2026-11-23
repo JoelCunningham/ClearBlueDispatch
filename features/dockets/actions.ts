@@ -16,10 +16,12 @@ import { getPhotoExtension } from "@/lib/utils/photo-utils";
 import { getDocketNumber } from "@/lib/utils/string-utils";
 import { getLogoBuffer, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
+import { logError, logServerEvent } from "@/lib/utils/logger";
 import { CreateDocketInput, UpdateDocketInput } from "./types";
 import { createDocketSchema, updateDocketSchema } from "./validation";
 
 export async function createDocket(input: CreateDocketInput) {
+  const startedAt = Date.now();
   const result = createDocketSchema.safeParse(input);
   if (!result.success) return getValidationResult(result.error, "Invalid docket details.");
 
@@ -42,14 +44,21 @@ export async function createDocket(input: CreateDocketInput) {
       const docket = await tx.orm.public.Docket.create({ deliveryId, volume, batchNumber, comments, repName, repSignature: signature });
       return docket.id;
     });
+    logServerEvent("info", "docket.created", {
+      docketId,
+      deliveryId,
+      photoCount: result.data.photos.length,
+      durationMs: Date.now() - startedAt
+    });
   } catch (error) {
+    logError("docket.create_failed", error, { deliveryId, durationMs: Date.now() - startedAt });
     return { success: false, error: getErrorMessage(error, "Unable to create docket.") };
   }
 
   try {
     await sendDocketEmail(docketId, result.data.photos);
   } catch (error) {
-    console.error("Failed to send docket email", error);
+    logError("docket.create_email_failed", error, { docketId, deliveryId });
   }
 
   revalidatePath(`/deliveries/${deliveryId}`);
@@ -57,6 +66,7 @@ export async function createDocket(input: CreateDocketInput) {
 }
 
 export async function updateDocket(input: UpdateDocketInput) {
+  const startedAt = Date.now();
   await requireRole("MANAGER");
 
   const result = updateDocketSchema.safeParse(input);
@@ -78,14 +88,21 @@ export async function updateDocket(input: UpdateDocketInput) {
       await tx.orm.public.Docket.where({ id: docketId }).update({ volume, batchNumber, comments, repName, repSignature: signature });
       return docket.deliveryId;
     });
+    logServerEvent("info", "docket.updated", {
+      docketId,
+      deliveryId,
+      photoCount: result.data.photos.length,
+      durationMs: Date.now() - startedAt
+    });
   } catch (error) {
+    logError("docket.update_failed", error, { docketId, durationMs: Date.now() - startedAt });
     return { success: false, error: getErrorMessage(error, "Unable to update docket.") };
   }
 
   try {
     await sendDocketEmail(docketId, result.data.photos, true);
   } catch (error) {
-    console.error("Failed to send docket email", error);
+    logError("docket.update_email_failed", error, { docketId, deliveryId });
   }
 
   revalidatePath(`/dockets/${docketId}`);

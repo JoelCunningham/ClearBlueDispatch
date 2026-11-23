@@ -19,9 +19,11 @@ import { getValidationResult } from "@/lib/utils/action-utils";
 import { getFuture } from "@/lib/utils/date-utils";
 import { getLoginUrl, getLogoUrl } from "@/lib/utils/url-utils";
 import { db } from "@/prisma/db";
+import { logError, logServerEvent } from "@/lib/utils/logger";
 import { ChangeOwnPasswordInput, CreateUserInput, ResetUserPasswordInput, UpdateOwnProfileInput, UpdateUserInput } from "./types";
 
 export async function createUser(input: CreateUserInput) {
+  const startedAt = Date.now();
   await requireRole("MANAGER");
 
   const result = createUserSchema.safeParse(input);
@@ -38,11 +40,12 @@ export async function createUser(input: CreateUserInput) {
   const loginTokenExpiry = getFuture(2);
 
   const newUser = await db.orm.public.User.create({ name, email: trimmedEmail, role, loginTokenHash, loginTokenExpiry, sessionVersion: 1 });
+  logServerEvent("info", "user.created", { userId: newUser.id, role: newUser.role, durationMs: Date.now() - startedAt });
 
   try {
     await sendNewUserEmail(newUser.name, newUser.email, token);
   } catch (error) {
-    console.error("Failed to send new user email:", error);
+    logError("user.create_email_failed", error, { userId: newUser.id });
   }
 
   revalidatePath("/users");

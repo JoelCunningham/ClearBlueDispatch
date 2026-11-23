@@ -32,6 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ServiceWorkerRegistration />
         <ServiceWorkerUpdate />
         <NetworkStatus />
+        {process.env.VERCEL_ENV === "preview" && (
+          <div className="shrink-0 bg-caution px-3 py-1 text-center text-xs font-semibold text-foreground">Preview site only. Not live</div>
+        )}
         <main className="flex-1 overflow-y-auto">{children}</main>
         <NavigationContainer />
       </body>

@@ -1,4 +1,7 @@
+import { NextResponse } from "next/server";
+
 import { auth } from "@/auth";
+import { logServerEvent } from "@/lib/utils/logger";
 
 export default auth(request => {
   const isProtectedRoute =
@@ -11,9 +14,19 @@ export default auth(request => {
     request.nextUrl.pathname.startsWith("/users");
 
   if (isProtectedRoute && !request.auth) {
+    const requestId = crypto.randomUUID();
+    logServerEvent("warn", "auth.protected_route_denied", {
+      requestId,
+      method: request.method,
+      path: request.nextUrl.pathname,
+      reason: "no_session"
+    });
+
     const loginUrl = new URL("/login", request.nextUrl.origin);
     loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname + request.nextUrl.search);
 
-    return Response.redirect(loginUrl);
+    const response = NextResponse.redirect(loginUrl);
+    response.headers.set("x-request-id", requestId);
+    return response;
   }
 });
