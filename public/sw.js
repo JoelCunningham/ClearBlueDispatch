@@ -1,4 +1,4 @@
-const CACHE_NAME = "clear-blue-dispatch-v4";
+const CACHE_NAME = "clear-blue-dispatch-v5";
 const STATIC_ASSETS = ["/", "/icons/logo-192.png", "/icons/logo-512.png", "/icons/logo-square.png"];
 
 self.addEventListener("install", event => {
